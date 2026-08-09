@@ -14,7 +14,7 @@ v5 執行檔名稱為 `WeatherToolsV5.exe`，不需要 ClickOnce、setup.exe、A
 
 - 風速、蒲福風級、溫度、氣壓與簡化浪高換算。
 - NHC、HKO、CWA 的 Dvorak Final-T／T、CI、風速與中心氣壓對照。
-- AMSU research 衛星自動分析報文的 DVTS 解析，可讀取 T、CI、趨勢與分析中心。
+- AMSU research 衛星自動分析報文的 DVTS 解析，可開啟 `.txt`／`.dat` 檔案或貼上內容，讀取 T、CI、趨勢與分析中心。
 - `ATCF路徑解析`：讀取或貼上 ATCF Best Track `b*.dat`，分析時間、位置、VMAX、MSLP、分級、風圈與完整欄位。
 - 延續早期版本的 `icon.ico` 作為 v5 執行檔與主視窗圖示。
 

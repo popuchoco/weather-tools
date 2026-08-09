@@ -45,6 +45,7 @@ Public Class MainForm
         Private ReadOnly dvtsGrid As New DataGridView()
         Private ReadOnly lblDvtsInfo As New Label()
         Private ReadOnly parsedDvtsRecords As New List(Of DvtsRecord)()
+        Private dvtsSourceFileName As String = ""
 
         Private ReadOnly txtAtcf As New TextBox()
         Private ReadOnly atcfGrid As New DataGridView()
@@ -282,13 +283,16 @@ Public Class MainForm
             buttonPanel.FlowDirection = FlowDirection.LeftToRight
             buttonPanel.WrapContents = False
             buttonPanel.Padding = New Padding(2, 5, 2, 2)
+            Dim openButton As Button = CreateButton("開啟 DVTS 檔案")
+            AddHandler openButton.Click, AddressOf OpenDvtsButtonClick
+            buttonPanel.Controls.Add(openButton)
             Dim parseButton As Button = CreateButton("解析 DVTS")
             AddHandler parseButton.Click, AddressOf ParseDvtsButtonClick
             buttonPanel.Controls.Add(parseButton)
             Dim importButton As Button = CreateButton("帶入選取資料")
             AddHandler importButton.Click, AddressOf ImportDvtsButtonClick
             buttonPanel.Controls.Add(importButton)
-            lblDvtsInfo.Text = "可貼上多行 DVTS；解析後選取一筆，再帶入 Dvorak 對照表。"
+            lblDvtsInfo.Text = "可開啟 .txt／.dat 或貼上多行 DVTS；解析後選取一筆，再帶入 Dvorak 對照表。"
             lblDvtsInfo.AutoSize = True
             lblDvtsInfo.ForeColor = Color.FromArgb(82, 104, 123)
             lblDvtsInfo.Margin = New Padding(14, 8, 3, 0)
@@ -338,6 +342,19 @@ Public Class MainForm
             layout.Controls.Add(note, 0, 3)
             Return page
         End Function
+
+        Private Sub OpenDvtsButtonClick(sender As Object, e As EventArgs)
+            Using dialog As New OpenFileDialog()
+                dialog.Filter = "DVTS files (*.txt;*.dat)|*.txt;*.dat|All files (*.*)|*.*"
+                dialog.Title = "開啟 DVTS 報文檔案"
+                If dialog.ShowDialog(Me) <> DialogResult.OK Then Return
+
+                dvtsSourceFileName = dialog.FileName
+                txtDvts.Text = File.ReadAllText(dialog.FileName, System.Text.Encoding.ASCII)
+                lblDvtsInfo.Text = Path.GetFileName(dialog.FileName) & " 已載入；請按「解析 DVTS」。"
+                SetStatus("DVTS 檔案已載入")
+            End Using
+        End Sub
 
         Private Function BuildAtcfTab() As TabPage
             Dim page As New TabPage("ATCF路徑解析")
@@ -1125,7 +1142,8 @@ Public Class MainForm
             End If
 
             Dim warningText As String = If(warnings.Count = 0, "", String.Format("；另有 {0} 行未解析", warnings.Count))
-            lblDvtsInfo.Text = String.Format("已解析 {0} 筆 DVTS{1}；選取資料後按「帶入選取資料」。", records.Count, warningText)
+            Dim sourceText As String = If(String.IsNullOrEmpty(dvtsSourceFileName), "貼上內容", Path.GetFileName(dvtsSourceFileName))
+            lblDvtsInfo.Text = String.Format("{0}：已解析 {1} 筆 DVTS{2}；選取資料後按「帶入選取資料」。", sourceText, records.Count, warningText)
             dvtsGrid.Rows(0).Selected = True
             SetStatus("DVTS 解析完成")
         End Sub

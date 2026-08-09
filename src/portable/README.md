@@ -16,7 +16,7 @@ v5 沿用早期版本提供的 `icon.ico`，並將它設定為執行檔與主視
 - NHC、HKO、CWA 的 Dvorak 風速與中心氣壓對照
 - 以顏色帶協助初學者理解熱帶氣旋強度變化
 - Dvorak 的 CSC、DT、MET、PT、FT、CI 入門流程
-- 多行 DVTS 報文貼上、T／CI／趨勢解析
+- DVTS `.txt`／`.dat` 檔案開啟或多行報文貼上、T／CI／趨勢解析
 - 發報中心代碼與機構名稱對照（例如 RCTP、KNES、PGTW、RJTD）
 - 將選取 DVTS 的實際 CI 帶入 NHC、HKO、CWA 對照表
 - ATCF 路徑資料（例如 `bwp132026.dat`）檔案開啟、貼上與完整欄位解讀
@@ -71,7 +71,7 @@ v5 可在「ATCF路徑解析」分頁讀取或貼上以下來源目錄中的最�
 
 ## DVTS 報文
 
-v5 接受 AMSU research 使用的衛星自動分析報文格式：
+v5 可開啟 DVTS `.txt`／`.dat` 檔案，也接受 AMSU research 使用的衛星自動分析報文格式貼上：
 
 ```text
 WP 01 202408081200 DVTS 1350N 14200E 80.0 5050 S0000 PGTW
