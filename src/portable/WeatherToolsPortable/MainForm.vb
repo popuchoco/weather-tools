@@ -44,6 +44,8 @@ Public Class MainForm
         Private ReadOnly txtDvts As New TextBox()
         Private ReadOnly dvtsGrid As New DataGridView()
         Private ReadOnly lblDvtsInfo As New Label()
+        Private ReadOnly dvtsCenterSelector As New ComboBox()
+        Private ReadOnly lblDvtsFilterInfo As New Label()
         Private ReadOnly parsedDvtsRecords As New List(Of DvtsRecord)()
         Private dvtsSourceFileName As String = ""
 
@@ -58,6 +60,20 @@ Public Class MainForm
             "無風", "輕風", "微風", "和風", "輕勁風", "清勁風", "強風",
             "疾風", "大風", "烈風", "狂風", "暴風", "颶風"
         }
+
+        Private Class DvtsCenterOption
+            Public ReadOnly Code As String
+            Public ReadOnly DisplayText As String
+
+            Public Sub New(code As String, displayText As String)
+                Me.Code = code
+                Me.DisplayText = displayText
+            End Sub
+
+            Public Overrides Function ToString() As String
+                Return DisplayText
+            End Function
+        End Class
 
         Public Sub New()
             Text = "氣象小工具 2026 Ver."
@@ -261,9 +277,10 @@ Public Class MainForm
             layout.Dock = DockStyle.Fill
             layout.Padding = New Padding(16)
             layout.ColumnCount = 1
-            layout.RowCount = 4
+            layout.RowCount = 5
             layout.RowStyles.Add(New RowStyle(SizeType.Absolute, 140.0F))
             layout.RowStyles.Add(New RowStyle(SizeType.Absolute, 68.0F))
+            layout.RowStyles.Add(New RowStyle(SizeType.Absolute, 44.0F))
             layout.RowStyles.Add(New RowStyle(SizeType.Percent, 100.0F))
             layout.RowStyles.Add(New RowStyle(SizeType.Absolute, 60.0F))
             page.Controls.Add(layout)
@@ -303,6 +320,25 @@ Public Class MainForm
             buttonPanel.Controls.Add(lblDvtsInfo)
             layout.Controls.Add(buttonPanel, 0, 1)
 
+            Dim centerFilterPanel As New FlowLayoutPanel()
+            centerFilterPanel.Dock = DockStyle.Fill
+            centerFilterPanel.FlowDirection = FlowDirection.LeftToRight
+            centerFilterPanel.WrapContents = False
+            centerFilterPanel.Padding = New Padding(2, 5, 2, 2)
+            centerFilterPanel.Controls.Add(New Label With {.Text = "中心篩選", .AutoSize = True, .Margin = New Padding(3, 7, 8, 0)})
+            dvtsCenterSelector.DropDownStyle = ComboBoxStyle.DropDownList
+            dvtsCenterSelector.Width = 310
+            dvtsCenterSelector.Margin = New Padding(2, 3, 12, 0)
+            AddHandler dvtsCenterSelector.SelectedIndexChanged, AddressOf DvtsCenterSelectorChanged
+            dvtsCenterSelector.Items.Add(New DvtsCenterOption("", "全部中心"))
+            dvtsCenterSelector.SelectedIndex = 0
+            centerFilterPanel.Controls.Add(dvtsCenterSelector)
+            lblDvtsFilterInfo.AutoSize = True
+            lblDvtsFilterInfo.ForeColor = Color.FromArgb(82, 104, 123)
+            lblDvtsFilterInfo.Margin = New Padding(3, 8, 3, 0)
+            centerFilterPanel.Controls.Add(lblDvtsFilterInfo)
+            layout.Controls.Add(centerFilterPanel, 0, 2)
+
             dvtsGrid.Dock = DockStyle.Fill
             dvtsGrid.AllowUserToAddRows = False
             dvtsGrid.AllowUserToDeleteRows = False
@@ -338,12 +374,12 @@ Public Class MainForm
             For Each column As DataGridViewColumn In dvtsGrid.Columns
                 column.SortMode = DataGridViewColumnSortMode.NotSortable
             Next
-            layout.Controls.Add(dvtsGrid, 0, 2)
+            layout.Controls.Add(dvtsGrid, 0, 3)
 
             Dim note As Label = CreateNote("DVTS 格式：海域 編號 YYYYMMDDHHMM DVTS 緯度 經度 風速(kt) TCI 趨勢 發報中心；TCI 例如 5050 代表 T5.0／CI5.0，趨勢例如 W1050 代表過去 50 小時減弱 1.0。")
             note.Dock = DockStyle.Fill
             note.MaximumSize = New Size(0, 0)
-            layout.Controls.Add(note, 0, 3)
+            layout.Controls.Add(note, 0, 4)
             Return page
         End Function
 
@@ -369,6 +405,76 @@ Public Class MainForm
             Using trendForm As New DvtsTrendForm(parsedDvtsRecords)
                 trendForm.ShowDialog(Me)
             End Using
+        End Sub
+
+        Private Sub DvtsCenterSelectorChanged(sender As Object, e As EventArgs)
+            ApplyDvtsCenterFilter()
+        End Sub
+
+        Private Sub PopulateDvtsCenterSelector(records As IEnumerable(Of DvtsRecord))
+            Dim selectedCode As String = GetSelectedDvtsCenterCode()
+            dvtsCenterSelector.Items.Clear()
+            dvtsCenterSelector.Items.Add(New DvtsCenterOption("", "全部中心"))
+
+            Dim centers As New SortedDictionary(Of String, String)(StringComparer.OrdinalIgnoreCase)
+            If records IsNot Nothing Then
+                For Each record As DvtsRecord In records
+                    If Not centers.ContainsKey(record.Center) Then centers.Add(record.Center, record.AgencyName)
+                Next
+            End If
+
+            For Each item As KeyValuePair(Of String, String) In centers
+                dvtsCenterSelector.Items.Add(New DvtsCenterOption(item.Key, item.Key & " — " & item.Value))
+            Next
+
+            Dim selectedIndex As Integer = 0
+            For i As Integer = 0 To dvtsCenterSelector.Items.Count - 1
+                Dim optionItem As DvtsCenterOption = TryCast(dvtsCenterSelector.Items(i), DvtsCenterOption)
+                If optionItem IsNot Nothing AndAlso String.Equals(optionItem.Code, selectedCode, StringComparison.OrdinalIgnoreCase) Then
+                    selectedIndex = i
+                    Exit For
+                End If
+            Next
+            dvtsCenterSelector.SelectedIndex = selectedIndex
+        End Sub
+
+        Private Function GetSelectedDvtsCenterCode() As String
+            Dim optionItem As DvtsCenterOption = TryCast(dvtsCenterSelector.SelectedItem, DvtsCenterOption)
+            If optionItem Is Nothing Then Return ""
+            Return optionItem.Code
+        End Function
+
+        Private Sub ApplyDvtsCenterFilter()
+            dvtsGrid.Rows.Clear()
+            Dim selectedCode As String = GetSelectedDvtsCenterCode()
+            Dim visibleCount As Integer = 0
+
+            For Each record As DvtsRecord In parsedDvtsRecords
+                If String.IsNullOrEmpty(selectedCode) OrElse String.Equals(record.Center, selectedCode, StringComparison.OrdinalIgnoreCase) Then
+                    AddDvtsGridRow(record)
+                    visibleCount += 1
+                End If
+            Next
+
+            Dim filterText As String = If(String.IsNullOrEmpty(selectedCode), "全部中心", selectedCode)
+            lblDvtsFilterInfo.Text = String.Format("{0}：顯示 {1}／{2} 筆", filterText, visibleCount, parsedDvtsRecords.Count)
+            If dvtsGrid.Rows.Count > 0 Then dvtsGrid.Rows(0).Selected = True
+        End Sub
+
+        Private Sub AddDvtsGridRow(record As DvtsRecord)
+            Dim tText As String = If(record.HasTNumber, record.TNumber.ToString("0.0"), "—")
+            Dim ciText As String = If(record.HasCINumber, record.CINumber.ToString("0.0"), "—")
+            Dim trendText As String = DvtsTrendText(record)
+            Dim rowIndex As Integer = dvtsGrid.Rows.Add(
+                record.Center,
+                record.AgencyName,
+                record.AnalysisTimeUtc.ToString("yyyy-MM-dd HH:mm"),
+                FormatCoordinate(record.Latitude, True) & " " & FormatCoordinate(record.Longitude, False),
+                record.WindKnots.ToString("0.0") & " kt",
+                tText,
+                ciText,
+                trendText)
+            dvtsGrid.Rows(rowIndex).Tag = record
         End Sub
 
         Private Function BuildAtcfTab() As TabPage
@@ -1133,22 +1239,8 @@ Public Class MainForm
             Dim records As List(Of DvtsRecord) = DvtsParser.Parse(txtDvts.Text, warnings)
             parsedDvtsRecords.Clear()
             parsedDvtsRecords.AddRange(records)
-            dvtsGrid.Rows.Clear()
-
-            For Each record As DvtsRecord In records
-                Dim tText As String = If(record.HasTNumber, record.TNumber.ToString("0.0"), "—")
-                Dim ciText As String = If(record.HasCINumber, record.CINumber.ToString("0.0"), "—")
-                Dim trendText As String = DvtsTrendText(record)
-                dvtsGrid.Rows.Add(
-                    record.Center,
-                    record.AgencyName,
-                    record.AnalysisTimeUtc.ToString("yyyy-MM-dd HH:mm"),
-                    FormatCoordinate(record.Latitude, True) & " " & FormatCoordinate(record.Longitude, False),
-                    record.WindKnots.ToString("0.0") & " kt",
-                    tText,
-                    ciText,
-                    trendText)
-            Next
+            PopulateDvtsCenterSelector(records)
+            ApplyDvtsCenterFilter()
 
             If records.Count = 0 Then
                 lblDvtsInfo.Text = "沒有解析到有效 DVTS。請確認每行都符合 DVTS 格式。"
@@ -1169,14 +1261,14 @@ Public Class MainForm
                 Return
             End If
 
-            Dim index As Integer = 0
-            If dvtsGrid.SelectedRows.Count > 0 Then index = dvtsGrid.SelectedRows(0).Index
-            If index < 0 OrElse index >= parsedDvtsRecords.Count Then
+            Dim record As DvtsRecord = Nothing
+            If dvtsGrid.SelectedRows.Count > 0 Then
+                record = TryCast(dvtsGrid.SelectedRows(0).Tag, DvtsRecord)
+            End If
+            If record Is Nothing Then
                 ShowError("找不到選取的 DVTS 資料。")
                 Return
             End If
-
-            Dim record As DvtsRecord = parsedDvtsRecords(index)
             If Not record.HasTNumber Then
                 ShowError("這筆 DVTS 沒有提供 T／CI，無法帶入 Dvorak 對照表。")
                 Return

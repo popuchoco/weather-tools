@@ -14,6 +14,7 @@ Public Class DvtsTrendForm
 
     Private ReadOnly sourceRecords As New List(Of DvtsRecord)()
     Private ReadOnly agencySelector As New ComboBox()
+    Private ReadOnly valueSelector As New ComboBox()
     Private ReadOnly trendChart As New Chart()
     Private ReadOnly summaryLabel As New Label()
 
@@ -23,6 +24,20 @@ Public Class DvtsTrendForm
 
         Public Sub New(code As String, displayText As String)
             Me.Code = code
+            Me.DisplayText = displayText
+        End Sub
+
+        Public Overrides Function ToString() As String
+            Return DisplayText
+        End Function
+    End Class
+
+    Private Class ValueOption
+        Public ReadOnly Mode As String
+        Public ReadOnly DisplayText As String
+
+        Public Sub New(mode As String, displayText As String)
+            Me.Mode = mode
             Me.DisplayText = displayText
         End Sub
 
@@ -78,6 +93,16 @@ Public Class DvtsTrendForm
         AddHandler agencySelector.SelectedIndexChanged, AddressOf AgencySelectorChanged
         filterPanel.Controls.Add(agencySelector)
 
+        filterPanel.Controls.Add(New Label With {.Text = "顯示", .AutoSize = True, .Margin = New Padding(0, 7, 6, 0)})
+        valueSelector.DropDownStyle = ComboBoxStyle.DropDownList
+        valueSelector.Width = 100
+        valueSelector.Margin = New Padding(2, 3, 12, 0)
+        AddHandler valueSelector.SelectedIndexChanged, AddressOf ValueSelectorChanged
+        valueSelector.Items.Add(New ValueOption("ALL", "T／CI"))
+        valueSelector.Items.Add(New ValueOption("T", "只看 T"))
+        valueSelector.Items.Add(New ValueOption("CI", "只看 CI"))
+        filterPanel.Controls.Add(valueSelector)
+
         Dim resetButton As Button = CreateButton("重設縮放")
         AddHandler resetButton.Click, AddressOf ResetZoomButtonClick
         filterPanel.Controls.Add(resetButton)
@@ -93,6 +118,7 @@ Public Class DvtsTrendForm
         root.Controls.Add(filterPanel, 0, 0)
 
         ConfigureChart()
+        valueSelector.SelectedIndex = 0
         root.Controls.Add(trendChart, 0, 1)
 
         Dim note As New Label()
@@ -142,8 +168,18 @@ Public Class DvtsTrendForm
         Dim legend As New Legend("DVTS Legend")
         legend.Docking = Docking.Top
         legend.Alignment = StringAlignment.Center
+        legend.TableStyle = LegendTableStyle.Wide
         legend.Font = New Font("Microsoft JhengHei", 9.0F, FontStyle.Regular)
         trendChart.Legends.Add(legend)
+
+        Dim cycloneTitle As New Title()
+        cycloneTitle.Name = "CycloneIdentifier"
+        cycloneTitle.Text = "氣旋編號：—"
+        cycloneTitle.Docking = Docking.Top
+        cycloneTitle.Alignment = ContentAlignment.TopRight
+        cycloneTitle.Font = New Font("Microsoft JhengHei", 10.0F, FontStyle.Bold)
+        cycloneTitle.ForeColor = Color.FromArgb(28, 53, 78)
+        trendChart.Titles.Add(cycloneTitle)
     End Sub
 
     Private Sub PopulateAgencySelector()
@@ -166,10 +202,25 @@ Public Class DvtsTrendForm
         RefreshChart()
     End Sub
 
+    Private Sub ValueSelectorChanged(sender As Object, e As EventArgs)
+        RefreshChart()
+    End Sub
+
+    Private Function GetSelectedValueMode() As String
+        Dim selectedOption As ValueOption = TryCast(valueSelector.SelectedItem, ValueOption)
+        If selectedOption Is Nothing Then Return "ALL"
+        Return selectedOption.Mode
+    End Function
+
     Private Sub RefreshChart()
         trendChart.Series.Clear()
+        trendChart.Legends("DVTS Legend").CustomItems.Clear()
+        trendChart.Titles("CycloneIdentifier").Text = "氣旋編號：" & GetCycloneIdentifier()
         Dim selectedOption As AgencyOption = TryCast(agencySelector.SelectedItem, AgencyOption)
         Dim selectedCode As String = If(selectedOption Is Nothing, "", selectedOption.Code)
+        Dim valueMode As String = GetSelectedValueMode()
+        Dim showT As Boolean = valueMode <> "CI"
+        Dim showCI As Boolean = valueMode <> "T"
 
         Dim grouped As New SortedDictionary(Of String, List(Of DvtsRecord))(StringComparer.OrdinalIgnoreCase)
         For Each record As DvtsRecord In sourceRecords
@@ -207,34 +258,41 @@ Public Class DvtsTrendForm
 
             For Each record As DvtsRecord In group.Value
                 filteredCount += 1
-                If record.HasTNumber Then
+                If showT AndAlso record.HasTNumber Then
                     AddValuePoint(tSeries, record.AnalysisTimeUtc, record.TNumber, BuildTooltip(record, "T"))
                     tCount += 1
                     groupHasT = True
-                Else
+                ElseIf showT Then
                     AddEmptyPoint(tSeries, record.AnalysisTimeUtc)
                 End If
 
-                If record.HasCINumber Then
+                If showCI AndAlso record.HasCINumber Then
                     AddValuePoint(ciSeries, record.AnalysisTimeUtc, record.CINumber, BuildTooltip(record, "CI"))
                     ciCount += 1
                     groupHasCI = True
-                Else
+                ElseIf showCI Then
                     AddEmptyPoint(ciSeries, record.AnalysisTimeUtc)
                 End If
             Next
 
             If groupHasT Then trendChart.Series.Add(tSeries)
             If groupHasCI Then trendChart.Series.Add(ciSeries)
+            If groupHasT OrElse groupHasCI Then AddGroupedLegendItem(trendChart.Legends("DVTS Legend"), group.Key, agencyName, If(groupHasT, tSeries, Nothing), If(groupHasCI, ciSeries, Nothing))
         Next
 
         Dim selectedText As String = If(String.IsNullOrEmpty(selectedCode), "全部機構", selectedCode)
-        summaryLabel.Text = String.Format(CultureInfo.InvariantCulture, "{0}｜{1} 筆資料，T {2} 點，CI {3} 點", selectedText, filteredCount, tCount, ciCount)
+        Dim valueText As String = If(valueMode = "T", "只看 T", If(valueMode = "CI", "只看 CI", "T／CI"))
+        summaryLabel.Text = String.Format(CultureInfo.InvariantCulture, "{0}｜{1}｜{2} 筆資料，T {3} 點，CI {4} 點", selectedText, valueText, filteredCount, tCount, ciCount)
         trendChart.ChartAreas("DVTS").RecalculateAxesScale()
         trendChart.ChartAreas("DVTS").AxisY.Minimum = 0.0
         trendChart.ChartAreas("DVTS").AxisY.Maximum = 8.0
         trendChart.ChartAreas("DVTS").AxisY.Interval = 1.0
     End Sub
+
+    Private Function GetCycloneIdentifier() As String
+        If sourceRecords.Count = 0 Then Return "—"
+        Return sourceRecords(0).Basin & " " & sourceRecords(0).StormNumber.ToString("00", CultureInfo.InvariantCulture)
+    End Function
 
     Private Shared Function CompareRecords(left As DvtsRecord, right As DvtsRecord) As Integer
         Dim timeCompare As Integer = DateTime.Compare(left.AnalysisTimeUtc, right.AnalysisTimeUtc)
@@ -251,6 +309,7 @@ Public Class DvtsTrendForm
         series.BorderWidth = 1
         series.Color = color
         series.LegendText = legendText
+        series.IsVisibleInLegend = False
         series.MarkerSize = 4
         series.MarkerStyle = If(dashed, MarkerStyle.Square, MarkerStyle.Circle)
         series.BorderDashStyle = If(dashed, ChartDashStyle.Dash, ChartDashStyle.Solid)
@@ -258,6 +317,25 @@ Public Class DvtsTrendForm
         series.EmptyPointStyle.MarkerStyle = MarkerStyle.None
         Return series
     End Function
+
+    Private Shared Sub AddGroupedLegendItem(legend As Legend, centerCode As String, agencyName As String, tSeries As Series, ciSeries As Series)
+        Dim item As New LegendItem()
+        item.Name = centerCode & " Legend"
+        If tSeries IsNot Nothing Then
+            Dim tCell As New LegendCell(LegendCellType.Text, "T ─●", ContentAlignment.MiddleCenter)
+            tCell.ForeColor = tSeries.Color
+            item.Cells.Add(tCell)
+        End If
+        If ciSeries IsNot Nothing Then
+            Dim ciCell As New LegendCell(LegendCellType.Text, "CI ┄■", ContentAlignment.MiddleCenter)
+            ciCell.ForeColor = ciSeries.Color
+            item.Cells.Add(ciCell)
+        End If
+        Dim nameCell As New LegendCell(LegendCellType.Text, centerCode & " — " & agencyName, ContentAlignment.MiddleLeft)
+        nameCell.ForeColor = If(tSeries IsNot Nothing, tSeries.Color, ciSeries.Color)
+        item.Cells.Add(nameCell)
+        legend.CustomItems.Add(item)
+    End Sub
 
     Private Shared Sub AddValuePoint(series As Series, timeUtc As DateTime, value As Double, tooltip As String)
         Dim pointIndex As Integer = series.Points.AddXY(timeUtc.ToOADate(), value)
@@ -318,7 +396,9 @@ Public Class DvtsTrendForm
     Private Function BuildDefaultFileName() As String
         Dim selectedOption As AgencyOption = TryCast(agencySelector.SelectedItem, AgencyOption)
         Dim agencyCode As String = If(selectedOption Is Nothing OrElse String.IsNullOrEmpty(selectedOption.Code), "ALL", selectedOption.Code)
-        Return "DVTS_Trend_" & agencyCode & "_" & DateTime.Now.ToString("yyyyMMddHHmmss", CultureInfo.InvariantCulture) & ".png"
+        Dim valueMode As String = GetSelectedValueMode()
+        Dim valueLabel As String = If(valueMode = "T", "T", If(valueMode = "CI", "CI", "ALL"))
+        Return "DVTS_Trend_" & agencyCode & "_" & valueLabel & "_" & DateTime.Now.ToString("yyyyMMddHHmmss", CultureInfo.InvariantCulture) & ".png"
     End Function
 
     Private Shared Function CreateButton(caption As String) As Button
