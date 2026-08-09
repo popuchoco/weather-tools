@@ -64,6 +64,8 @@ v4 沒有保留原始碼，以下內容是由 `氣象小工具v4.exe` 的 .NET m
 
 ## Releases
 
+Latest version: **v4**.
+
 請至 [GitHub Releases](https://github.com/popuchoco/weather-tools/releases) 下載 v2.5、v3、v3.5 與 v4 執行檔及安裝封裝。
 
 ## License
