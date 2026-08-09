@@ -263,7 +263,7 @@ Public Class MainForm
             layout.ColumnCount = 1
             layout.RowCount = 4
             layout.RowStyles.Add(New RowStyle(SizeType.Absolute, 140.0F))
-            layout.RowStyles.Add(New RowStyle(SizeType.Absolute, 48.0F))
+            layout.RowStyles.Add(New RowStyle(SizeType.Absolute, 68.0F))
             layout.RowStyles.Add(New RowStyle(SizeType.Percent, 100.0F))
             layout.RowStyles.Add(New RowStyle(SizeType.Absolute, 60.0F))
             page.Controls.Add(layout)
@@ -281,7 +281,8 @@ Public Class MainForm
             Dim buttonPanel As New FlowLayoutPanel()
             buttonPanel.Dock = DockStyle.Fill
             buttonPanel.FlowDirection = FlowDirection.LeftToRight
-            buttonPanel.WrapContents = False
+            buttonPanel.WrapContents = True
+            buttonPanel.AutoScroll = True
             buttonPanel.Padding = New Padding(2, 5, 2, 2)
             Dim openButton As Button = CreateButton("開啟 DVTS 檔案")
             AddHandler openButton.Click, AddressOf OpenDvtsButtonClick
@@ -292,6 +293,9 @@ Public Class MainForm
             Dim importButton As Button = CreateButton("帶入選取資料")
             AddHandler importButton.Click, AddressOf ImportDvtsButtonClick
             buttonPanel.Controls.Add(importButton)
+            Dim trendButton As Button = CreateButton("趨勢圖分析")
+            AddHandler trendButton.Click, AddressOf DvtsTrendButtonClick
+            buttonPanel.Controls.Add(trendButton)
             lblDvtsInfo.Text = "可開啟 .txt／.dat 或貼上多行 DVTS；解析後選取一筆，再帶入 Dvorak 對照表。"
             lblDvtsInfo.AutoSize = True
             lblDvtsInfo.ForeColor = Color.FromArgb(82, 104, 123)
@@ -353,6 +357,17 @@ Public Class MainForm
                 txtDvts.Text = File.ReadAllText(dialog.FileName, System.Text.Encoding.ASCII)
                 lblDvtsInfo.Text = Path.GetFileName(dialog.FileName) & " 已載入；請按「解析 DVTS」。"
                 SetStatus("DVTS 檔案已載入")
+            End Using
+        End Sub
+
+        Private Sub DvtsTrendButtonClick(sender As Object, e As EventArgs)
+            If parsedDvtsRecords.Count = 0 Then
+                ShowError("請先按「解析 DVTS」，再開啟趨勢圖分析。")
+                Return
+            End If
+
+            Using trendForm As New DvtsTrendForm(parsedDvtsRecords)
+                trendForm.ShowDialog(Me)
             End Using
         End Sub
 
