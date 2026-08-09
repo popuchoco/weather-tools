@@ -304,6 +304,9 @@ Public Class MainForm
             Dim openButton As Button = CreateButton("開啟 DVTS 檔案")
             AddHandler openButton.Click, AddressOf OpenDvtsButtonClick
             buttonPanel.Controls.Add(openButton)
+            Dim clearButton As Button = CreateButton("清除資料")
+            AddHandler clearButton.Click, AddressOf ClearDvtsButtonClick
+            buttonPanel.Controls.Add(clearButton)
             Dim parseButton As Button = CreateButton("解析 DVTS")
             AddHandler parseButton.Click, AddressOf ParseDvtsButtonClick
             buttonPanel.Controls.Add(parseButton)
@@ -394,6 +397,17 @@ Public Class MainForm
                 lblDvtsInfo.Text = Path.GetFileName(dialog.FileName) & " 已載入；請按「解析 DVTS」。"
                 SetStatus("DVTS 檔案已載入")
             End Using
+        End Sub
+
+        Private Sub ClearDvtsButtonClick(sender As Object, e As EventArgs)
+            txtDvts.Clear()
+            dvtsSourceFileName = ""
+            parsedDvtsRecords.Clear()
+            dvtsGrid.Rows.Clear()
+            PopulateDvtsCenterSelector(parsedDvtsRecords)
+            ApplyDvtsCenterFilter()
+            lblDvtsInfo.Text = "DVTS 資料已清除；可貼上內容或開啟報文檔案。"
+            SetStatus("DVTS 資料已清除")
         End Sub
 
         Private Sub DvtsTrendButtonClick(sender As Object, e As EventArgs)
@@ -487,7 +501,7 @@ Public Class MainForm
             layout.ColumnCount = 1
             layout.RowCount = 5
             layout.RowStyles.Add(New RowStyle(SizeType.Absolute, 142.0F))
-            layout.RowStyles.Add(New RowStyle(SizeType.Absolute, 48.0F))
+            layout.RowStyles.Add(New RowStyle(SizeType.Absolute, 68.0F))
             layout.RowStyles.Add(New RowStyle(SizeType.Percent, 100.0F))
             layout.RowStyles.Add(New RowStyle(SizeType.Absolute, 170.0F))
             layout.RowStyles.Add(New RowStyle(SizeType.Absolute, 62.0F))
@@ -505,11 +519,15 @@ Public Class MainForm
             Dim buttonPanel As New FlowLayoutPanel()
             buttonPanel.Dock = DockStyle.Fill
             buttonPanel.FlowDirection = FlowDirection.LeftToRight
-            buttonPanel.WrapContents = False
+            buttonPanel.WrapContents = True
+            buttonPanel.AutoScroll = True
             buttonPanel.Padding = New Padding(2, 5, 2, 2)
             Dim openButton As Button = CreateButton("開啟 .dat")
             AddHandler openButton.Click, AddressOf OpenAtcfButtonClick
             buttonPanel.Controls.Add(openButton)
+            Dim clearButton As Button = CreateButton("清除資料")
+            AddHandler clearButton.Click, AddressOf ClearAtcfButtonClick
+            buttonPanel.Controls.Add(clearButton)
             Dim parseButton As Button = CreateButton("解析 Tracking Data")
             AddHandler parseButton.Click, AddressOf ParseAtcfButtonClick
             buttonPanel.Controls.Add(parseButton)
@@ -595,6 +613,16 @@ Public Class MainForm
                 lblAtcfInfo.Text = Path.GetFileName(dialog.FileName) & " 已載入；請按「解析 Tracking Data」。"
                 SetStatus("ATCF 檔案已載入")
             End Using
+        End Sub
+
+        Private Sub ClearAtcfButtonClick(sender As Object, e As EventArgs)
+            txtAtcf.Clear()
+            atcfSourceFileName = ""
+            parsedAtcfRecords.Clear()
+            atcfGrid.Rows.Clear()
+            txtAtcfDetail.Text = "選取上方資料列查看完整欄位解讀。"
+            lblAtcfInfo.Text = "ATCF 資料已清除；可貼上或開啟 b*.dat。"
+            SetStatus("ATCF 資料已清除")
         End Sub
 
         Private Sub ParseAtcfButtonClick(sender As Object, e As EventArgs)
