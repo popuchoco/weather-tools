@@ -1,0 +1,71 @@
+# 氣象小工具
+
+這個 repository 保存「氣象小工具」早期 Visual Basic .NET Windows Forms 原始碼，並將後續版本以 GitHub Releases 發佈。
+
+## 專案沿革與檔案範圍
+
+從 `D:\備份\氣象小工具` 找到並整理的可編輯專案如下：
+
+- `src/v1`：氣象小工具 v1 原始碼
+- `src/v1.5`：氣象小工具 v1.5 原始碼
+- `src/v2`：氣象小工具 v2 原始碼
+
+備份中的 `氣象小工具v2.5` 目前只有 ClickOnce 發佈檔、執行檔與壓縮檔；檢查其 `.rar` 後也只有圖示、說明文字與 `v2.5.exe`，沒有 `.vb` 或 `.vbproj`。因此本 repository 不放反編譯程式碼，也不把沒有原始碼依據的內容冒充成 v2.5 source。
+
+v2.5 及之後能取得的執行檔會放在 GitHub Releases；依原始規劃，v3、v3.5、v4 只作為 release 產物，不進入 source tree。
+
+## 整體架構
+
+### v1～v2 原始碼可直接確認的架構
+
+這是一組傳統 VB.NET Windows Forms 單一專案解決方案：每個版本包含一個 `.sln`、一個 `.vbproj`、表單程式碼、Visual Studio Designer 產生的 `.Designer.vb`、`.resx` 資源，以及 `My Project` 啟動與設定檔案。主要邏輯集中在表單事件處理器，沒有獨立的 domain/service/data-access layer。
+
+v2 的主表單 `氣象小工具v1` 由幾個事件組成：
+
+- `Button3_Click`：以 Knot 為輸入，換算 km/h、m/s、mph，並輸出 JTWC、中央氣象局、日本氣象廳、香港天文台及美國颶風分級結果。
+- `Button5_Click`：以 `0.836 * Beaufort^(3/2)` 將蒲福風級換算為 m/s。
+- `Button7_Click`：以 `0.154 * (1019 - pressure)` 估算理想浪高。
+- `氣象小工具v1_Load`：從當時中央氣象局衛星圖網址下載圖片，放入 `PictureBox`。
+
+### v4 執行檔反編譯/metadata 對照結果
+
+v4 沒有保留原始碼，以下內容是由 `氣象小工具v4.exe` 的 .NET metadata、型別/方法名稱、表單控制項、嵌入資源與字串常值推論而來：
+
+- 組件名稱為 `WindowsApplication2`，MSIL/.NET Framework 應用程式，引用 `Microsoft.VisualBasic`、`System.Windows.Forms`、`System.Drawing` 等標準組件。
+- 程式由 `My.MyApplication` 啟動，主畫面是 `Form1`；另外有 `Form2`～`Form7` 六個圖片視窗，每個視窗都含一個 `PictureBox`，在 Load 事件從固定網址取得圖片。
+- `Form1` 是整合式主控台，包含：風速換算與分級、蒲福風級換算、即時影像按鈕、溫度轉換、搜尋/官方網站連結。
+- v4 的風速分級由 v2 的單一表單邏輯擴充為六個標準欄位：JTWC、NHC、CWB、JMA、HKO、KMA；核心輸入事件為 `TextBox1_TextChanged`。
+- v4 新增攝氏/華氏互換（`TextBox15_TextChanged`、`TextBox18_TextChanged`），並把蒲福風級與風速換算拆成文字框變更事件（`TextBox10_TextChanged`、`TextBox13_TextChanged`）。
+- v4 的圖片按鈕對應六個子表單：CWB 衛星雲圖、海溫圖、風切趨勢、CWB 色調強化圖、香港風場圖、CWB 地面天氣圖。這些網址是執行檔內的固定字串，並非 API client 或可配置資料源。
+- 所有表單的 UI 佈局與文字大多存放於編譯後的 `.resources`，業務邏輯仍是事件驅動的 code-behind；沒有觀察到資料庫、第三方套件或獨立網路服務層。
+
+### v2 到 v4 的演進
+
+| 面向 | v2 原始碼 | v4 執行檔反編譯結果 |
+| --- | --- | --- |
+| UI 結構 | 單一 Form | 1 個主 Form + 6 個圖片 Form |
+| 風速換算 | Knot → km/h、m/s、mph | 保留並擴充為 6 個地區/機構分級欄位 |
+| 其他換算 | 蒲福風級、理想浪高 | 蒲福風級、溫度轉換，並以即時事件處理輸入 |
+| 即時資料 | 主表單載入一張衛星圖 | 多個圖片視窗，各自載入固定圖像網址 |
+| 導航/連結 | 無明顯獨立導航層 | 主表單內含搜尋、官方網站與討論區按鈕 |
+| 技術型態 | VB.NET WinForms、`.resx`、`My Project` | 同樣的 VB.NET WinForms 編譯模型，組件名稱改為 `WindowsApplication2` |
+
+這個比較描述的是結構與功能演進，不宣稱 v4 的反編譯結果等同於作者原始碼；名稱、控制項與演算法細節可能因編譯器最佳化或反編譯工具而略有差異。
+
+## 建置與執行
+
+- Visual Studio 2012/2015
+- Visual Basic .NET Windows Forms
+- .NET Framework 4.5
+
+開啟對應 `src` 子目錄的 `.sln` 即可檢視專案。這是歷史專案，部分圖片網址已失效或可能需要 HTTPS/現代網站調整；網路圖片載入失敗不影響原始碼結構的閱讀。
+
+原始專案曾引用本機 ClickOnce 簽章金鑰與發佈路徑。為避免把私密金鑰提交到公開 repository，整理版已排除 `*.pfx` 並關閉 manifest 簽章；若要重新發佈，請改用自己的憑證。v1.5 原始專案也曾引用備份中不存在的外部 v2.5 程式檔，整理版改為使用同一專案目錄內保留下來的 `氣象小工具v2.vb` 與 Designer 檔，方便閱讀與後續修復。
+
+## Releases
+
+請至 [GitHub Releases](https://github.com/popuchoco/weather-tools/releases) 下載 v2.5 及之後的執行檔與安裝檔。
+
+## License
+
+本專案採用 Apache License 2.0，詳見 [LICENSE](LICENSE)。

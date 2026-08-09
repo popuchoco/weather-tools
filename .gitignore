@@ -1,0 +1,23 @@
+# Visual Studio / .NET build output
+bin/
+obj/
+.vs/
+*.user
+*.suo
+*.pdb
+*.xml
+
+# ClickOnce and local signing material
+Application Files/
+*.application
+*.deploy
+*.pfx
+*.manifest
+
+# Local editor and OS files
+.idea/
+.vscode/
+*.userosscache
+*.sln.docstates
+Thumbs.db
+Desktop.ini
