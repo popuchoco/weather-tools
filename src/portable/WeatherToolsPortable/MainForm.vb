@@ -60,7 +60,7 @@ Public Class MainForm
         }
 
         Public Sub New()
-            Text = "氣象小工具 v5"
+            Text = "氣象小工具 2026 Ver."
             StartPosition = FormStartPosition.CenterScreen
             MinimumSize = New Size(900, 700)
             Size = New Size(1120, 820)
@@ -794,7 +794,7 @@ Public Class MainForm
             panel.Dock = DockStyle.Fill
 
             Dim title As New Label()
-            title.Text = "氣象小工具 v5"
+            title.Text = "氣象小工具 2026 Ver."
             title.Font = New Font(Font.FontFamily, 24.0F, FontStyle.Bold)
             title.ForeColor = Color.FromArgb(28, 53, 78)
             title.AutoSize = True

@@ -1,8 +1,8 @@
-﻿# 氣象小工具 v5
+﻿# 氣象小工具 2026 Ver.
 
 這是延續早期 VB.NET Windows Forms 版本的免安裝版，將常用的氣象換算集中在單一視窗，適合氣象入門者離線練習。
 
-v5 沿用早期版本提供的 `icon.ico`，並將它設定為執行檔與主視窗圖示。
+2026 Ver. 沿用早期版本提供的 `icon.ico`，並將它設定為執行檔與主視窗圖示。
 
 ## 功能
 
@@ -25,7 +25,7 @@ v5 沿用早期版本提供的 `icon.ico`，並將它設定為執行檔與主視
 
 ## 使用方式
 
-用 Visual Studio 2012/2015 開啟 `WeatherToolsPortable.sln`，建置 `Release` 後，直接攜帶 `bin\Release\WeatherToolsV5.exe` 即可執行，不需要 ClickOnce 或 setup.exe。程式視窗名稱為「氣象小工具 v5」。
+用 Visual Studio 2012/2015 開啟 `WeatherToolsPortable.sln`，建置 `Release` 後，直接攜帶 `bin\Release\WeatherToolsV5.exe` 即可執行，不需要 ClickOnce 或 setup.exe。程式視窗名稱為「氣象小工具 2026 Ver.」。
 
 此版本以 .NET Framework 4.0 編譯；目標電腦需要具備相容的 .NET Framework。Dvorak 是根據衛星雲型進行的強度估計方法，本工具只提供 T／CI 對照與趨勢教學，不會自動判讀衛星影像。工具內的分級與浪高是教育用途的參考，不取代官方警報、海象預報或現場觀測。
 
@@ -41,7 +41,7 @@ NHC 的表格使用 1 分鐘平均風；HKO 說明以 0.93 將 Dvorak 的 1 分�
 
 ## ATCF 路徑解析
 
-v5 可在「ATCF路徑解析」分頁讀取或貼上以下來源目錄中的最佳路徑 `b*.dat` 檔案：
+2026 Ver. 可在「ATCF路徑解析」分頁讀取或貼上以下來源目錄中的最佳路徑 `b*.dat` 檔案：
 
 - [NOAA SSD／JTWC ATCF archive](https://www.ssd.noaa.gov/PS/TROP/DATA/ATCF/JTWC/)
 - [NOAA/NCEP EMC DECKS archive](https://www.emc.ncep.noaa.gov/gc_wmb/vxt/DECKS/)
@@ -62,17 +62,17 @@ v5 可在「ATCF路徑解析」分頁讀取或貼上以下來源目錄中的最�
 
 ## Source code structure
 
-- `Program.vb`：v5 應用程式入口。
+- `Program.vb`：2026 Ver. 應用程式入口。
 - `MainForm.vb`：WinForms 介面、換算功能、Dvorak／DVTS／ATCF 操作流程。
 - `AgencyReference.vb`：NHC、HKO、CWA Dvorak 強度對照。
 - `DvtsParser.vb`：AMSU research 衛星自動分析報文解析。
 - `AtcfParser.vb`：ATCF Best Track／路徑 `.dat` 欄位解析與系統分級。
 - `CenterDirectory.vb`：中心代碼與機構名稱對照。
-- `icon.ico`：v5 執行檔與主視窗圖示。
+- `icon.ico`：2026 Ver. 執行檔與主視窗圖示。
 
 ## DVTS 報文
 
-v5 可開啟 DVTS `.txt`／`.dat` 檔案，也接受 AMSU research 使用的衛星自動分析報文格式貼上：
+2026 Ver. 可開啟 DVTS `.txt`／`.dat` 檔案，也接受 AMSU research 使用的衛星自動分析報文格式貼上：
 
 ```text
 WP 01 202408081200 DVTS 1350N 14200E 80.0 5050 S0000 PGTW
