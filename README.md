@@ -2,17 +2,11 @@
 
 這個 repository 保存「氣象小工具」早期 Visual Basic .NET Windows Forms 原始碼，並將後續版本以 GitHub Releases 發佈。
 
-## 專案沿革與檔案範圍
+## Source and Releases
 
-從本機備份資料找到並整理的可編輯專案如下：
+The editable source code is organized under `src/v1`, `src/v1.5`, and `src/v2`.
 
-- `src/v1`：氣象小工具 v1 原始碼
-- `src/v1.5`：氣象小工具 v1.5 原始碼
-- `src/v2`：氣象小工具 v2 原始碼
-
-備份中的 `氣象小工具v2.5` 目前只有 ClickOnce 發佈檔、執行檔與壓縮檔；檢查其 `.rar` 後也只有圖示、說明文字與 `v2.5.exe`，沒有 `.vb` 或 `.vbproj`。因此本 repository 不放反編譯程式碼，也不把沒有原始碼依據的內容冒充成 v2.5 source。
-
-目前已公開 v2.5、v3、v3.5、v4 releases；依原始規劃，v2.5 及之後版本只作為 release 產物，不進入 source tree。
+Version 2.5 and later are distributed as binary-only releases. See [GitHub Releases](https://github.com/popuchoco/weather-tools/releases) for downloads.
 
 ## 整體架構
 
