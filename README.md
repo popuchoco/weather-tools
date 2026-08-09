@@ -12,7 +12,7 @@
 
 備份中的 `氣象小工具v2.5` 目前只有 ClickOnce 發佈檔、執行檔與壓縮檔；檢查其 `.rar` 後也只有圖示、說明文字與 `v2.5.exe`，沒有 `.vb` 或 `.vbproj`。因此本 repository 不放反編譯程式碼，也不把沒有原始碼依據的內容冒充成 v2.5 source。
 
-v2.5 及之後能取得的執行檔會放在 GitHub Releases；依原始規劃，v3、v3.5、v4 只作為 release 產物，不進入 source tree。
+目前已公開的 releases 從 v3 開始；依原始規劃，v3、v3.5、v4 只作為 release 產物，不進入 source tree。v2.5 的 binary 仍只存在於原始備份，沒有放進這個公開 repository。
 
 ## 整體架構
 
@@ -64,7 +64,7 @@ v4 沒有保留原始碼，以下內容是由 `氣象小工具v4.exe` 的 .NET m
 
 ## Releases
 
-請至 [GitHub Releases](https://github.com/popuchoco/weather-tools/releases) 下載 v2.5 及之後的執行檔與安裝檔。
+請至 [GitHub Releases](https://github.com/popuchoco/weather-tools/releases) 下載 v3、v3.5 與 v4 執行檔。
 
 ## License
 
