@@ -10,7 +10,7 @@ Imports System.Windows.Forms
 Imports System.Windows.Forms.DataVisualization.Charting
 
 Public Class DvtsTrendForm
-    Inherits Form
+    Inherits BufferedForm
 
     Private ReadOnly sourceRecords As New List(Of DvtsRecord)()
     Private ReadOnly agencySelector As New ComboBox()
@@ -57,7 +57,6 @@ Public Class DvtsTrendForm
         BackColor = Color.FromArgb(244, 247, 251)
         Font = New Font("Microsoft JhengHei", 10.0F, FontStyle.Regular, GraphicsUnit.Point)
         AutoScaleMode = AutoScaleMode.Font
-
         Try
             Dim applicationIcon As System.Drawing.Icon = System.Drawing.Icon.ExtractAssociatedIcon(Application.ExecutablePath)
             If applicationIcon IsNot Nothing Then Me.Icon = applicationIcon
@@ -133,6 +132,7 @@ Public Class DvtsTrendForm
 
     Private Sub ConfigureChart()
         trendChart.Dock = DockStyle.Fill
+        UiRendering.EnableDoubleBuffer(trendChart)
         trendChart.BackColor = Color.White
         trendChart.BorderlineColor = Color.FromArgb(180, 190, 200)
         trendChart.BorderlineDashStyle = ChartDashStyle.Solid
@@ -214,7 +214,9 @@ Public Class DvtsTrendForm
     End Function
 
     Private Sub RefreshChart()
-        trendChart.Series.Clear()
+        UiRendering.BeginUpdate(trendChart)
+        Try
+            trendChart.Series.Clear()
         trendChart.Legends("DVTS Legend").CustomItems.Clear()
         trendChart.Titles("CycloneIdentifier").Text = String.Format(LanguageManager.Translate("trend.cyclone.title", "氣旋編號：{0}"), GetCycloneIdentifier())
         Dim selectedOption As AgencyOption = TryCast(agencySelector.SelectedItem, AgencyOption)
@@ -287,7 +289,10 @@ Public Class DvtsTrendForm
         trendChart.ChartAreas("DVTS").RecalculateAxesScale()
         trendChart.ChartAreas("DVTS").AxisY.Minimum = 0.0
         trendChart.ChartAreas("DVTS").AxisY.Maximum = 8.0
-        trendChart.ChartAreas("DVTS").AxisY.Interval = 1.0
+            trendChart.ChartAreas("DVTS").AxisY.Interval = 1.0
+        Finally
+            UiRendering.EndUpdate(trendChart)
+        End Try
     End Sub
 
     Private Function GetCycloneIdentifier() As String

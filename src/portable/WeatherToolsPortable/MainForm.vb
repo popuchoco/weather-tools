@@ -10,7 +10,13 @@ Imports System.IO
 Imports System.Windows.Forms
 
 Public Class MainForm
-        Inherits Form
+        Inherits BufferedForm
+
+        Protected Overrides ReadOnly Property MoveContentControl As Control
+            Get
+                Return mainContentRoot
+            End Get
+        End Property
 
         Private ReadOnly txtKnots As New TextBox()
         Private ReadOnly lblKmh As New Label()
@@ -41,6 +47,7 @@ Public Class MainForm
         Private ReadOnly lblStatus As New Label()
         Private ReadOnly mainTabs As New TabControl()
         Private ReadOnly languageSelector As New ComboBox()
+        Private mainContentRoot As Control
         Private languageSelectorLoading As Boolean
 
         Private ReadOnly txtDvts As New TextBox()
@@ -57,6 +64,13 @@ Public Class MainForm
         Private ReadOnly lblAtcfInfo As New Label()
         Private ReadOnly parsedAtcfRecords As New List(Of AtcfRecord)()
         Private atcfSourceFileName As String = ""
+
+        Private ReadOnly txtAtcfSector As New TextBox()
+        Private ReadOnly atcfSectorGrid As New DataGridView()
+        Private ReadOnly txtAtcfSectorDetail As New TextBox()
+        Private ReadOnly lblAtcfSectorInfo As New Label()
+        Private ReadOnly parsedAtcfSectorRecords As New List(Of AtcfSectorRecord)()
+        Private atcfSectorSourceFileName As String = ""
 
         Private Shared Function T(key As String, fallback As String) As String
             Return LanguageManager.Translate(key, fallback)
@@ -108,26 +122,29 @@ Public Class MainForm
             root.RowCount = 2
             root.ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 50.0F))
             root.ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 50.0F))
-            root.RowStyles.Add(New RowStyle(SizeType.Absolute, 122.0F))
-            root.RowStyles.Add(New RowStyle(SizeType.Percent, 100.0F))
-            Controls.Add(root)
+             root.RowStyles.Add(New RowStyle(SizeType.Absolute, 122.0F))
+             root.RowStyles.Add(New RowStyle(SizeType.Percent, 100.0F))
+             mainContentRoot = root
+             Controls.Add(root)
 
             Dim header As Panel = BuildHeader()
             root.Controls.Add(header, 0, 0)
             root.SetColumnSpan(header, 2)
 
-            mainTabs.Dock = DockStyle.Fill
-            mainTabs.Margin = New Padding(0)
-            mainTabs.Controls.Add(BuildQuickTab())
-            mainTabs.Controls.Add(BuildAgencyTab())
-            mainTabs.Controls.Add(BuildDvtsTab())
-            mainTabs.Controls.Add(BuildAtcfTab())
-            mainTabs.Controls.Add(BuildLearningTab())
-            root.Controls.Add(mainTabs, 0, 1)
-            root.SetColumnSpan(mainTabs, 2)
-        End Sub
+             mainTabs.Dock = DockStyle.Fill
+             mainTabs.Margin = New Padding(0)
+             UiRendering.EnableDoubleBuffer(mainTabs)
+             mainTabs.TabPages.Add(BuildQuickTab())
+             mainTabs.TabPages.Add(BuildAgencyTab())
+             mainTabs.TabPages.Add(BuildDvtsTab())
+             mainTabs.TabPages.Add(BuildAtcfTab())
+             mainTabs.TabPages.Add(BuildAtcfSectorTab())
+             mainTabs.TabPages.Add(BuildLearningTab())
+             root.Controls.Add(mainTabs, 0, 1)
+             root.SetColumnSpan(mainTabs, 2)
+         End Sub
 
-        Private Function BuildQuickTab() As TabPage
+         Private Function BuildQuickTab() As TabPage
             Dim page As New TabPage("快速換算")
             page.BackColor = BackColor
 
@@ -142,10 +159,10 @@ Public Class MainForm
             layout.RowStyles.Add(New RowStyle(SizeType.Percent, 42.0F))
             layout.Controls.Add(BuildWindGroup(), 0, 0)
             layout.Controls.Add(BuildBeaufortGroup(), 1, 0)
-            layout.Controls.Add(BuildTemperatureGroup(), 0, 1)
-            layout.Controls.Add(BuildPressureGroup(), 1, 1)
-            page.Controls.Add(layout)
-            Return page
+             layout.Controls.Add(BuildTemperatureGroup(), 0, 1)
+             layout.Controls.Add(BuildPressureGroup(), 1, 1)
+             page.Controls.Add(layout)
+             Return page
         End Function
 
         Private Function BuildAgencyTab() As TabPage
@@ -159,9 +176,9 @@ Public Class MainForm
             layout.RowCount = 4
             layout.RowStyles.Add(New RowStyle(SizeType.Absolute, 60.0F))
             layout.RowStyles.Add(New RowStyle(SizeType.Percent, 100.0F))
-            layout.RowStyles.Add(New RowStyle(SizeType.Absolute, 42.0F))
-            layout.RowStyles.Add(New RowStyle(SizeType.Absolute, 58.0F))
-            page.Controls.Add(layout)
+             layout.RowStyles.Add(New RowStyle(SizeType.Absolute, 42.0F))
+             layout.RowStyles.Add(New RowStyle(SizeType.Absolute, 58.0F))
+             page.Controls.Add(layout)
 
             Dim inputPanel As New FlowLayoutPanel()
             inputPanel.Dock = DockStyle.Fill
@@ -186,6 +203,7 @@ Public Class MainForm
             layout.Controls.Add(inputPanel, 0, 0)
 
             agencyGrid.Dock = DockStyle.Fill
+            UiRendering.EnableDoubleBuffer(agencyGrid)
             agencyGrid.AllowUserToAddRows = False
             agencyGrid.AllowUserToDeleteRows = False
             agencyGrid.AllowUserToResizeRows = False
@@ -237,9 +255,9 @@ Public Class MainForm
             panel.Padding = New Padding(22)
             panel.ColumnCount = 1
             panel.RowCount = 2
-            panel.RowStyles.Add(New RowStyle(SizeType.Absolute, 62.0F))
-            panel.RowStyles.Add(New RowStyle(SizeType.Percent, 100.0F))
-            page.Controls.Add(panel)
+             panel.RowStyles.Add(New RowStyle(SizeType.Absolute, 62.0F))
+             panel.RowStyles.Add(New RowStyle(SizeType.Percent, 100.0F))
+             page.Controls.Add(panel)
 
             Dim title As New Label()
             title.Text = T("learning.title", "Dvorak 是從衛星雲型估計熱帶氣旋強度的方法")
@@ -294,9 +312,9 @@ Public Class MainForm
             layout.RowStyles.Add(New RowStyle(SizeType.Absolute, 46.0F))
             layout.RowStyles.Add(New RowStyle(SizeType.Absolute, 32.0F))
             layout.RowStyles.Add(New RowStyle(SizeType.Absolute, 44.0F))
-            layout.RowStyles.Add(New RowStyle(SizeType.Percent, 100.0F))
-            layout.RowStyles.Add(New RowStyle(SizeType.Absolute, 60.0F))
-            page.Controls.Add(layout)
+             layout.RowStyles.Add(New RowStyle(SizeType.Percent, 100.0F))
+             layout.RowStyles.Add(New RowStyle(SizeType.Absolute, 60.0F))
+             page.Controls.Add(layout)
 
             txtDvts.Multiline = True
             txtDvts.AcceptsReturn = True
@@ -363,6 +381,7 @@ Public Class MainForm
             layout.Controls.Add(centerFilterPanel, 0, 3)
 
             dvtsGrid.Dock = DockStyle.Fill
+            UiRendering.EnableDoubleBuffer(dvtsGrid)
             dvtsGrid.AllowUserToAddRows = False
             dvtsGrid.AllowUserToDeleteRows = False
             dvtsGrid.AllowUserToResizeRows = False
@@ -479,16 +498,21 @@ Public Class MainForm
         End Function
 
         Private Sub ApplyDvtsCenterFilter()
-            dvtsGrid.Rows.Clear()
             Dim selectedCode As String = GetSelectedDvtsCenterCode()
             Dim visibleCount As Integer = 0
 
-            For Each record As DvtsRecord In parsedDvtsRecords
-                If String.IsNullOrEmpty(selectedCode) OrElse String.Equals(record.Center, selectedCode, StringComparison.OrdinalIgnoreCase) Then
-                    AddDvtsGridRow(record)
-                    visibleCount += 1
-                End If
-            Next
+            UiRendering.BeginUpdate(dvtsGrid)
+            Try
+                dvtsGrid.Rows.Clear()
+                For Each record As DvtsRecord In parsedDvtsRecords
+                    If String.IsNullOrEmpty(selectedCode) OrElse String.Equals(record.Center, selectedCode, StringComparison.OrdinalIgnoreCase) Then
+                        AddDvtsGridRow(record)
+                        visibleCount += 1
+                    End If
+                Next
+            Finally
+                UiRendering.EndUpdate(dvtsGrid)
+            End Try
 
             Dim filterText As String = If(String.IsNullOrEmpty(selectedCode), T("dvts.filter.all", "全部中心"), selectedCode)
             lblDvtsFilterInfo.Text = String.Format(T("dvts.filter.summary", "{0}：顯示 {1}／{2} 筆"), filterText, visibleCount, parsedDvtsRecords.Count)
@@ -523,10 +547,10 @@ Public Class MainForm
             layout.RowStyles.Add(New RowStyle(SizeType.Absolute, 142.0F))
             layout.RowStyles.Add(New RowStyle(SizeType.Absolute, 46.0F))
             layout.RowStyles.Add(New RowStyle(SizeType.Absolute, 32.0F))
-            layout.RowStyles.Add(New RowStyle(SizeType.Percent, 100.0F))
-            layout.RowStyles.Add(New RowStyle(SizeType.Absolute, 170.0F))
-            layout.RowStyles.Add(New RowStyle(SizeType.Absolute, 62.0F))
-            page.Controls.Add(layout)
+             layout.RowStyles.Add(New RowStyle(SizeType.Percent, 100.0F))
+             layout.RowStyles.Add(New RowStyle(SizeType.Absolute, 170.0F))
+             layout.RowStyles.Add(New RowStyle(SizeType.Absolute, 62.0F))
+             page.Controls.Add(layout)
 
             txtAtcf.Multiline = True
             txtAtcf.AcceptsReturn = True
@@ -552,6 +576,9 @@ Public Class MainForm
             Dim parseButton As Button = CreateButton("解析 Tracking Data")
             AddHandler parseButton.Click, AddressOf ParseAtcfButtonClick
             buttonPanel.Controls.Add(parseButton)
+            Dim intensityButton As Button = CreateButton(T("atcf.trend.button", "強度變化"))
+            AddHandler intensityButton.Click, AddressOf AtcfIntensityTrendButtonClick
+            buttonPanel.Controls.Add(intensityButton)
             layout.Controls.Add(buttonPanel, 0, 1)
 
             Dim infoPanel As New Panel()
@@ -587,8 +614,275 @@ Public Class MainForm
             Return page
         End Function
 
+        Private Function BuildAtcfSectorTab() As TabPage
+            Dim page As New TabPage(T("atcf.sector.tab", "ATCF實時定位分析"))
+            page.BackColor = BackColor
+
+            Dim layout As New TableLayoutPanel()
+            layout.Dock = DockStyle.Fill
+            layout.Padding = New Padding(16)
+            layout.ColumnCount = 1
+            layout.RowCount = 6
+            layout.RowStyles.Add(New RowStyle(SizeType.Absolute, 142.0F))
+            layout.RowStyles.Add(New RowStyle(SizeType.Absolute, 46.0F))
+            layout.RowStyles.Add(New RowStyle(SizeType.Absolute, 32.0F))
+             layout.RowStyles.Add(New RowStyle(SizeType.Percent, 100.0F))
+             layout.RowStyles.Add(New RowStyle(SizeType.Absolute, 170.0F))
+             layout.RowStyles.Add(New RowStyle(SizeType.Absolute, 76.0F))
+             page.Controls.Add(layout)
+
+            txtAtcfSector.Multiline = True
+            txtAtcfSector.AcceptsReturn = True
+            txtAtcfSector.ScrollBars = ScrollBars.Both
+            txtAtcfSector.WordWrap = False
+            txtAtcfSector.Dock = DockStyle.Fill
+            txtAtcfSector.Font = New Font("Consolas", 9.0F, FontStyle.Regular)
+            txtAtcfSector.BackColor = Color.White
+            layout.Controls.Add(txtAtcfSector, 0, 0)
+
+            Dim buttonPanel As New FlowLayoutPanel()
+            buttonPanel.Dock = DockStyle.Fill
+            buttonPanel.FlowDirection = FlowDirection.LeftToRight
+            buttonPanel.WrapContents = False
+            buttonPanel.AutoScroll = True
+            buttonPanel.Padding = New Padding(2, 6, 2, 3)
+            Dim openButton As Button = CreateButton(T("atcf.sector.button.open", "開啟核心扇區檔"))
+            AddHandler openButton.Click, AddressOf OpenAtcfSectorButtonClick
+            buttonPanel.Controls.Add(openButton)
+            Dim clearButton As Button = CreateButton(T("atcf.sector.button.clear", "清除資料"))
+            AddHandler clearButton.Click, AddressOf ClearAtcfSectorButtonClick
+            buttonPanel.Controls.Add(clearButton)
+            Dim parseButton As Button = CreateButton(T("atcf.sector.button.parse", "解析核心扇區"))
+            AddHandler parseButton.Click, AddressOf ParseAtcfSectorButtonClick
+            buttonPanel.Controls.Add(parseButton)
+            Dim intensityButton As Button = CreateButton(T("atcf.trend.button", "強度變化"))
+            AddHandler intensityButton.Click, AddressOf AtcfSectorIntensityTrendButtonClick
+            buttonPanel.Controls.Add(intensityButton)
+            layout.Controls.Add(buttonPanel, 0, 1)
+
+            Dim infoPanel As New Panel()
+            infoPanel.Dock = DockStyle.Fill
+            infoPanel.Padding = New Padding(2, 0, 2, 0)
+            lblAtcfSectorInfo.Text = T("atcf.sector.info.initial", "可貼上或開啟核心扇區定位檔；解析後選取資料列查看欄位解讀。")
+            lblAtcfSectorInfo.AutoSize = False
+            lblAtcfSectorInfo.Dock = DockStyle.Fill
+            lblAtcfSectorInfo.TextAlign = ContentAlignment.MiddleLeft
+            lblAtcfSectorInfo.AutoEllipsis = True
+            lblAtcfSectorInfo.ForeColor = Color.FromArgb(82, 104, 123)
+            infoPanel.Controls.Add(lblAtcfSectorInfo)
+            layout.Controls.Add(infoPanel, 0, 2)
+
+            ConfigureAtcfSectorGrid()
+            layout.Controls.Add(atcfSectorGrid, 0, 3)
+
+            txtAtcfSectorDetail.Multiline = True
+            txtAtcfSectorDetail.ReadOnly = True
+            txtAtcfSectorDetail.ScrollBars = ScrollBars.Vertical
+            txtAtcfSectorDetail.WordWrap = True
+            txtAtcfSectorDetail.Dock = DockStyle.Fill
+            txtAtcfSectorDetail.Font = New Font(Font.FontFamily, 10.0F, FontStyle.Regular)
+            txtAtcfSectorDetail.BackColor = Color.White
+            txtAtcfSectorDetail.ForeColor = Color.FromArgb(45, 61, 74)
+            txtAtcfSectorDetail.Text = T("atcf.sector.detail.placeholder", "選取上方資料列查看核心扇區欄位解讀。")
+            layout.Controls.Add(txtAtcfSectorDetail, 0, 4)
+
+            Dim note As Label = CreateNote(T("atcf.sector.note", "格式：Storm ID、Storm Name、YYMMDD、HHMM、LAT、LON、BASIN、VMAX、MSLP。資料來源為 NRL 與 SSEC 核心扇區檔；程式讀取本機檔案或貼上內容，不會自動下載。"))
+            note.Dock = DockStyle.Fill
+            note.MaximumSize = New Size(0, 0)
+            layout.Controls.Add(note, 0, 5)
+            Return page
+        End Function
+
+        Private Sub ConfigureAtcfSectorGrid()
+            atcfSectorGrid.Dock = DockStyle.Fill
+            UiRendering.EnableDoubleBuffer(atcfSectorGrid)
+            atcfSectorGrid.AllowUserToAddRows = False
+            atcfSectorGrid.AllowUserToDeleteRows = False
+            atcfSectorGrid.AllowUserToResizeRows = False
+            atcfSectorGrid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
+            atcfSectorGrid.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells
+            atcfSectorGrid.BackgroundColor = Color.White
+            atcfSectorGrid.BorderStyle = BorderStyle.FixedSingle
+            atcfSectorGrid.ColumnHeadersHeight = 34
+            atcfSectorGrid.EnableHeadersVisualStyles = False
+            atcfSectorGrid.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(28, 53, 78)
+            atcfSectorGrid.ColumnHeadersDefaultCellStyle.ForeColor = Color.White
+            atcfSectorGrid.ColumnHeadersDefaultCellStyle.Font = New Font(Font.FontFamily, 10.0F, FontStyle.Bold)
+            atcfSectorGrid.ColumnHeadersDefaultCellStyle.WrapMode = DataGridViewTriState.False
+            atcfSectorGrid.DefaultCellStyle.Font = New Font(Font.FontFamily, 10.0F, FontStyle.Regular)
+            atcfSectorGrid.DefaultCellStyle.WrapMode = DataGridViewTriState.True
+            atcfSectorGrid.DefaultCellStyle.SelectionBackColor = Color.FromArgb(71, 116, 153)
+            atcfSectorGrid.ReadOnly = True
+            atcfSectorGrid.RowHeadersVisible = False
+            atcfSectorGrid.SelectionMode = DataGridViewSelectionMode.FullRowSelect
+            atcfSectorGrid.MultiSelect = False
+            atcfSectorGrid.Columns.Add("StormId", T("atcf.sector.grid.id", "Storm ID"))
+            atcfSectorGrid.Columns.Add("StormName", T("atcf.sector.grid.name", "Storm Name"))
+            atcfSectorGrid.Columns.Add("Time", T("atcf.sector.grid.time", "分析時間 UTC"))
+            atcfSectorGrid.Columns.Add("Position", T("atcf.sector.grid.position", "位置"))
+            atcfSectorGrid.Columns.Add("Basin", T("atcf.sector.grid.basin", "海域"))
+            atcfSectorGrid.Columns.Add("Wind", T("atcf.sector.grid.wind", "VMAX"))
+            atcfSectorGrid.Columns.Add("Pressure", T("atcf.sector.grid.pressure", "MSLP"))
+            atcfSectorGrid.Columns("StormId").FillWeight = 60
+            atcfSectorGrid.Columns("StormName").FillWeight = 110
+            atcfSectorGrid.Columns("Time").FillWeight = 125
+            atcfSectorGrid.Columns("Position").FillWeight = 95
+            atcfSectorGrid.Columns("Basin").FillWeight = 120
+            atcfSectorGrid.Columns("Wind").FillWeight = 65
+            atcfSectorGrid.Columns("Pressure").FillWeight = 70
+            For Each column As DataGridViewColumn In atcfSectorGrid.Columns
+                column.SortMode = DataGridViewColumnSortMode.NotSortable
+            Next
+            AddHandler atcfSectorGrid.SelectionChanged, AddressOf AtcfSectorGridSelectionChanged
+        End Sub
+
+        Private Sub OpenAtcfSectorButtonClick(sender As Object, e As EventArgs)
+            Using dialog As New OpenFileDialog()
+                dialog.Filter = T("atcf.sector.dialog.filter", "ATCF 核心扇區檔案 (*.*)|*.*")
+                dialog.Title = T("atcf.sector.dialog.open", "開啟 ATCF 核心扇區定位檔")
+                If dialog.ShowDialog(Me) <> DialogResult.OK Then Return
+
+                atcfSectorSourceFileName = dialog.FileName
+                txtAtcfSector.Text = File.ReadAllText(dialog.FileName, System.Text.Encoding.ASCII)
+                lblAtcfSectorInfo.Text = String.Format(T("atcf.sector.file.loaded", "{0} 已載入；請按「解析核心扇區」。"), Path.GetFileName(dialog.FileName))
+                SetStatus(T("atcf.sector.status.loaded", "ATCF 核心扇區檔案已載入"))
+            End Using
+        End Sub
+
+        Private Sub ClearAtcfSectorButtonClick(sender As Object, e As EventArgs)
+            txtAtcfSector.Clear()
+            atcfSectorSourceFileName = ""
+            parsedAtcfSectorRecords.Clear()
+            atcfSectorGrid.Rows.Clear()
+            txtAtcfSectorDetail.Text = T("atcf.sector.detail.placeholder", "選取上方資料列查看核心扇區欄位解讀。")
+            lblAtcfSectorInfo.Text = T("atcf.sector.info.cleared", "ATCF 核心扇區資料已清除；可貼上或開啟定位檔。")
+            SetStatus(T("atcf.sector.status.cleared", "ATCF 核心扇區資料已清除"))
+        End Sub
+
+        Private Sub ParseAtcfSectorButtonClick(sender As Object, e As EventArgs)
+            Dim warnings As New List(Of String)()
+            Dim records As List(Of AtcfSectorRecord) = AtcfSectorParser.Parse(txtAtcfSector.Text, atcfSectorSourceFileName, warnings)
+            parsedAtcfSectorRecords.Clear()
+            parsedAtcfSectorRecords.AddRange(records)
+            UiRendering.BeginUpdate(atcfSectorGrid)
+            Try
+                atcfSectorGrid.Rows.Clear()
+                txtAtcfSectorDetail.Text = T("atcf.sector.detail.placeholder", "選取上方資料列查看核心扇區欄位解讀。")
+
+                For Each record As AtcfSectorRecord In records
+                    Dim rowIndex As Integer = atcfSectorGrid.Rows.Add(
+                        record.StormId,
+                        record.StormName,
+                        AtcfSectorTimeText(record),
+                        record.PositionText,
+                        record.BasinDisplayText,
+                        record.MaxWindText,
+                        record.MslpText)
+                    atcfSectorGrid.Rows(rowIndex).Tag = record
+                Next
+            Finally
+                UiRendering.EndUpdate(atcfSectorGrid)
+            End Try
+
+            If records.Count = 0 Then
+                lblAtcfSectorInfo.Text = T("atcf.sector.error.no.records", "沒有解析到有效核心扇區資料。請確認每行符合 9 欄格式。")
+                If warnings.Count > 0 Then ShowError(warnings(0))
+                Return
+            End If
+
+            Dim warningText As String = If(warnings.Count = 0, "", String.Format(T("atcf.sector.warning", "；{0} 行有欄位或格式提醒"), warnings.Count))
+            lblAtcfSectorInfo.Text = BuildAtcfSectorSummary(records) & warningText
+            atcfSectorGrid.Rows(0).Selected = True
+            atcfSectorGrid.CurrentCell = atcfSectorGrid.Rows(0).Cells(0)
+            AtcfSectorGridSelectionChanged(Nothing, EventArgs.Empty)
+            SetStatus(T("atcf.sector.status.parsed", "ATCF 核心扇區定位資料解析完成"))
+        End Sub
+
+        Private Sub AtcfSectorIntensityTrendButtonClick(sender As Object, e As EventArgs)
+            If parsedAtcfSectorRecords.Count = 0 Then
+                ShowError(T("atcf.trend.error.first", "請先解析 ATCF 資料，再開啟強度變化圖。"))
+                Return
+            End If
+
+            Dim points As New List(Of AtcfIntensityPoint)()
+            For Each record As AtcfSectorRecord In parsedAtcfSectorRecords
+                If record.HasAnalysisTime Then points.Add(AtcfIntensityPoint.FromAtcfSectorRecord(record))
+            Next
+            If points.Count = 0 Then
+                ShowError(T("atcf.trend.error.time", "目前 ATCF 資料沒有可用的 UTC 時間，無法繪製強度變化圖。"))
+                Return
+            End If
+
+            Using trendForm As New AtcfIntensityTrendForm(points, T("atcf.trend.source.sector", "NRL Sector File"))
+                trendForm.ShowDialog(Me)
+            End Using
+        End Sub
+
+        Private Sub AtcfSectorGridSelectionChanged(sender As Object, e As EventArgs)
+            If atcfSectorGrid.SelectedRows.Count = 0 Then Return
+            Dim index As Integer = atcfSectorGrid.SelectedRows(0).Index
+            If index < 0 OrElse index >= parsedAtcfSectorRecords.Count Then Return
+            txtAtcfSectorDetail.Text = BuildAtcfSectorDetail(parsedAtcfSectorRecords(index))
+        End Sub
+
+        Private Function BuildAtcfSectorSummary(records As List(Of AtcfSectorRecord)) As String
+            Dim sourceText As String = If(String.IsNullOrEmpty(atcfSectorSourceFileName),
+                                          T("atcf.sector.source.pasted", "貼上資料內容"),
+                                          Path.GetFileName(atcfSectorSourceFileName))
+            Dim firstTime As DateTime = DateTime.MaxValue
+            Dim lastTime As DateTime = DateTime.MinValue
+            Dim systems As New Dictionary(Of String, Boolean)(StringComparer.OrdinalIgnoreCase)
+            For Each record As AtcfSectorRecord In records
+                If record.HasAnalysisTime Then
+                    If record.AnalysisTimeUtc < firstTime Then firstTime = record.AnalysisTimeUtc
+                    If record.AnalysisTimeUtc > lastTime Then lastTime = record.AnalysisTimeUtc
+                End If
+                If Not systems.ContainsKey(record.StormId) Then systems.Add(record.StormId, True)
+            Next
+
+            Dim parts As New List(Of String)()
+            parts.Add(String.Format(T("atcf.sector.summary.source", "{0}"), sourceText))
+            parts.Add(String.Format(CultureInfo.InvariantCulture, T("atcf.sector.summary.count", "{0} 筆／{1} 個系統"), records.Count, systems.Count))
+            If firstTime <> DateTime.MaxValue AndAlso lastTime <> DateTime.MinValue Then
+                parts.Add(String.Format(CultureInfo.InvariantCulture, T("atcf.sector.summary.time", "{0:yyyy-MM-dd HH:mm}～{1:yyyy-MM-dd HH:mm} UTC"), firstTime, lastTime))
+            End If
+            Return String.Join(T("atcf.sector.summary.separator", "；"), parts.ToArray())
+        End Function
+
+        Private Shared Function AtcfSectorTimeText(record As AtcfSectorRecord) As String
+            If Not record.HasAnalysisTime Then Return "—"
+            Return record.AnalysisTimeUtc.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture)
+        End Function
+
+        Private Shared Function BuildAtcfSectorDetail(record As AtcfSectorRecord) As String
+            Dim lines As New List(Of String)()
+            lines.Add(String.Format(CultureInfo.InvariantCulture,
+                LanguageManager.Translate("atcf.sector.detail.line", "第 {0} 行｜{1} {2}｜{3}"),
+                record.SourceLineNumber, record.StormId, record.StormName, AtcfSectorTimeText(record) & " UTC"))
+            lines.Add(LanguageManager.Translate("atcf.sector.detail.fields", "ATCF 核心扇區欄位（9 欄）"))
+            AddAtcfSectorDetailLine(lines, 1, LanguageManager.Translate("atcf.sector.field.id", "Storm ID"), record.StormId, LanguageManager.Translate("atcf.sector.meaning.id", "系統識別碼，例如 13W 或 93C。"))
+            AddAtcfSectorDetailLine(lines, 2, LanguageManager.Translate("atcf.sector.field.name", "Storm Name"), record.StormName, LanguageManager.Translate("atcf.sector.meaning.name", "系統名稱；INVEST 可表示尚未正式命名的系統。"))
+            AddAtcfSectorDetailLine(lines, 3, LanguageManager.Translate("atcf.sector.field.date", "YYMMDD"), If(record.HasAnalysisTime, record.AnalysisTimeUtc.ToString("yyMMdd", CultureInfo.InvariantCulture), "—"), LanguageManager.Translate("atcf.sector.meaning.date", "定位日期；兩位數年份依 2000 年代解讀。"))
+            AddAtcfSectorDetailLine(lines, 4, LanguageManager.Translate("atcf.sector.field.time", "HHMM"), If(record.HasAnalysisTime, record.AnalysisTimeUtc.ToString("HHmm", CultureInfo.InvariantCulture) & " UTC", "—"), LanguageManager.Translate("atcf.sector.meaning.time", "定位時間，UTC。"))
+            AddAtcfSectorDetailLine(lines, 5, LanguageManager.Translate("atcf.sector.field.lat", "LAT"), record.LatitudeText, LanguageManager.Translate("atcf.sector.meaning.lat", "中心緯度，十進位度數與 N/S 半球。"))
+            AddAtcfSectorDetailLine(lines, 6, LanguageManager.Translate("atcf.sector.field.lon", "LON"), record.LongitudeText, LanguageManager.Translate("atcf.sector.meaning.lon", "中心經度，十進位度數與 E/W 半球。"))
+            AddAtcfSectorDetailLine(lines, 7, LanguageManager.Translate("atcf.sector.field.basin", "BASIN"), record.BasinDisplayText, LanguageManager.Translate("atcf.sector.meaning.basin", "ATCF 海域代碼，例如 WPAC、CPAC、SHEM。"))
+            AddAtcfSectorDetailLine(lines, 8, LanguageManager.Translate("atcf.sector.field.wind", "VMAX"), record.MaxWindText, LanguageManager.Translate("atcf.sector.meaning.wind", "最大持續風速，節（kt）。"))
+            AddAtcfSectorDetailLine(lines, 9, LanguageManager.Translate("atcf.sector.field.pressure", "MSLP"), record.MslpText, LanguageManager.Translate("atcf.sector.meaning.pressure", "最低海平面氣壓，hPa。"))
+            lines.Add("")
+            lines.Add(LanguageManager.Translate("atcf.sector.detail.raw", "原始資料：") & record.OriginalLine)
+            Return String.Join(Environment.NewLine, lines.ToArray())
+        End Function
+
+        Private Shared Sub AddAtcfSectorDetailLine(lines As List(Of String), index As Integer, fieldName As String, value As String, meaning As String)
+            lines.Add(String.Format(CultureInfo.InvariantCulture, LanguageManager.Translate("atcf.sector.detail.field", "{0:00}. {1}"), index, fieldName))
+            lines.Add(LanguageManager.Translate("atcf.sector.detail.value", "    值：") & value)
+            lines.Add(LanguageManager.Translate("atcf.sector.detail.meaning", "    說明：") & meaning)
+        End Sub
+
         Private Sub ConfigureAtcfGrid()
             atcfGrid.Dock = DockStyle.Fill
+            UiRendering.EnableDoubleBuffer(atcfGrid)
             atcfGrid.AllowUserToAddRows = False
             atcfGrid.AllowUserToDeleteRows = False
             atcfGrid.AllowUserToResizeRows = False
@@ -659,25 +953,30 @@ Public Class MainForm
             Dim records As List(Of AtcfRecord) = AtcfParser.Parse(txtAtcf.Text, atcfSourceFileName, warnings)
             parsedAtcfRecords.Clear()
             parsedAtcfRecords.AddRange(records)
-            atcfGrid.Rows.Clear()
-            txtAtcfDetail.Text = "選取上方資料列查看完整欄位解讀。"
+            UiRendering.BeginUpdate(atcfGrid)
+            Try
+                atcfGrid.Rows.Clear()
+                txtAtcfDetail.Text = "選取上方資料列查看完整欄位解讀。"
 
-            For Each record As AtcfRecord In records
-                Dim systemText As String = record.Basin & "/" & If(record.HasCycloneNumber, record.CycloneNumber.ToString("00", CultureInfo.InvariantCulture), "—")
-                Dim typeText As String = If(String.IsNullOrEmpty(record.SystemType), "—", record.SystemType & "（" & record.TypeText & "）")
-                Dim nameText As String = If(String.IsNullOrEmpty(record.StormName), "—", record.StormName)
-                Dim windText As String = If(record.HasMaxWind, record.MaxWindKnots.ToString(CultureInfo.InvariantCulture) & " kt", "—")
-                Dim pressureText As String = If(record.HasMslp, record.MslpHpa.ToString(CultureInfo.InvariantCulture) & " hPa", "—")
-                atcfGrid.Rows.Add(
-                    AtcfTimeText(record),
-                    systemText,
-                    record.Tech & "/" & If(record.HasTau, record.TauHours.ToString(CultureInfo.InvariantCulture) & " h", "—"),
-                    AtcfPositionText(record),
-                    windText,
-                    pressureText,
-                    typeText,
-                    nameText & "；" & record.WindRadiiText)
-            Next
+                For Each record As AtcfRecord In records
+                    Dim systemText As String = record.Basin & "/" & If(record.HasCycloneNumber, record.CycloneNumber.ToString("00", CultureInfo.InvariantCulture), "—")
+                    Dim typeText As String = If(String.IsNullOrEmpty(record.SystemType), "—", record.SystemType & "（" & record.TypeText & "）")
+                    Dim nameText As String = If(String.IsNullOrEmpty(record.StormName), "—", record.StormName)
+                    Dim windText As String = If(record.HasMaxWind, record.MaxWindKnots.ToString(CultureInfo.InvariantCulture) & " kt", "—")
+                    Dim pressureText As String = If(record.HasMslp, record.MslpHpa.ToString(CultureInfo.InvariantCulture) & " hPa", "—")
+                    atcfGrid.Rows.Add(
+                        AtcfTimeText(record),
+                        systemText,
+                        record.Tech & "/" & If(record.HasTau, record.TauHours.ToString(CultureInfo.InvariantCulture) & " h", "—"),
+                        AtcfPositionText(record),
+                        windText,
+                        pressureText,
+                        typeText,
+                        nameText & "；" & record.WindRadiiText)
+                Next
+            Finally
+                UiRendering.EndUpdate(atcfGrid)
+            End Try
 
             If records.Count = 0 Then
                 lblAtcfInfo.Text = T("atcf.error.no.records", "沒有解析到有效 ATCF 資料。請確認每行至少包含前 8 個必要欄位。")
@@ -691,6 +990,26 @@ Public Class MainForm
             atcfGrid.CurrentCell = atcfGrid.Rows(0).Cells(0)
             AtcfGridSelectionChanged(Nothing, EventArgs.Empty)
             SetStatus("ATCF Tracking Data 解析完成")
+        End Sub
+
+        Private Sub AtcfIntensityTrendButtonClick(sender As Object, e As EventArgs)
+            If parsedAtcfRecords.Count = 0 Then
+                ShowError(T("atcf.trend.error.first", "請先解析 ATCF 資料，再開啟強度變化圖。"))
+                Return
+            End If
+
+            Dim points As New List(Of AtcfIntensityPoint)()
+            For Each record As AtcfRecord In parsedAtcfRecords
+                If record.HasAnalysisTime Then points.Add(AtcfIntensityPoint.FromAtcfRecord(record))
+            Next
+            If points.Count = 0 Then
+                ShowError(T("atcf.trend.error.time", "目前 ATCF 資料沒有可用的 UTC 時間，無法繪製強度變化圖。"))
+                Return
+            End If
+
+            Using trendForm As New AtcfIntensityTrendForm(points, T("atcf.trend.source.atcf", "ATCF Tracking Data"))
+                trendForm.ShowDialog(Me)
+            End Using
         End Sub
 
         Private Sub AtcfGridSelectionChanged(sender As Object, e As EventArgs)
@@ -1398,15 +1717,20 @@ Public Class MainForm
         End Sub
 
         Private Sub PopulateAgencyGrid(rows As List(Of IntensityAgencyRow), ci As Double, summary As String)
-            agencyGrid.Rows.Clear()
-            Dim rowColor As Color = IntensityRowColor(ci)
-            Dim rowTextColor As Color = If(ci >= 6.0, Color.White, Color.FromArgb(28, 53, 78))
+            UiRendering.BeginUpdate(agencyGrid)
+            Try
+                agencyGrid.Rows.Clear()
+                Dim rowColor As Color = IntensityRowColor(ci)
+                Dim rowTextColor As Color = If(ci >= 6.0, Color.White, Color.FromArgb(28, 53, 78))
 
-            For Each row As IntensityAgencyRow In rows
-                Dim rowIndex As Integer = agencyGrid.Rows.Add(row.Agency, row.WindDefinition, row.WindText, row.Category, row.PressureText, row.SourceNote)
-                agencyGrid.Rows(rowIndex).DefaultCellStyle.BackColor = rowColor
-                agencyGrid.Rows(rowIndex).DefaultCellStyle.ForeColor = rowTextColor
-            Next
+                For Each row As IntensityAgencyRow In rows
+                    Dim rowIndex As Integer = agencyGrid.Rows.Add(row.Agency, row.WindDefinition, row.WindText, row.Category, row.PressureText, row.SourceNote)
+                    agencyGrid.Rows(rowIndex).DefaultCellStyle.BackColor = rowColor
+                    agencyGrid.Rows(rowIndex).DefaultCellStyle.ForeColor = rowTextColor
+                Next
+            Finally
+                UiRendering.EndUpdate(agencyGrid)
+            End Try
 
             lblAgencyInfo.Text = summary
         End Sub

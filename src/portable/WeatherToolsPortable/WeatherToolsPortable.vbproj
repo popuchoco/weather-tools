@@ -67,6 +67,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Compile Include="Program.vb" />
+    <Compile Include="BufferedForm.vb" />
     <Compile Include="MainForm.vb" />
     <Compile Include="LanguageManager.vb" />
     <Compile Include="AgencyReference.vb" />
@@ -74,6 +75,8 @@
     <Compile Include="DvtsTrendForm.vb" />
     <Compile Include="CenterDirectory.vb" />
     <Compile Include="AtcfParser.vb" />
+    <Compile Include="AtcfSectorParser.vb" />
+    <Compile Include="AtcfIntensityTrendForm.vb" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
 </Project>

@@ -19,6 +19,9 @@ VB.NET Windows Forms 气象工具，延续早期“气象小工具”的换算�
 - AMSU research 卫星自动分析报文的 DVTS 解析，可打开 `.txt`／`.dat` 文件或粘贴内容，读取 T、CI、趋势与分析机构。
 - DVTS 趋势图分析：依报文中的分析机构分类，以 UTC 时间绘制 T／CI 折线图，Y 轴固定为 0～8，并可输出 PNG 图像文件。
 - ATCF 路径解析：读取或粘贴 ATCF Best Track `b*.dat`，分析时间、位置、VMAX、MSLP、等级、风圈与完整字段。
+- ATCF 实时定位分析：读取或粘贴 `NRL Sector File`，解析 Storm ID、Storm Name、YYMMDD、HHMM、LAT、LON、BASIN、VMAX 与 MSLP。
+- ATCF 两个页面都可打开强度变化图：X 轴为 UTC 时间，并可在 `VMAX`（0～200 kts）与 `MSLP`（800～1050 hPa）之间切换 Y 轴。
+- 主窗口拖曳优化：大量页签控件在移动期间暂时与主窗口分离，释放鼠标后恢复，以减少 Windows Forms 重绘延迟。
 - 延续早期版本的 `icon.ico`，作为 2026 V6 执行文件与主窗口图标。
 
 ## ATCF 最佳路径资料
@@ -41,6 +44,23 @@ ATCF 页面中的“清除资料”会同时清除输入框、已解析路径表
 
 字段分析依据 [ATCF Best Track／Objective Aid／Wind Radii Format](https://science.nrlmry.navy.mil/atcf/docs/database/new/abrdeck.html)，包含 common fields 1–35，以及第 36 栏起的 `USERDEFINED`／`userdata`。
 
+## ATCF 实时定位分析
+
+此页面用于解读美国海军研究实验室使用的 `NRL Sector File` 核心扇区定位文件。可从以下来源取得文件后，在程序中打开或粘贴：
+
+- [NRL Sector File](https://www.nrlmry.navy.mil/tcdat/sectors/atcf_sector_file)
+- [SSEC NRL Sector File](https://tropic.ssec.wisc.edu/real-time/amsu/herndon/new_sector_file)
+
+每行格式为：
+
+```text
+[Storm ID] [Storm Name] [YYMMDD] [HHMM] [LAT] [LON] [BASIN] [VMAX] [MSLP]
+```
+
+字段定义依据 2001 年 Hawkins 等人发表于 *Bulletin of the American Meteorological Society* 的 [Real-Time Internet Distribution of Satellite Products for Tropical Cyclone Reconnaissance](https://journals.ametsoc.org/view/journals/bams/82/4/1520-0477_2001_082_0567_ridosp_2_3_co_2.xml)。程序将两位数年份按 2000 年代解读，时间以 UTC 显示；此页面只解读文件内容，不会自动下载或替代官方定位分析。
+
+解析后点击“强度变化”即可打开新 Form。图内右上角会显示 `气旋：13W PEILOU` 这类气旋信息；选择 `VMAX` 时 Y 轴固定为 0～200 kts，选择 `MSLP` 时固定为 800～1050 hPa。缺值会保留为空白，不会补成 0。
+
 ## DVTS 报文
 
 2026 V6 接受 AMSU research 使用的卫星自动分析格式，例如：
@@ -57,7 +77,7 @@ DVTS 页面中的“清除资料”会同时清除输入框、已解析记录、
 
 ## 语言包
 
-Portable 版的界面与解读内容由 `src/portable/WeatherToolsPortable/languages` 下的 XML 语言包提供，目前附带繁体中文 `zh-TW.xml`、简体中文 `zh-CN.xml` 与英文 `en-US.xml`。三份语言包使用相同的 343 个 key，并以每个 `<string>` 一行的格式维护，避免不同语言看起来像是缺少内容。程序右上方只提供 `EN`、`Zh-HanS`、`Zh-HanT` 三个选项；选择后会立即重新启动并套用语言，设置会记录在执行文件旁的 `language.settings.xml`，下次启动会沿用。
+Portable 版的界面与解读内容由 `src/portable/WeatherToolsPortable/languages` 下的 XML 语言包提供，目前附带繁体中文 `zh-TW.xml`、简体中文 `zh-CN.xml` 与英文 `en-US.xml`。三份语言包使用相同的 427 个 key，并以每个 `<string>` 一行的格式维护，避免不同语言看起来像是缺少内容。程序右上方只提供 `EN`、`Zh-HanS`、`Zh-HanT` 三个选项；选择后会立即重新启动并套用语言，设置会记录在执行文件旁的 `language.settings.xml`，下次启动会沿用。
 
 语言包是供使用者自行维护的 XML 资料，请使用 IDE 编辑各个 `<string>` 元素的文字，并保留 `key` 属性；程序不内置语言包编辑器。修改 XML 后重新打开程序即可套用。
 
@@ -85,6 +105,8 @@ Portable 版的界面与解读内容由 `src/portable/WeatherToolsPortable/langu
 | `DvtsParser.vb` | DVTS 报文解析 |
 | `DvtsTrendForm.vb` | DVTS T／CI 趋势图与机构筛选 |
 | `AtcfParser.vb` | ATCF Best Track 字段与等级解析 |
+| `AtcfSectorParser.vb` | NRL Sector File 核心扇区定位文件解析 |
+| `AtcfIntensityTrendForm.vb` | ATCF VMAX／MSLP 强度变化图 |
 | `CenterDirectory.vb` | 分析中心代码与机构名称对照 |
 | `languages/*.xml` | 繁体中文、简体中文与英文语言包；可由使用者以 IDE 维护 |
 | `icon.ico` | 2026 V6 执行文件与主窗口图标 |
@@ -98,7 +120,7 @@ Portable 版的界面与解读内容由 `src/portable/WeatherToolsPortable/langu
 - [2026 V5（重置版）](https://github.com/popuchoco/weather-tools/releases/tag/2026.0)：以“气象小工具 2026 Ver.”重新整理 VB.NET source code 与项目结构，建立目前的离线 Portable 架构，并纳入风速／Dvorak、DVTS 与 ATCF 基础功能。
   - [2026 V5（Ver. 1）](https://github.com/popuchoco/weather-tools/releases/tag/2026.1)：在 V5 重置架构上加入 DVTS 中心筛选、T／CI／ALL 趋势显示、同机构图例、气旋编号与 PNG 文件名辨识。
   - [2026 V5（Ver. 2）](https://github.com/popuchoco/weather-tools/releases/tag/2026.2)：补上 DVTS／ATCF 清除资料流程，清除输入、解析结果、筛选与文件状态，并修正清空后趋势图沿用旧资料。
-- [2026 V6](https://github.com/popuchoco/weather-tools/releases/tag/v6.0)：在 V5 重置架构上进行大幅改版，加入三语 343-key XML 语言包、语言设置记忆、界面版面整理与干净的 Portable 交付包，并延续 DVTS／ATCF、趋势图与 PNG 功能。
+- [2026 V6](https://github.com/popuchoco/weather-tools/releases/tag/v6.0)：在 V5 重置架构上进行大幅改版，加入三语 427-key XML 语言包、语言设置记忆、界面版面整理与干净的 Portable 交付包，并延续 DVTS／ATCF、趋势图与 PNG 功能。
 
 ## 建置
 
