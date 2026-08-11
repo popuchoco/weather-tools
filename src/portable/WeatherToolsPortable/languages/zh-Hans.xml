@@ -442,4 +442,5 @@ CWA 入门分段：T 小于 2 约为热带低压阶段，T 约 2.5～3.5 为轻�
   <string key="atcf.trend.source.sector">NRL Sector File</string>
   <string key="atcf.trend.cyclone.title">气旋：{0}</string>
   <string key="atcf.trend.cyclone.empty">气旋：—</string>
+  <string key="atcf.trend.png.title">导出 ATCF 强度分析图 PNG</string>
 </language>

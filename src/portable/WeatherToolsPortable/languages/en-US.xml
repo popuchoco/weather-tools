@@ -442,4 +442,5 @@ Limitations: Dvorak is a statistical and subjective satellite estimate, not a di
   <string key="atcf.trend.source.sector">NRL Sector File</string>
   <string key="atcf.trend.cyclone.title">Cyclone: {0}</string>
   <string key="atcf.trend.cyclone.empty">Cyclone: —</string>
+  <string key="atcf.trend.png.title">Export ATCF intensity chart PNG</string>
 </language>

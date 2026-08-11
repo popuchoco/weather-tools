@@ -137,6 +137,10 @@ Public Class AtcfIntensityTrendForm
         AddHandler resetButton.Click, AddressOf ResetZoomButtonClick
         filterPanel.Controls.Add(resetButton)
 
+        Dim exportButton As Button = CreateButton("輸出 PNG")
+        AddHandler exportButton.Click, AddressOf ExportPngButtonClick
+        filterPanel.Controls.Add(exportButton)
+
         summaryLabel.AutoSize = True
         summaryLabel.ForeColor = Color.FromArgb(82, 104, 123)
         summaryLabel.Margin = New Padding(14, 7, 3, 0)
@@ -330,6 +334,38 @@ Public Class AtcfIntensityTrendForm
         trendChart.ChartAreas("ATCF").AxisX.ScaleView.ZoomReset(0)
         trendChart.ChartAreas("ATCF").AxisY.ScaleView.ZoomReset(0)
     End Sub
+
+    Private Sub ExportPngButtonClick(sender As Object, e As EventArgs)
+        Using dialog As New SaveFileDialog()
+            dialog.Filter = LanguageManager.Translate("trend.png.filter", "PNG 圖檔 (*.png)|*.png")
+            dialog.Title = LanguageManager.Translate("atcf.trend.png.title", "輸出 ATCF 強度分析圖 PNG")
+            dialog.DefaultExt = "png"
+            dialog.AddExtension = True
+            dialog.FileName = BuildDefaultFileName()
+            If dialog.ShowDialog(Me) <> DialogResult.OK Then Return
+
+            Try
+                trendChart.SaveImage(dialog.FileName, ChartImageFormat.Png)
+                MessageBox.Show(Me,
+                                String.Format(LanguageManager.Translate("trend.png.success", "PNG 圖檔已輸出：{0}"), Environment.NewLine & dialog.FileName),
+                                LanguageManager.Translate("text.輸出完成", "輸出完成"),
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Information)
+            Catch ex As Exception
+                MessageBox.Show(Me,
+                                String.Format(LanguageManager.Translate("trend.png.failure", "PNG 輸出失敗：{0}"), ex.Message),
+                                LanguageManager.Translate("text.輸出失敗", "輸出失敗"),
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Error)
+            End Try
+        End Using
+    End Sub
+
+    Private Function BuildDefaultFileName() As String
+        Dim systemKey As String = GetCycloneIdentifier()
+        If String.IsNullOrEmpty(systemKey) OrElse systemKey = "—" Then systemKey = "UNKNOWN"
+        Return "ATCF_Trend_" & systemKey & "_" & GetSelectedMode() & "_" & DateTime.Now.ToString("yyyyMMddHHmmss", CultureInfo.InvariantCulture) & ".png"
+    End Function
 
     Private Shared Function CreateButton(caption As String) As Button
         Dim button As New Button()
