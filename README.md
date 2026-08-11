@@ -1,5 +1,7 @@
 # 氣象小工具 2026
 
+[简体中文（简）](README.zh-Hans.md)
+
 VB.NET Windows Forms 氣象工具，延續早期「氣象小工具」的換算功能，並加入 Dvorak 強度對照、DVTS 報文解析與 ATCF 最佳路徑資料解讀。
 
 本專案採 Apache License 2.0。歷史版本保留原始碼或 GitHub Release；2026 V6 source code 位於 [`src/portable`](src/portable)。
