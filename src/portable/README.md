@@ -34,7 +34,7 @@
 
 ### 語言包
 
-Portable 版附帶 `languages` 資料夾，內含 `zh-TW.xml`（繁體中文）、`zh-CN.xml`（簡體中文）與 `en-US.xml`（English）三份 XML 語言包；三份語言包使用相同的 427 個 key，且每個 `<string>` 會獨立一行。程式右上方只提供 `EN`、`Zh-HanS`、`Zh-HanT` 三個選項；選取後會立即重新啟動並套用語言，設定會記錄在執行檔旁的 `language.settings.xml`，下次啟動會沿用。
+Portable 版附帶 `languages` 資料夾，內含 `zh-Hant.xml`（繁體中文）、`zh-Hans.xml`（簡體中文）與 `en-US.xml`（English）三份 XML 語言包；三份語言包使用相同的 427 個 key，且每個 `<string>` 會獨立一行。程式右上方只提供 `EN`、`Zh-HanS`、`Zh-HanT` 三個選項；選取後會立即重新啟動並套用語言，設定會記錄在執行檔旁的 `language.settings.xml`，下次啟動會沿用。
 
 使用者可用 IDE 直接編輯 XML 的元素文字來維護翻譯；請保留 `key` 屬性，不需要也不應在程式內加入語言包編輯器。修改 XML 後重新開啟程式即可套用。
 
@@ -43,11 +43,11 @@ Portable 版附帶 `languages` 資料夾，內含 `zh-TW.xml`（繁體中文）�
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <settings>
-  <language file="zh-TW.xml" />
+  <language file="zh-Hant.xml" />
 </settings>
 ```
 
-`file` 可使用 `en-US.xml`、`zh-CN.xml` 或 `zh-TW.xml`。刪除這個設定檔會在下次啟動時回到繁體中文預設值；若指定的語言包不存在，程式會嘗試其他可用語言包。三份語言包都不存在或無法讀取時，程式會顯示中英雙語錯誤並停止啟動。
+`file` 可使用 `en-US.xml`、`zh-Hans.xml` 或 `zh-Hant.xml`。刪除這個設定檔會在下次啟動時回到繁體中文預設值；若指定的語言包不存在，程式會嘗試其他可用語言包。三份語言包都不存在或無法讀取時，程式會顯示中英雙語錯誤並停止啟動。
 
 若 `languages` 資料夾或所有可用 XML 語言包被移除，程式會顯示中英雙語錯誤並停止開啟主介面；請先把語言包補回執行檔旁，再重新啟動。
 

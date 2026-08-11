@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- User-editable language package. Keep key attributes unchanged and edit element text. -->
-<language locale="zh-TW" name="繁體中文（台灣）" version="1.0">
+<language locale="zh-Hant" name="繁體中文" version="1.0">
   <string key="app.title">氣象小工具 2026 V6</string>
   <string key="app.subtitle">給氣象初學者的離線換算工具｜不需安裝、不需網路、不需 API Key</string>
   <string key="language.label">語言包</string>

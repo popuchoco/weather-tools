@@ -19,8 +19,8 @@ Public NotInheritable Class LanguagePackageInfo
         Me.Locale = locale
         Select Case fileName.ToLowerInvariant()
             Case "en-us.xml" : ShortName = "EN"
-            Case "zh-cn.xml" : ShortName = "Zh-HanS"
-            Case "zh-tw.xml" : ShortName = "Zh-HanT"
+            Case "zh-hans.xml" : ShortName = "Zh-HanS"
+            Case "zh-hant.xml" : ShortName = "Zh-HanT"
             Case Else : ShortName = displayName
         End Select
     End Sub
@@ -34,7 +34,7 @@ Public NotInheritable Class LanguageManager
     Private Shared ReadOnly Values As New Dictionary(Of String, String)(StringComparer.OrdinalIgnoreCase)
     Private Shared isInitialized As Boolean
     Private Shared languageReady As Boolean
-    Private Shared selectedFileName As String = "zh-TW.xml"
+    Private Shared selectedFileName As String = "zh-Hant.xml"
 
     Private Sub New()
     End Sub
@@ -108,7 +108,7 @@ Public NotInheritable Class LanguageManager
     End Function
 
     Public Shared Function GetStartupErrorMessage() As String
-        Return "找不到可用的語言包，程式無法啟動。請將 languages 資料夾與 zh-TW.xml、zh-CN.xml、en-US.xml 放回執行檔旁，再重新開啟程式。" & Environment.NewLine & Environment.NewLine & "No usable language package was found. Restore the languages folder and its XML files beside the executable, then restart the application."
+        Return "找不到可用的語言包，程式無法啟動。請將 languages 資料夾與 zh-Hant.xml、zh-Hans.xml、en-US.xml 放回執行檔旁，再重新開啟程式。" & Environment.NewLine & Environment.NewLine & "No usable language package was found. Restore the languages folder and its XML files beside the executable, then restart the application."
     End Function
 
     Private Shared Function LoadPackage(fileName As String, rememberSelection As Boolean) As Boolean
@@ -165,8 +165,8 @@ Public NotInheritable Class LanguageManager
 
     Private Shared Function IsSupportedPackage(fileName As String) As Boolean
         Return String.Equals(fileName, "en-US.xml", StringComparison.OrdinalIgnoreCase) OrElse
-               String.Equals(fileName, "zh-CN.xml", StringComparison.OrdinalIgnoreCase) OrElse
-               String.Equals(fileName, "zh-TW.xml", StringComparison.OrdinalIgnoreCase)
+               String.Equals(fileName, "zh-Hans.xml", StringComparison.OrdinalIgnoreCase) OrElse
+               String.Equals(fileName, "zh-Hant.xml", StringComparison.OrdinalIgnoreCase)
     End Function
 
     Private Shared Function ReadPackageInfo(filePath As String) As LanguagePackageInfo
@@ -188,15 +188,15 @@ Public NotInheritable Class LanguageManager
     Private Shared Function ReadSelectedFileName() As String
         Try
             Dim settingsPath As String = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "language.settings.xml")
-            If Not File.Exists(settingsPath) Then Return "zh-TW.xml"
+            If Not File.Exists(settingsPath) Then Return "zh-Hant.xml"
             Dim document As New XmlDocument()
             document.Load(settingsPath)
             Dim node As XmlElement = TryCast(document.SelectSingleNode("/settings/language"), XmlElement)
-            If node Is Nothing Then Return "zh-TW.xml"
+            If node Is Nothing Then Return "zh-Hant.xml"
             Dim fileName As String = node.GetAttribute("file")
-            Return If(String.IsNullOrEmpty(fileName), "zh-TW.xml", System.IO.Path.GetFileName(fileName))
+            Return If(String.IsNullOrEmpty(fileName), "zh-Hant.xml", System.IO.Path.GetFileName(fileName))
         Catch
-            Return "zh-TW.xml"
+            Return "zh-Hant.xml"
         End Try
     End Function
 

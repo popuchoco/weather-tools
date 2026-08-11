@@ -1367,7 +1367,7 @@ Public Class MainForm
                     packagesByFile(package.FileName) = package
                 Next
 
-                For Each fileName As String In New String() {"en-US.xml", "zh-CN.xml", "zh-TW.xml"}
+                For Each fileName As String In New String() {"en-US.xml", "zh-Hans.xml", "zh-Hant.xml"}
                     Dim package As LanguagePackageInfo = Nothing
                     If packagesByFile.TryGetValue(fileName, package) Then languageSelector.Items.Add(package)
                 Next

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- 用户可编辑的语言包。请保留 key 属性，只修改元素文字。 -->
-<language locale="zh-CN" name="简体中文（中国大陆）" version="1.0">
+<language locale="zh-Hans" name="简体中文" version="1.0">
   <string key="app.title">气象小工具 2026 V6</string>
   <string key="app.subtitle">面向气象初学者的离线换算工具｜无需安装、无需网络、无需 API Key</string>
   <string key="language.label">语言包</string>

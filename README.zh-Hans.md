@@ -78,7 +78,7 @@ DVTS 页面中的“清除资料”会同时清除输入框、已解析记录、
 
 ## 语言包
 
-Portable 版的界面与解读内容由 `src/portable/WeatherToolsPortable/languages` 下的 XML 语言包提供，目前附带繁体中文 `zh-TW.xml`、简体中文 `zh-CN.xml` 与英文 `en-US.xml`。三份语言包使用相同的 427 个 key，并以每个 `<string>` 一行的格式维护，避免不同语言看起来像是缺少内容。程序右上方只提供 `EN`、`Zh-HanS`、`Zh-HanT` 三个选项；选择后会立即重新启动并套用语言，设置会记录在执行文件旁的 `language.settings.xml`，下次启动会沿用。
+Portable 版的界面与解读内容由 `src/portable/WeatherToolsPortable/languages` 下的 XML 语言包提供，目前附带繁体中文 `zh-Hant.xml`、简体中文 `zh-Hans.xml` 与英文 `en-US.xml`。三份语言包使用相同的 427 个 key，并以每个 `<string>` 一行的格式维护，避免不同语言看起来像是缺少内容。程序右上方只提供 `EN`、`Zh-HanS`、`Zh-HanT` 三个选项；选择后会立即重新启动并套用语言，设置会记录在执行文件旁的 `language.settings.xml`，下次启动会沿用。
 
 语言包是供使用者自行维护的 XML 资料，请使用 IDE 编辑各个 `<string>` 元素的文字，并保留 `key` 属性；程序不内置语言包编辑器。修改 XML 后重新打开程序即可套用。
 
@@ -87,11 +87,11 @@ Portable 版的界面与解读内容由 `src/portable/WeatherToolsPortable/langu
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <settings>
-  <language file="zh-CN.xml" />
+  <language file="zh-Hans.xml" />
 </settings>
 ```
 
-`file` 只能指定随程序附带的 `en-US.xml`、`zh-CN.xml` 或 `zh-TW.xml`。一般使用者不需要手动编辑；如果删除 `language.settings.xml`，下次启动会回到繁体中文默认值。如果设置文件指定的语言包不存在，程序会改载入其他可用语言包；如果三份语言包都不可用，则会显示错误并停止打开主界面。
+`file` 只能指定随程序附带的 `en-US.xml`、`zh-Hans.xml` 或 `zh-Hant.xml`。一般使用者不需要手动编辑；如果删除 `language.settings.xml`，下次启动会回到繁体中文默认值。如果设置文件指定的语言包不存在，程序会改载入其他可用语言包；如果三份语言包都不可用，则会显示错误并停止打开主界面。
 
 如果语言包文件夹或全部语言包被移除，程序会显示中英双语错误并停止打开主界面，直到至少补回一份可用的 XML 语言包。
 
