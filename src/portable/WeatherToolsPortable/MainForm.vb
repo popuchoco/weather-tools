@@ -1,4 +1,4 @@
-Option Explicit On
+﻿Option Explicit On
 Option Strict On
 Option Infer On
 
@@ -90,8 +90,8 @@ Public Class MainForm
         End Function
 
         Private Shared ReadOnly BeaufortNames As String() = {
-            "??", "??", "??", "??", "???", "???", "??",
-            "??", "??", "??", "??", "??", "??"
+            "無風", "輕風", "微風", "和風", "輕勁風", "清勁風", "強風",
+            "疾風", "大風", "烈風", "狂風", "暴風", "颶風"
         }
 
         Private Class DvtsCenterOption
@@ -110,7 +110,7 @@ Public Class MainForm
 
         Public Sub New()
             LanguageManager.EnsureInitialized()
-            Text = T("app.title", "????? 2026 V6")
+            Text = T("app.title", "氣象小工具 2026 V6")
             StartPosition = FormStartPosition.CenterScreen
             MinimumSize = New Size(900, 700)
             Size = New Size(1120, 820)
@@ -158,7 +158,7 @@ Public Class MainForm
          End Sub
 
          Private Function BuildQuickTab() As TabPage
-            Dim page As New TabPage("????")
+            Dim page As New TabPage("快速換算")
             page.BackColor = BackColor
 
             Dim layout As New TableLayoutPanel()
@@ -179,7 +179,7 @@ Public Class MainForm
         End Function
 
         Private Function BuildAgencyTab() As TabPage
-            Dim page As New TabPage("Dvorak???????")
+            Dim page As New TabPage("Dvorak／熱帶氣旋強度")
             page.BackColor = BackColor
 
             Dim layout As New TableLayoutPanel()
@@ -198,19 +198,19 @@ Public Class MainForm
             inputPanel.FlowDirection = FlowDirection.LeftToRight
             inputPanel.WrapContents = False
             inputPanel.Padding = New Padding(2, 6, 2, 2)
-            inputPanel.Controls.Add(New Label With {.Text = "Final-T?T ?", .AutoSize = True, .Margin = New Padding(3, 8, 5, 0)})
+            inputPanel.Controls.Add(New Label With {.Text = "Final-T／T 值", .AutoSize = True, .Margin = New Padding(3, 8, 5, 0)})
             txtIntensityT.Width = 70
             txtIntensityT.Text = "4.0"
             txtIntensityT.Margin = New Padding(3, 3, 12, 0)
             inputPanel.Controls.Add(txtIntensityT)
-            inputPanel.Controls.Add(New Label With {.Text = "????", .AutoSize = True, .Margin = New Padding(3, 8, 5, 0)})
+            inputPanel.Controls.Add(New Label With {.Text = "強度趨勢", .AutoSize = True, .Margin = New Padding(3, 8, 5, 0)})
             cmbIntensityTrend.Width = 160
             cmbIntensityTrend.DropDownStyle = ComboBoxStyle.DropDownList
-            cmbIntensityTrend.Items.AddRange(New Object() {"???????CI?T?", "???CI?T?", "????? Dvorak?", "??????HKO ???"})
+            cmbIntensityTrend.Items.AddRange(New Object() {"發展中／維持（CI＝T）", "穩定（CI＝T）", "減弱（傳統 Dvorak）", "登陸後減弱（HKO 試行）"})
             cmbIntensityTrend.SelectedIndex = 0
             cmbIntensityTrend.Margin = New Padding(3, 3, 12, 0)
             inputPanel.Controls.Add(cmbIntensityTrend)
-            Dim button As Button = CreateButton("?? CI ???")
+            Dim button As Button = CreateButton("估算 CI 並對照")
             AddHandler button.Click, AddressOf AgencyButtonClick
             inputPanel.Controls.Add(button)
             layout.Controls.Add(inputPanel, 0, 0)
@@ -235,24 +235,24 @@ Public Class MainForm
             agencyGrid.ReadOnly = True
             agencyGrid.RowHeadersVisible = False
             agencyGrid.SelectionMode = DataGridViewSelectionMode.FullRowSelect
-            agencyGrid.Columns.Add("Agency", "??")
-            agencyGrid.Columns.Add("Definition", "????")
-            agencyGrid.Columns.Add("Wind", "????")
-            agencyGrid.Columns.Add("Category", "??")
-            agencyGrid.Columns.Add("Pressure", "????")
-            agencyGrid.Columns.Add("Source", "?????")
+            agencyGrid.Columns.Add("Agency", "機構")
+            agencyGrid.Columns.Add("Definition", "風速定義")
+            agencyGrid.Columns.Add("Wind", "風速對照")
+            agencyGrid.Columns.Add("Category", "分級")
+            agencyGrid.Columns.Add("Pressure", "中心氣壓")
+            agencyGrid.Columns.Add("Source", "來源／備註")
             agencyGrid.Columns("Agency").FillWeight = 115
             agencyGrid.Columns("Category").FillWeight = 175
             agencyGrid.Columns("Source").FillWeight = 190
             layout.Controls.Add(agencyGrid, 0, 1)
 
-            lblAgencyInfo.Text = T("agency.info", "?????????? T ?????????? CI???????????????")
+            lblAgencyInfo.Text = T("agency.info", "先由衛星雲型分析得到 T 值，再依強度趨勢估算 CI；此工具不會自動判讀衛星影像。")
             lblAgencyInfo.AutoSize = True
             lblAgencyInfo.ForeColor = Color.FromArgb(82, 104, 123)
             lblAgencyInfo.Margin = New Padding(3, 8, 3, 0)
             layout.Controls.Add(lblAgencyInfo, 0, 2)
 
-            Dim note As Label = CreateNote(T("agency.note", "NHC?HKO?CWA ???????????? 1 ??????HKO ? Dvorak 1 ????? 0.93 ?? 10 ????CWA ?? 10 ????????????????????"))
+            Dim note As Label = CreateNote(T("agency.note", "NHC、HKO、CWA 的資料定義不同：美國常用 1 分鐘平均風，HKO 將 Dvorak 1 分鐘風速乘 0.93 轉成 10 分鐘風，CWA 表為 10 分鐘風。結果僅供學習，不可取代官方警報。"))
             note.Dock = DockStyle.Fill
             note.MaximumSize = New Size(0, 0)
             layout.Controls.Add(note, 0, 3)
@@ -260,7 +260,7 @@ Public Class MainForm
         End Function
 
         Private Function BuildLearningTab() As TabPage
-            Dim page As New TabPage("Dvorak ??")
+            Dim page As New TabPage("Dvorak 入門")
             page.BackColor = BackColor
 
             Dim panel As New TableLayoutPanel()
@@ -273,7 +273,7 @@ Public Class MainForm
              page.Controls.Add(panel)
 
             Dim title As New Label()
-            title.Text = T("learning.title", "Dvorak ?????????????????")
+            title.Text = T("learning.title", "Dvorak 是從衛星雲型估計熱帶氣旋強度的方法")
             title.Font = New Font(Font.FontFamily, 15.0F, FontStyle.Bold)
             title.ForeColor = Color.FromArgb(28, 53, 78)
             title.AutoSize = True
@@ -290,19 +290,19 @@ Public Class MainForm
             lesson.Font = New Font("Microsoft JhengHei", 11.0F, FontStyle.Regular)
             lesson.BorderStyle = BorderStyle.FixedSingle
             Dim lessonFallback As String = String.Join(Environment.NewLine, New String() {
-                "?????",
-                "1. ???????CSC??????????????????????",
-                "2. ??????????????????????CDO?????????????CCC??",
-                "3. ?????????? Data T?DT????? 24 ????????????????",
-                "4. ?? Model Expected T?MET?? Pattern T?PT?PAT???? Final T?FT??",
-                "5. ???????????? Current Intensity?CI?????????????",
+                "學習流程：",
+                "1. 找出雲系中心（CSC），必要時參考低層中心、過去位置與其他觀測。",
+                "2. 判斷雲型：彎曲雲帶、風切、眼、中心密集雲團（CDO）、嵌入中心或中央冷雲蓋（CCC）。",
+                "3. 依雲型與雲頂溫度估計 Data T（DT），再比較 24 小時前後的發展、維持或減弱趨勢。",
+                "4. 估計 Model Expected T（MET）與 Pattern T（PT／PAT），選出 Final T（FT）。",
+                "5. 依系統趨勢與限制條件推估 Current Intensity（CI），再查詢風速與中心氣壓。",
                 "",
-                "????????? 5 ?????????? Final-T?T?????????????????? DT?",
-                "?????????? CI?T ????????CI ?????? T?HKO ???????????? CI ?? FT?0.5 ???",
+                "本工具的強度頁是第 5 步的教學查表器：輸入 Final-T／T，再選擇趨勢，並不會自動從衛星圖判讀 DT。",
+                "發展或維持：通常先以 CI＝T 示範；傳統減弱：CI 可能暫時高於 T；HKO 的登陸後減弱試行處理則以 CI 約為 FT＋0.5 示範。",
                 "",
-                "CWA ??????T ?? 2 ?????????T ? 2.5?3.5 ??????T ? 4.0?5.5 ??????T ?? 5.5 ??????",
+                "CWA 的入門分段：T 小於 2 約為熱帶低壓階段，T 約 2.5～3.5 為輕度颱風，T 約 4.0～5.5 為中度颱風，T 大於 5.5 為強烈颱風。",
                 "",
-                "?????Dvorak ??????????????????????????????????????????????????????????????????????????"
+                "重要限制：Dvorak 是統計與主觀判讀的衛星估計，不是直接測量；衛星視角、眼的大小、雲系脈動、登陸與快速減弱都可能造成偏差。請交叉比對雷達、浮標、船舶、散射儀與官方分析。"
             })
             Dim lessonText As String = T("learning.body", lessonFallback)
             ' XML normalizes line endings to LF; the WinForms TextBox needs CRLF to keep each lesson step on its own line.
@@ -313,7 +313,7 @@ Public Class MainForm
         End Function
 
         Private Function BuildDvtsTab() As TabPage
-            Dim page As New TabPage("DVTS ????")
+            Dim page As New TabPage("DVTS 報文解析")
             page.BackColor = BackColor
 
             Dim layout As New TableLayoutPanel()
@@ -345,19 +345,19 @@ Public Class MainForm
             buttonPanel.WrapContents = False
             buttonPanel.AutoScroll = True
             buttonPanel.Padding = New Padding(2, 6, 2, 3)
-            Dim openButton As Button = CreateButton("?? DVTS ??")
+            Dim openButton As Button = CreateButton("開啟 DVTS 檔案")
             AddHandler openButton.Click, AddressOf OpenDvtsButtonClick
             buttonPanel.Controls.Add(openButton)
-            Dim clearButton As Button = CreateButton("????")
+            Dim clearButton As Button = CreateButton("清除資料")
             AddHandler clearButton.Click, AddressOf ClearDvtsButtonClick
             buttonPanel.Controls.Add(clearButton)
-            Dim parseButton As Button = CreateButton("?? DVTS")
+            Dim parseButton As Button = CreateButton("解析 DVTS")
             AddHandler parseButton.Click, AddressOf ParseDvtsButtonClick
             buttonPanel.Controls.Add(parseButton)
-            Dim importButton As Button = CreateButton("??????")
+            Dim importButton As Button = CreateButton("帶入選取資料")
             AddHandler importButton.Click, AddressOf ImportDvtsButtonClick
             buttonPanel.Controls.Add(importButton)
-            Dim trendButton As Button = CreateButton("?????")
+            Dim trendButton As Button = CreateButton("趨勢圖分析")
             AddHandler trendButton.Click, AddressOf DvtsTrendButtonClick
             buttonPanel.Controls.Add(trendButton)
             layout.Controls.Add(buttonPanel, 0, 1)
@@ -365,7 +365,7 @@ Public Class MainForm
             Dim infoPanel As New Panel()
             infoPanel.Dock = DockStyle.Fill
             infoPanel.Padding = New Padding(2, 0, 2, 0)
-            lblDvtsInfo.Text = T("dvts.info.initial", "??? .txt?.dat ????? DVTS???????????? Dvorak ????")
+            lblDvtsInfo.Text = T("dvts.info.initial", "可開啟 .txt／.dat 或貼上多行 DVTS；解析後選取一筆，再帶入 Dvorak 對照表。")
             lblDvtsInfo.AutoSize = False
             lblDvtsInfo.Dock = DockStyle.Fill
             lblDvtsInfo.TextAlign = ContentAlignment.MiddleLeft
@@ -379,12 +379,12 @@ Public Class MainForm
             centerFilterPanel.FlowDirection = FlowDirection.LeftToRight
             centerFilterPanel.WrapContents = False
             centerFilterPanel.Padding = New Padding(2, 5, 2, 2)
-            centerFilterPanel.Controls.Add(New Label With {.Text = T("dvts.filter.label", "????"), .AutoSize = True, .Margin = New Padding(3, 7, 8, 0)})
+            centerFilterPanel.Controls.Add(New Label With {.Text = T("dvts.filter.label", "中心篩選"), .AutoSize = True, .Margin = New Padding(3, 7, 8, 0)})
             dvtsCenterSelector.DropDownStyle = ComboBoxStyle.DropDownList
             dvtsCenterSelector.Width = 310
             dvtsCenterSelector.Margin = New Padding(2, 3, 12, 0)
             AddHandler dvtsCenterSelector.SelectedIndexChanged, AddressOf DvtsCenterSelectorChanged
-            dvtsCenterSelector.Items.Add(New DvtsCenterOption("", T("dvts.filter.all", "????")))
+            dvtsCenterSelector.Items.Add(New DvtsCenterOption("", T("dvts.filter.all", "全部中心")))
             dvtsCenterSelector.SelectedIndex = 0
             centerFilterPanel.Controls.Add(dvtsCenterSelector)
             lblDvtsFilterInfo.AutoSize = True
@@ -413,14 +413,14 @@ Public Class MainForm
             dvtsGrid.RowHeadersVisible = False
             dvtsGrid.SelectionMode = DataGridViewSelectionMode.FullRowSelect
             dvtsGrid.MultiSelect = False
-            dvtsGrid.Columns.Add("Center", "??")
-            dvtsGrid.Columns.Add("Agency", "????")
-            dvtsGrid.Columns.Add("Time", "???? UTC")
-            dvtsGrid.Columns.Add("Position", "??")
-            dvtsGrid.Columns.Add("Wind", "DVTS ??")
+            dvtsGrid.Columns.Add("Center", "中心")
+            dvtsGrid.Columns.Add("Agency", "發報機構")
+            dvtsGrid.Columns.Add("Time", "分析時間 UTC")
+            dvtsGrid.Columns.Add("Position", "位置")
+            dvtsGrid.Columns.Add("Wind", "DVTS 風速")
             dvtsGrid.Columns.Add("T", "T")
             dvtsGrid.Columns.Add("CI", "CI")
-            dvtsGrid.Columns.Add("Trend", "??")
+            dvtsGrid.Columns.Add("Trend", "趨勢")
             dvtsGrid.Columns("Center").FillWeight = 75
             dvtsGrid.Columns("Agency").FillWeight = 155
             dvtsGrid.Columns("Time").FillWeight = 120
@@ -431,7 +431,7 @@ Public Class MainForm
             Next
             layout.Controls.Add(dvtsGrid, 0, 4)
 
-            Dim note As Label = CreateNote(T("dvts.note", "DVTS ????? ?? YYYYMMDDHHMM DVTS ?? ?? ??(kt) TCI ?? ?????TCI ?? 5050 ?? T5.0?CI5.0????? W1050 ???? 50 ???? 1.0?"))
+            Dim note As Label = CreateNote(T("dvts.note", "DVTS 格式：海域 編號 YYYYMMDDHHMM DVTS 緯度 經度 風速(kt) TCI 趨勢 發報中心；TCI 例如 5050 代表 T5.0／CI5.0，趨勢例如 W1050 代表過去 50 小時減弱 1.0。"))
             note.Dock = DockStyle.Fill
             note.MaximumSize = New Size(0, 0)
             layout.Controls.Add(note, 0, 5)
@@ -441,13 +441,13 @@ Public Class MainForm
         Private Sub OpenDvtsButtonClick(sender As Object, e As EventArgs)
             Using dialog As New OpenFileDialog()
                 dialog.Filter = T("dvts.dialog.filter", "DVTS files (*.txt;*.dat)|*.txt;*.dat|All files (*.*)|*.*")
-                dialog.Title = T("dvts.dialog.open", "?? DVTS ????")
+                dialog.Title = T("dvts.dialog.open", "開啟 DVTS 報文檔案")
                 If dialog.ShowDialog(Me) <> DialogResult.OK Then Return
 
                 dvtsSourceFileName = dialog.FileName
                 txtDvts.Text = File.ReadAllText(dialog.FileName, System.Text.Encoding.ASCII)
-                lblDvtsInfo.Text = String.Format(T("dvts.file.loaded", "{0} ????????? DVTS??"), Path.GetFileName(dialog.FileName))
-                SetStatus("DVTS ?????")
+                lblDvtsInfo.Text = String.Format(T("dvts.file.loaded", "{0} 已載入；請按「解析 DVTS」。"), Path.GetFileName(dialog.FileName))
+                SetStatus("DVTS 檔案已載入")
             End Using
         End Sub
 
@@ -458,13 +458,13 @@ Public Class MainForm
             dvtsGrid.Rows.Clear()
             PopulateDvtsCenterSelector(parsedDvtsRecords)
             ApplyDvtsCenterFilter()
-            lblDvtsInfo.Text = T("dvts.info.cleared", "DVTS ???????????????????")
-            SetStatus("DVTS ?????")
+            lblDvtsInfo.Text = T("dvts.info.cleared", "DVTS 資料已清除；可貼上內容或開啟報文檔案。")
+            SetStatus("DVTS 資料已清除")
         End Sub
 
         Private Sub DvtsTrendButtonClick(sender As Object, e As EventArgs)
             If parsedDvtsRecords.Count = 0 Then
-                ShowError(T("dvts.error.trend.first", "?????? DVTS???????????"))
+                ShowError(T("dvts.error.trend.first", "請先按「解析 DVTS」，再開啟趨勢圖分析。"))
                 Return
             End If
 
@@ -480,7 +480,7 @@ Public Class MainForm
         Private Sub PopulateDvtsCenterSelector(records As IEnumerable(Of DvtsRecord))
             Dim selectedCode As String = GetSelectedDvtsCenterCode()
             dvtsCenterSelector.Items.Clear()
-            dvtsCenterSelector.Items.Add(New DvtsCenterOption("", T("dvts.filter.all", "????")))
+            dvtsCenterSelector.Items.Add(New DvtsCenterOption("", T("dvts.filter.all", "全部中心")))
 
             Dim centers As New SortedDictionary(Of String, String)(StringComparer.OrdinalIgnoreCase)
             If records IsNot Nothing Then
@@ -490,7 +490,7 @@ Public Class MainForm
             End If
 
             For Each item As KeyValuePair(Of String, String) In centers
-                dvtsCenterSelector.Items.Add(New DvtsCenterOption(item.Key, item.Key & " ? " & item.Value))
+                dvtsCenterSelector.Items.Add(New DvtsCenterOption(item.Key, item.Key & " — " & item.Value))
             Next
 
             Dim selectedIndex As Integer = 0
@@ -527,14 +527,14 @@ Public Class MainForm
                 UiRendering.EndUpdate(dvtsGrid)
             End Try
 
-            Dim filterText As String = If(String.IsNullOrEmpty(selectedCode), T("dvts.filter.all", "????"), selectedCode)
-            lblDvtsFilterInfo.Text = String.Format(T("dvts.filter.summary", "{0}??? {1}?{2} ?"), filterText, visibleCount, parsedDvtsRecords.Count)
+            Dim filterText As String = If(String.IsNullOrEmpty(selectedCode), T("dvts.filter.all", "全部中心"), selectedCode)
+            lblDvtsFilterInfo.Text = String.Format(T("dvts.filter.summary", "{0}：顯示 {1}／{2} 筆"), filterText, visibleCount, parsedDvtsRecords.Count)
             If dvtsGrid.Rows.Count > 0 Then dvtsGrid.Rows(0).Selected = True
         End Sub
 
         Private Sub AddDvtsGridRow(record As DvtsRecord)
-            Dim tText As String = If(record.HasTNumber, record.TNumber.ToString("0.0"), "?")
-            Dim ciText As String = If(record.HasCINumber, record.CINumber.ToString("0.0"), "?")
+            Dim tText As String = If(record.HasTNumber, record.TNumber.ToString("0.0"), "—")
+            Dim ciText As String = If(record.HasCINumber, record.CINumber.ToString("0.0"), "—")
             Dim trendText As String = DvtsTrendText(record)
             Dim rowIndex As Integer = dvtsGrid.Rows.Add(
                 record.Center,
@@ -549,7 +549,7 @@ Public Class MainForm
         End Sub
 
         Private Function BuildAtcfTab() As TabPage
-            Dim page As New TabPage("ATCF????")
+            Dim page As New TabPage("ATCF路徑解析")
             page.BackColor = BackColor
 
             Dim layout As New TableLayoutPanel()
@@ -580,16 +580,16 @@ Public Class MainForm
             buttonPanel.WrapContents = False
             buttonPanel.AutoScroll = True
             buttonPanel.Padding = New Padding(2, 6, 2, 3)
-            Dim openButton As Button = CreateButton("?? .dat")
+            Dim openButton As Button = CreateButton("開啟 .dat")
             AddHandler openButton.Click, AddressOf OpenAtcfButtonClick
             buttonPanel.Controls.Add(openButton)
-            Dim clearButton As Button = CreateButton("????")
+            Dim clearButton As Button = CreateButton("清除資料")
             AddHandler clearButton.Click, AddressOf ClearAtcfButtonClick
             buttonPanel.Controls.Add(clearButton)
-            Dim parseButton As Button = CreateButton("?? Tracking Data")
+            Dim parseButton As Button = CreateButton("解析 Tracking Data")
             AddHandler parseButton.Click, AddressOf ParseAtcfButtonClick
             buttonPanel.Controls.Add(parseButton)
-            Dim intensityButton As Button = CreateButton(T("atcf.trend.button", "????"))
+            Dim intensityButton As Button = CreateButton(T("atcf.trend.button", "強度變化"))
             AddHandler intensityButton.Click, AddressOf AtcfIntensityTrendButtonClick
             buttonPanel.Controls.Add(intensityButton)
             layout.Controls.Add(buttonPanel, 0, 1)
@@ -597,7 +597,7 @@ Public Class MainForm
             Dim infoPanel As New Panel()
             infoPanel.Dock = DockStyle.Fill
             infoPanel.Padding = New Padding(2, 0, 2, 0)
-            lblAtcfInfo.Text = T("atcf.info.initial", "?????? b*.dat?????????????? 1?35 ?? USERDEFINED ??????")
+            lblAtcfInfo.Text = T("atcf.info.initial", "可貼上或開啟 b*.dat；選取資料列後，下方會顯示第 1～35 欄與 USERDEFINED 的完整解讀。")
             lblAtcfInfo.AutoSize = False
             lblAtcfInfo.Dock = DockStyle.Fill
             lblAtcfInfo.TextAlign = ContentAlignment.MiddleLeft
@@ -617,10 +617,10 @@ Public Class MainForm
             txtAtcfDetail.Font = New Font(Font.FontFamily, 10.0F, FontStyle.Regular)
             txtAtcfDetail.BackColor = Color.White
             txtAtcfDetail.ForeColor = Color.FromArgb(45, 61, 74)
-            txtAtcfDetail.Text = T("atcf.detail.placeholder", "????????????????")
+            txtAtcfDetail.Text = T("atcf.detail.placeholder", "選取上方資料列查看完整欄位解讀。")
             layout.Controls.Add(txtAtcfDetail, 0, 4)
 
-            Dim note As Label = CreateNote(T("atcf.note", "?? bwp132026.dat ?????b?Best Track?WP???????13??????2026????? 8 ???????????????????????????????????"))
+            Dim note As Label = CreateNote(T("atcf.note", "檔名 bwp132026.dat 可解讀為：b＝Best Track、WP＝西北太平洋、13＝系統編號、2026＝年份。前 8 欄是基本定位資料；後續欄位可因檔案版本或資料用途省略，空白不視為錯誤。"))
             note.Dock = DockStyle.Fill
             note.MaximumSize = New Size(0, 0)
             layout.Controls.Add(note, 0, 5)
@@ -628,7 +628,7 @@ Public Class MainForm
         End Function
 
         Private Function BuildAtcfSectorTab() As TabPage
-            Dim page As New TabPage(T("atcf.sector.tab", "ATCF??????"))
+            Dim page As New TabPage(T("atcf.sector.tab", "ATCF實時定位分析"))
             page.BackColor = BackColor
 
             Dim layout As New TableLayoutPanel()
@@ -659,16 +659,16 @@ Public Class MainForm
             buttonPanel.WrapContents = False
             buttonPanel.AutoScroll = True
             buttonPanel.Padding = New Padding(2, 6, 2, 3)
-            Dim openButton As Button = CreateButton(T("atcf.sector.button.open", "???????"))
+            Dim openButton As Button = CreateButton(T("atcf.sector.button.open", "開啟核心扇區檔"))
             AddHandler openButton.Click, AddressOf OpenAtcfSectorButtonClick
             buttonPanel.Controls.Add(openButton)
-            Dim clearButton As Button = CreateButton(T("atcf.sector.button.clear", "????"))
+            Dim clearButton As Button = CreateButton(T("atcf.sector.button.clear", "清除資料"))
             AddHandler clearButton.Click, AddressOf ClearAtcfSectorButtonClick
             buttonPanel.Controls.Add(clearButton)
-            Dim parseButton As Button = CreateButton(T("atcf.sector.button.parse", "??????"))
+            Dim parseButton As Button = CreateButton(T("atcf.sector.button.parse", "解析核心扇區"))
             AddHandler parseButton.Click, AddressOf ParseAtcfSectorButtonClick
             buttonPanel.Controls.Add(parseButton)
-            Dim intensityButton As Button = CreateButton(T("atcf.trend.button", "????"))
+            Dim intensityButton As Button = CreateButton(T("atcf.trend.button", "強度變化"))
             AddHandler intensityButton.Click, AddressOf AtcfSectorIntensityTrendButtonClick
             buttonPanel.Controls.Add(intensityButton)
             layout.Controls.Add(buttonPanel, 0, 1)
@@ -676,7 +676,7 @@ Public Class MainForm
             Dim infoPanel As New Panel()
             infoPanel.Dock = DockStyle.Fill
             infoPanel.Padding = New Padding(2, 0, 2, 0)
-            lblAtcfSectorInfo.Text = T("atcf.sector.info.initial", "?????????????????????????????")
+            lblAtcfSectorInfo.Text = T("atcf.sector.info.initial", "可貼上或開啟核心扇區定位檔；解析後選取資料列查看欄位解讀。")
             lblAtcfSectorInfo.AutoSize = False
             lblAtcfSectorInfo.Dock = DockStyle.Fill
             lblAtcfSectorInfo.TextAlign = ContentAlignment.MiddleLeft
@@ -696,10 +696,10 @@ Public Class MainForm
             txtAtcfSectorDetail.Font = New Font(Font.FontFamily, 10.0F, FontStyle.Regular)
             txtAtcfSectorDetail.BackColor = Color.White
             txtAtcfSectorDetail.ForeColor = Color.FromArgb(45, 61, 74)
-            txtAtcfSectorDetail.Text = T("atcf.sector.detail.placeholder", "??????????????????")
+            txtAtcfSectorDetail.Text = T("atcf.sector.detail.placeholder", "選取上方資料列查看核心扇區欄位解讀。")
             layout.Controls.Add(txtAtcfSectorDetail, 0, 4)
 
-            Dim note As Label = CreateNote(T("atcf.sector.note", "???Storm ID?Storm Name?YYMMDD?HHMM?LAT?LON?BASIN?VMAX?MSLP?????? NRL ? SSEC ???????????????????????????"))
+            Dim note As Label = CreateNote(T("atcf.sector.note", "格式：Storm ID、Storm Name、YYMMDD、HHMM、LAT、LON、BASIN、VMAX、MSLP。資料來源為 NRL 與 SSEC 核心扇區檔；程式讀取本機檔案或貼上內容，不會自動下載。"))
             note.Dock = DockStyle.Fill
             note.MaximumSize = New Size(0, 0)
             layout.Controls.Add(note, 0, 5)
@@ -731,9 +731,9 @@ Public Class MainForm
             atcfSectorGrid.MultiSelect = False
             atcfSectorGrid.Columns.Add("StormId", T("atcf.sector.grid.id", "Storm ID"))
             atcfSectorGrid.Columns.Add("StormName", T("atcf.sector.grid.name", "Storm Name"))
-            atcfSectorGrid.Columns.Add("Time", T("atcf.sector.grid.time", "???? UTC"))
-            atcfSectorGrid.Columns.Add("Position", T("atcf.sector.grid.position", "??"))
-            atcfSectorGrid.Columns.Add("Basin", T("atcf.sector.grid.basin", "??"))
+            atcfSectorGrid.Columns.Add("Time", T("atcf.sector.grid.time", "分析時間 UTC"))
+            atcfSectorGrid.Columns.Add("Position", T("atcf.sector.grid.position", "位置"))
+            atcfSectorGrid.Columns.Add("Basin", T("atcf.sector.grid.basin", "海域"))
             atcfSectorGrid.Columns.Add("Wind", T("atcf.sector.grid.wind", "VMAX"))
             atcfSectorGrid.Columns.Add("Pressure", T("atcf.sector.grid.pressure", "MSLP"))
             atcfSectorGrid.Columns("StormId").FillWeight = 60
@@ -751,14 +751,14 @@ Public Class MainForm
 
         Private Sub OpenAtcfSectorButtonClick(sender As Object, e As EventArgs)
             Using dialog As New OpenFileDialog()
-                dialog.Filter = T("atcf.sector.dialog.filter", "ATCF ?????? (*.*)|*.*")
-                dialog.Title = T("atcf.sector.dialog.open", "?? ATCF ???????")
+                dialog.Filter = T("atcf.sector.dialog.filter", "ATCF 核心扇區檔案 (*.*)|*.*")
+                dialog.Title = T("atcf.sector.dialog.open", "開啟 ATCF 核心扇區定位檔")
                 If dialog.ShowDialog(Me) <> DialogResult.OK Then Return
 
                 atcfSectorSourceFileName = dialog.FileName
                 txtAtcfSector.Text = File.ReadAllText(dialog.FileName, System.Text.Encoding.ASCII)
-                lblAtcfSectorInfo.Text = String.Format(T("atcf.sector.file.loaded", "{0} ???????????????"), Path.GetFileName(dialog.FileName))
-                SetStatus(T("atcf.sector.status.loaded", "ATCF ?????????"))
+                lblAtcfSectorInfo.Text = String.Format(T("atcf.sector.file.loaded", "{0} 已載入；請按「解析核心扇區」。"), Path.GetFileName(dialog.FileName))
+                SetStatus(T("atcf.sector.status.loaded", "ATCF 核心扇區檔案已載入"))
             End Using
         End Sub
 
@@ -767,9 +767,9 @@ Public Class MainForm
             atcfSectorSourceFileName = ""
             parsedAtcfSectorRecords.Clear()
             atcfSectorGrid.Rows.Clear()
-            txtAtcfSectorDetail.Text = T("atcf.sector.detail.placeholder", "??????????????????")
-            lblAtcfSectorInfo.Text = T("atcf.sector.info.cleared", "ATCF ????????????????????")
-            SetStatus(T("atcf.sector.status.cleared", "ATCF ?????????"))
+            txtAtcfSectorDetail.Text = T("atcf.sector.detail.placeholder", "選取上方資料列查看核心扇區欄位解讀。")
+            lblAtcfSectorInfo.Text = T("atcf.sector.info.cleared", "ATCF 核心扇區資料已清除；可貼上或開啟定位檔。")
+            SetStatus(T("atcf.sector.status.cleared", "ATCF 核心扇區資料已清除"))
         End Sub
 
         Private Sub ParseAtcfSectorButtonClick(sender As Object, e As EventArgs)
@@ -780,7 +780,7 @@ Public Class MainForm
             UiRendering.BeginUpdate(atcfSectorGrid)
             Try
                 atcfSectorGrid.Rows.Clear()
-                txtAtcfSectorDetail.Text = T("atcf.sector.detail.placeholder", "??????????????????")
+                txtAtcfSectorDetail.Text = T("atcf.sector.detail.placeholder", "選取上方資料列查看核心扇區欄位解讀。")
 
                 For Each record As AtcfSectorRecord In records
                     Dim rowIndex As Integer = atcfSectorGrid.Rows.Add(
@@ -798,22 +798,22 @@ Public Class MainForm
             End Try
 
             If records.Count = 0 Then
-                lblAtcfSectorInfo.Text = T("atcf.sector.error.no.records", "????????????????????? 9 ????")
+                lblAtcfSectorInfo.Text = T("atcf.sector.error.no.records", "沒有解析到有效核心扇區資料。請確認每行符合 9 欄格式。")
                 If warnings.Count > 0 Then ShowError(warnings(0))
                 Return
             End If
 
-            Dim warningText As String = If(warnings.Count = 0, "", String.Format(T("atcf.sector.warning", "?{0} ?????????"), warnings.Count))
+            Dim warningText As String = If(warnings.Count = 0, "", String.Format(T("atcf.sector.warning", "；{0} 行有欄位或格式提醒"), warnings.Count))
             lblAtcfSectorInfo.Text = BuildAtcfSectorSummary(records) & warningText
             atcfSectorGrid.Rows(0).Selected = True
             atcfSectorGrid.CurrentCell = atcfSectorGrid.Rows(0).Cells(0)
             AtcfSectorGridSelectionChanged(Nothing, EventArgs.Empty)
-            SetStatus(T("atcf.sector.status.parsed", "ATCF ????????????"))
+            SetStatus(T("atcf.sector.status.parsed", "ATCF 核心扇區定位資料解析完成"))
         End Sub
 
         Private Sub AtcfSectorIntensityTrendButtonClick(sender As Object, e As EventArgs)
             If parsedAtcfSectorRecords.Count = 0 Then
-                ShowError(T("atcf.trend.error.first", "???? ATCF ????????????"))
+                ShowError(T("atcf.trend.error.first", "請先解析 ATCF 資料，再開啟強度變化圖。"))
                 Return
             End If
 
@@ -827,13 +827,13 @@ Public Class MainForm
             Dim systemKeys As List(Of String) = GetAtcfSystemKeys(allPoints)
             If systemKeys.Count > 1 Then
                 Dim message As String = String.Format(CultureInfo.InvariantCulture,
-                    T("atcf.trend.error.multiple.systems", "???????????????????????????{0}?????????? INVEST?NINE ????????????????????????????????????????"),
+                    T("atcf.trend.error.multiple.systems", "強度分析目前只支援單一氣旋；目前資料包含多個氣旋編號：{0}。同一編號即使名稱由 INVEST、NINE 變更為正式名稱，也會視為同一氣旋，不會依名稱分開。請只保留一個氣旋編號後再開啟。"),
                     String.Join(", ", systemKeys.ToArray()))
                 ShowErrorDialog(message)
                 Return
             End If
             If points.Count = 0 Then
-                ShowError(T("atcf.trend.error.time", "?? ATCF ??????? UTC ?????????????"))
+                ShowError(T("atcf.trend.error.time", "目前 ATCF 資料沒有可用的 UTC 時間，無法繪製強度變化圖。"))
                 Return
             End If
 
@@ -851,7 +851,7 @@ Public Class MainForm
 
         Private Function BuildAtcfSectorSummary(records As List(Of AtcfSectorRecord)) As String
             Dim sourceText As String = If(String.IsNullOrEmpty(atcfSectorSourceFileName),
-                                          T("atcf.sector.source.pasted", "??????"),
+                                          T("atcf.sector.source.pasted", "貼上資料內容"),
                                           Path.GetFileName(atcfSectorSourceFileName))
             Dim firstTime As DateTime = DateTime.MaxValue
             Dim lastTime As DateTime = DateTime.MinValue
@@ -866,42 +866,42 @@ Public Class MainForm
 
             Dim parts As New List(Of String)()
             parts.Add(String.Format(T("atcf.sector.summary.source", "{0}"), sourceText))
-            parts.Add(String.Format(CultureInfo.InvariantCulture, T("atcf.sector.summary.count", "{0} ??{1} ???"), records.Count, systems.Count))
+            parts.Add(String.Format(CultureInfo.InvariantCulture, T("atcf.sector.summary.count", "{0} 筆／{1} 個系統"), records.Count, systems.Count))
             If firstTime <> DateTime.MaxValue AndAlso lastTime <> DateTime.MinValue Then
-                parts.Add(String.Format(CultureInfo.InvariantCulture, T("atcf.sector.summary.time", "{0:yyyy-MM-dd HH:mm}?{1:yyyy-MM-dd HH:mm} UTC"), firstTime, lastTime))
+                parts.Add(String.Format(CultureInfo.InvariantCulture, T("atcf.sector.summary.time", "{0:yyyy-MM-dd HH:mm}～{1:yyyy-MM-dd HH:mm} UTC"), firstTime, lastTime))
             End If
-            Return String.Join(T("atcf.sector.summary.separator", "?"), parts.ToArray())
+            Return String.Join(T("atcf.sector.summary.separator", "；"), parts.ToArray())
         End Function
 
         Private Shared Function AtcfSectorTimeText(record As AtcfSectorRecord) As String
-            If Not record.HasAnalysisTime Then Return "?"
+            If Not record.HasAnalysisTime Then Return "—"
             Return record.AnalysisTimeUtc.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture)
         End Function
 
         Private Shared Function BuildAtcfSectorDetail(record As AtcfSectorRecord) As String
             Dim lines As New List(Of String)()
             lines.Add(String.Format(CultureInfo.InvariantCulture,
-                LanguageManager.Translate("atcf.sector.detail.line", "? {0} ??{1} {2}?{3}"),
+                LanguageManager.Translate("atcf.sector.detail.line", "第 {0} 行｜{1} {2}｜{3}"),
                 record.SourceLineNumber, record.StormId, record.StormName, AtcfSectorTimeText(record) & " UTC"))
-            lines.Add(LanguageManager.Translate("atcf.sector.detail.fields", "ATCF ???????9 ??"))
-            AddAtcfSectorDetailLine(lines, 1, LanguageManager.Translate("atcf.sector.field.id", "Storm ID"), record.StormId, LanguageManager.Translate("atcf.sector.meaning.id", "???????? 13W ? 93C?"))
-            AddAtcfSectorDetailLine(lines, 2, LanguageManager.Translate("atcf.sector.field.name", "Storm Name"), record.StormName, LanguageManager.Translate("atcf.sector.meaning.name", "?????INVEST ?????????????"))
-            AddAtcfSectorDetailLine(lines, 3, LanguageManager.Translate("atcf.sector.field.date", "YYMMDD"), If(record.HasAnalysisTime, record.AnalysisTimeUtc.ToString("yyMMdd", CultureInfo.InvariantCulture), "?"), LanguageManager.Translate("atcf.sector.meaning.date", "??????????? 2000 ?????"))
-            AddAtcfSectorDetailLine(lines, 4, LanguageManager.Translate("atcf.sector.field.time", "HHMM"), If(record.HasAnalysisTime, record.AnalysisTimeUtc.ToString("HHmm", CultureInfo.InvariantCulture) & " UTC", "?"), LanguageManager.Translate("atcf.sector.meaning.time", "?????UTC?"))
-            AddAtcfSectorDetailLine(lines, 5, LanguageManager.Translate("atcf.sector.field.lat", "LAT"), record.LatitudeText, LanguageManager.Translate("atcf.sector.meaning.lat", "??????????? N/S ???"))
-            AddAtcfSectorDetailLine(lines, 6, LanguageManager.Translate("atcf.sector.field.lon", "LON"), record.LongitudeText, LanguageManager.Translate("atcf.sector.meaning.lon", "??????????? E/W ???"))
-            AddAtcfSectorDetailLine(lines, 7, LanguageManager.Translate("atcf.sector.field.basin", "BASIN"), record.BasinDisplayText, LanguageManager.Translate("atcf.sector.meaning.basin", "ATCF ??????? WPAC?CPAC?SHEM?"))
-            AddAtcfSectorDetailLine(lines, 8, LanguageManager.Translate("atcf.sector.field.wind", "VMAX"), record.MaxWindText, LanguageManager.Translate("atcf.sector.meaning.wind", "?????????kt??"))
-            AddAtcfSectorDetailLine(lines, 9, LanguageManager.Translate("atcf.sector.field.pressure", "MSLP"), record.MslpText, LanguageManager.Translate("atcf.sector.meaning.pressure", "????????hPa?"))
+            lines.Add(LanguageManager.Translate("atcf.sector.detail.fields", "ATCF 核心扇區欄位（9 欄）"))
+            AddAtcfSectorDetailLine(lines, 1, LanguageManager.Translate("atcf.sector.field.id", "Storm ID"), record.StormId, LanguageManager.Translate("atcf.sector.meaning.id", "系統識別碼，例如 13W 或 93C。"))
+            AddAtcfSectorDetailLine(lines, 2, LanguageManager.Translate("atcf.sector.field.name", "Storm Name"), record.StormName, LanguageManager.Translate("atcf.sector.meaning.name", "系統名稱；INVEST 可表示尚未正式命名的系統。"))
+            AddAtcfSectorDetailLine(lines, 3, LanguageManager.Translate("atcf.sector.field.date", "YYMMDD"), If(record.HasAnalysisTime, record.AnalysisTimeUtc.ToString("yyMMdd", CultureInfo.InvariantCulture), "—"), LanguageManager.Translate("atcf.sector.meaning.date", "定位日期；兩位數年份依 2000 年代解讀。"))
+            AddAtcfSectorDetailLine(lines, 4, LanguageManager.Translate("atcf.sector.field.time", "HHMM"), If(record.HasAnalysisTime, record.AnalysisTimeUtc.ToString("HHmm", CultureInfo.InvariantCulture) & " UTC", "—"), LanguageManager.Translate("atcf.sector.meaning.time", "定位時間，UTC。"))
+            AddAtcfSectorDetailLine(lines, 5, LanguageManager.Translate("atcf.sector.field.lat", "LAT"), record.LatitudeText, LanguageManager.Translate("atcf.sector.meaning.lat", "中心緯度，十進位度數與 N/S 半球。"))
+            AddAtcfSectorDetailLine(lines, 6, LanguageManager.Translate("atcf.sector.field.lon", "LON"), record.LongitudeText, LanguageManager.Translate("atcf.sector.meaning.lon", "中心經度，十進位度數與 E/W 半球。"))
+            AddAtcfSectorDetailLine(lines, 7, LanguageManager.Translate("atcf.sector.field.basin", "BASIN"), record.BasinDisplayText, LanguageManager.Translate("atcf.sector.meaning.basin", "ATCF 海域代碼，例如 WPAC、CPAC、SHEM。"))
+            AddAtcfSectorDetailLine(lines, 8, LanguageManager.Translate("atcf.sector.field.wind", "VMAX"), record.MaxWindText, LanguageManager.Translate("atcf.sector.meaning.wind", "最大持續風速，節（kt）。"))
+            AddAtcfSectorDetailLine(lines, 9, LanguageManager.Translate("atcf.sector.field.pressure", "MSLP"), record.MslpText, LanguageManager.Translate("atcf.sector.meaning.pressure", "最低海平面氣壓，hPa。"))
             lines.Add("")
-            lines.Add(LanguageManager.Translate("atcf.sector.detail.raw", "?????") & record.OriginalLine)
+            lines.Add(LanguageManager.Translate("atcf.sector.detail.raw", "原始資料：") & record.OriginalLine)
             Return String.Join(Environment.NewLine, lines.ToArray())
         End Function
 
         Private Shared Sub AddAtcfSectorDetailLine(lines As List(Of String), index As Integer, fieldName As String, value As String, meaning As String)
             lines.Add(String.Format(CultureInfo.InvariantCulture, LanguageManager.Translate("atcf.sector.detail.field", "{0:00}. {1}"), index, fieldName))
-            lines.Add(LanguageManager.Translate("atcf.sector.detail.value", "    ??") & value)
-            lines.Add(LanguageManager.Translate("atcf.sector.detail.meaning", "    ???") & meaning)
+            lines.Add(LanguageManager.Translate("atcf.sector.detail.value", "    值：") & value)
+            lines.Add(LanguageManager.Translate("atcf.sector.detail.meaning", "    說明：") & meaning)
         End Sub
 
         Private Sub ConfigureAtcfGrid()
@@ -927,14 +927,14 @@ Public Class MainForm
             atcfGrid.RowHeadersVisible = False
             atcfGrid.SelectionMode = DataGridViewSelectionMode.FullRowSelect
             atcfGrid.MultiSelect = False
-            atcfGrid.Columns.Add("Time", "???? UTC")
-            atcfGrid.Columns.Add("System", "?????")
-            atcfGrid.Columns.Add("TechTau", "TECH?TAU")
-            atcfGrid.Columns.Add("Position", "??")
+            atcfGrid.Columns.Add("Time", "分析時間 UTC")
+            atcfGrid.Columns.Add("System", "海域／編號")
+            atcfGrid.Columns.Add("TechTau", "TECH／TAU")
+            atcfGrid.Columns.Add("Position", "位置")
             atcfGrid.Columns.Add("Wind", "VMAX")
             atcfGrid.Columns.Add("Pressure", "MSLP")
-            atcfGrid.Columns.Add("Type", "??")
-            atcfGrid.Columns.Add("Radii", "?????")
+            atcfGrid.Columns.Add("Type", "分級")
+            atcfGrid.Columns.Add("Radii", "風圈／名稱")
             atcfGrid.Columns("Time").FillWeight = 125
             atcfGrid.Columns("System").FillWeight = 110
             atcfGrid.Columns("TechTau").FillWeight = 80
@@ -952,13 +952,13 @@ Public Class MainForm
         Private Sub OpenAtcfButtonClick(sender As Object, e As EventArgs)
             Using dialog As New OpenFileDialog()
                 dialog.Filter = T("atcf.dialog.filter", "ATCF data (*.dat)|*.dat|All files (*.*)|*.*")
-                dialog.Title = T("atcf.dialog.open", "?? ATCF Tracking Data")
+                dialog.Title = T("atcf.dialog.open", "開啟 ATCF Tracking Data")
                 If dialog.ShowDialog(Me) <> DialogResult.OK Then Return
 
                 atcfSourceFileName = dialog.FileName
                 txtAtcf.Text = File.ReadAllText(dialog.FileName, System.Text.Encoding.ASCII)
-                lblAtcfInfo.Text = String.Format(T("atcf.file.loaded", "{0} ????????? Tracking Data??"), Path.GetFileName(dialog.FileName))
-                SetStatus("ATCF ?????")
+                lblAtcfInfo.Text = String.Format(T("atcf.file.loaded", "{0} 已載入；請按「解析 Tracking Data」。"), Path.GetFileName(dialog.FileName))
+                SetStatus("ATCF 檔案已載入")
             End Using
         End Sub
 
@@ -967,9 +967,9 @@ Public Class MainForm
             atcfSourceFileName = ""
             parsedAtcfRecords.Clear()
             atcfGrid.Rows.Clear()
-            txtAtcfDetail.Text = T("atcf.detail.placeholder", "????????????????")
-            lblAtcfInfo.Text = T("atcf.info.cleared", "ATCF ???????????? b*.dat?")
-            SetStatus("ATCF ?????")
+            txtAtcfDetail.Text = T("atcf.detail.placeholder", "選取上方資料列查看完整欄位解讀。")
+            lblAtcfInfo.Text = T("atcf.info.cleared", "ATCF 資料已清除；可貼上或開啟 b*.dat。")
+            SetStatus("ATCF 資料已清除")
         End Sub
 
         Private Sub ParseAtcfButtonClick(sender As Object, e As EventArgs)
@@ -980,45 +980,45 @@ Public Class MainForm
             UiRendering.BeginUpdate(atcfGrid)
             Try
                 atcfGrid.Rows.Clear()
-                txtAtcfDetail.Text = "????????????????"
+                txtAtcfDetail.Text = "選取上方資料列查看完整欄位解讀。"
 
                 For Each record As AtcfRecord In records
-                    Dim systemText As String = record.Basin & "/" & If(record.HasCycloneNumber, record.CycloneNumber.ToString("00", CultureInfo.InvariantCulture), "?")
-                    Dim typeText As String = If(String.IsNullOrEmpty(record.SystemType), "?", record.SystemType & "?" & record.TypeText & "?")
-                    Dim nameText As String = If(String.IsNullOrEmpty(record.StormName), "?", record.StormName)
-                    Dim windText As String = If(record.HasMaxWind, record.MaxWindKnots.ToString(CultureInfo.InvariantCulture) & " kt", "?")
-                    Dim pressureText As String = If(record.HasMslp, record.MslpHpa.ToString(CultureInfo.InvariantCulture) & " hPa", "?")
+                    Dim systemText As String = record.Basin & "/" & If(record.HasCycloneNumber, record.CycloneNumber.ToString("00", CultureInfo.InvariantCulture), "—")
+                    Dim typeText As String = If(String.IsNullOrEmpty(record.SystemType), "—", record.SystemType & "（" & record.TypeText & "）")
+                    Dim nameText As String = If(String.IsNullOrEmpty(record.StormName), "—", record.StormName)
+                    Dim windText As String = If(record.HasMaxWind, record.MaxWindKnots.ToString(CultureInfo.InvariantCulture) & " kt", "—")
+                    Dim pressureText As String = If(record.HasMslp, record.MslpHpa.ToString(CultureInfo.InvariantCulture) & " hPa", "—")
                     atcfGrid.Rows.Add(
                         AtcfTimeText(record),
                         systemText,
-                        record.Tech & "/" & If(record.HasTau, record.TauHours.ToString(CultureInfo.InvariantCulture) & " h", "?"),
+                        record.Tech & "/" & If(record.HasTau, record.TauHours.ToString(CultureInfo.InvariantCulture) & " h", "—"),
                         AtcfPositionText(record),
                         windText,
                         pressureText,
                         typeText,
-                        nameText & "?" & record.WindRadiiText)
+                        nameText & "；" & record.WindRadiiText)
                 Next
             Finally
                 UiRendering.EndUpdate(atcfGrid)
             End Try
 
             If records.Count = 0 Then
-                lblAtcfInfo.Text = T("atcf.error.no.records", "??????? ATCF ????????????? 8 ??????")
+                lblAtcfInfo.Text = T("atcf.error.no.records", "沒有解析到有效 ATCF 資料。請確認每行至少包含前 8 個必要欄位。")
                 If warnings.Count > 0 Then ShowError(warnings(0))
                 Return
             End If
 
-            Dim warningText As String = If(warnings.Count = 0, "", String.Format(T("atcf.warning", "?{0} ?????????"), warnings.Count))
+            Dim warningText As String = If(warnings.Count = 0, "", String.Format(T("atcf.warning", "；{0} 行有欄位或格式提醒"), warnings.Count))
             lblAtcfInfo.Text = BuildAtcfSummary(records) & warningText
             atcfGrid.Rows(0).Selected = True
             atcfGrid.CurrentCell = atcfGrid.Rows(0).Cells(0)
             AtcfGridSelectionChanged(Nothing, EventArgs.Empty)
-            SetStatus("ATCF Tracking Data ????")
+            SetStatus("ATCF Tracking Data 解析完成")
         End Sub
 
         Private Sub AtcfIntensityTrendButtonClick(sender As Object, e As EventArgs)
             If parsedAtcfRecords.Count = 0 Then
-                ShowError(T("atcf.trend.error.first", "???? ATCF ????????????"))
+                ShowError(T("atcf.trend.error.first", "請先解析 ATCF 資料，再開啟強度變化圖。"))
                 Return
             End If
 
@@ -1032,13 +1032,13 @@ Public Class MainForm
             Dim systemKeys As List(Of String) = GetAtcfSystemKeys(allPoints)
             If systemKeys.Count > 1 Then
                 Dim message As String = String.Format(CultureInfo.InvariantCulture,
-                    T("atcf.trend.error.multiple.systems", "???????????????????????????{0}?????????? INVEST?NINE ????????????????????????????????????????"),
+                    T("atcf.trend.error.multiple.systems", "強度分析目前只支援單一氣旋；目前資料包含多個氣旋編號：{0}。同一編號即使名稱由 INVEST、NINE 變更為正式名稱，也會視為同一氣旋，不會依名稱分開。請只保留一個氣旋編號後再開啟。"),
                     String.Join(", ", systemKeys.ToArray()))
                 ShowErrorDialog(message)
                 Return
             End If
             If points.Count = 0 Then
-                ShowError(T("atcf.trend.error.time", "?? ATCF ??????? UTC ?????????????"))
+                ShowError(T("atcf.trend.error.time", "目前 ATCF 資料沒有可用的 UTC 時間，無法繪製強度變化圖。"))
                 Return
             End If
 
@@ -1057,8 +1057,8 @@ Public Class MainForm
         Private Function BuildAtcfSummary(records As List(Of AtcfRecord)) As String
             Dim fileInfo As AtcfFileInfo = AtcfFileInfo.FromFileName(atcfSourceFileName)
             Dim sourceText As String = If(fileInfo.HasPattern,
-                                          fileInfo.FileName & "?" & fileInfo.FileKindText & "?" & fileInfo.SystemId,
-                                          T("atcf.source.pasted", "??????"))
+                                          fileInfo.FileName & "｜" & fileInfo.FileKindText & "｜" & fileInfo.SystemId,
+                                          T("atcf.source.pasted", "貼上資料內容"))
             Dim firstTime As DateTime = DateTime.MaxValue
             Dim lastTime As DateTime = DateTime.MinValue
             Dim maxWind As Integer = Integer.MinValue
@@ -1078,65 +1078,65 @@ Public Class MainForm
 
             Dim parts As New List(Of String)()
             parts.Add(sourceText)
-            parts.Add(String.Format(CultureInfo.InvariantCulture, T("atcf.summary.count", "{0} ?"), records.Count))
+            parts.Add(String.Format(CultureInfo.InvariantCulture, T("atcf.summary.count", "{0} 筆"), records.Count))
             If firstTime <> DateTime.MaxValue AndAlso lastTime <> DateTime.MinValue Then
-                parts.Add(String.Format(CultureInfo.InvariantCulture, T("atcf.summary.time", "{0:yyyy-MM-dd HH:mm}?{1:yyyy-MM-dd HH:mm} UTC"), firstTime, lastTime))
+                parts.Add(String.Format(CultureInfo.InvariantCulture, T("atcf.summary.time", "{0:yyyy-MM-dd HH:mm}～{1:yyyy-MM-dd HH:mm} UTC"), firstTime, lastTime))
             End If
             If maxWindRecord IsNot Nothing Then
-                parts.Add(String.Format(CultureInfo.InvariantCulture, T("atcf.summary.maxwind", "?? VMAX {0} kt?{1}?"), maxWind, maxWindRecord.TypeText))
+                parts.Add(String.Format(CultureInfo.InvariantCulture, T("atcf.summary.maxwind", "最大 VMAX {0} kt（{1}）"), maxWind, maxWindRecord.TypeText))
             End If
-            If minPressure <> Integer.MaxValue Then parts.Add(String.Format(CultureInfo.InvariantCulture, T("atcf.summary.minpressure", "?? MSLP {0} hPa"), minPressure))
-            Return String.Join(T("atcf.summary.separator", "?"), parts.ToArray())
+            If minPressure <> Integer.MaxValue Then parts.Add(String.Format(CultureInfo.InvariantCulture, T("atcf.summary.minpressure", "最低 MSLP {0} hPa"), minPressure))
+            Return String.Join(T("atcf.summary.separator", "；"), parts.ToArray())
         End Function
 
         Private Shared Function AtcfTimeText(record As AtcfRecord) As String
-            If Not record.HasAnalysisTime Then Return "?"
+            If Not record.HasAnalysisTime Then Return "—"
             Return record.AnalysisTimeUtc.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture)
         End Function
 
         Private Shared Function AtcfPositionText(record As AtcfRecord) As String
-            If Not record.HasLatitude OrElse Not record.HasLongitude Then Return "?"
+            If Not record.HasLatitude OrElse Not record.HasLongitude Then Return "—"
             Return FormatCoordinate(record.Latitude, True) & " " & FormatCoordinate(record.Longitude, False)
         End Function
 
         Private Shared Function BuildAtcfDetail(record As AtcfRecord) As String
             Dim lines As New List(Of String)()
-            lines.Add(String.Format(CultureInfo.InvariantCulture, LanguageManager.Translate("atcf.detail.line", "? {0} ??{1} {2:00}?{3}?TAU {4} h"), record.SourceLineNumber, record.Basin, record.CycloneNumber, record.Tech, If(record.HasTau, record.TauHours.ToString(CultureInfo.InvariantCulture), "?")))
-            lines.Add(LanguageManager.Translate("atcf.detail.common", "ATCF common fields?? 1?35 ??"))
+            lines.Add(String.Format(CultureInfo.InvariantCulture, LanguageManager.Translate("atcf.detail.line", "第 {0} 行｜{1} {2:00}｜{3}／TAU {4} h"), record.SourceLineNumber, record.Basin, record.CycloneNumber, record.Tech, If(record.HasTau, record.TauHours.ToString(CultureInfo.InvariantCulture), "—")))
+            lines.Add(LanguageManager.Translate("atcf.detail.common", "ATCF common fields（第 1～35 欄）"))
             For index As Integer = 0 To 34
                 Dim rawValue As String = AtcfRawValue(record, index)
                 lines.Add(String.Format(CultureInfo.InvariantCulture, LanguageManager.Translate("atcf.detail.field", "{0:00}. {1}"), index + 1, AtcfFieldName(index)))
-                lines.Add(LanguageManager.Translate("atcf.detail.value", "    ??{0}").Replace("{0}", AtcfDisplayField(record, index, rawValue)))
-                lines.Add(LanguageManager.Translate("atcf.detail.meaning", "    ???{0}").Replace("{0}", AtcfFieldMeaning(index)))
+                lines.Add(LanguageManager.Translate("atcf.detail.value", "    值：{0}").Replace("{0}", AtcfDisplayField(record, index, rawValue)))
+                lines.Add(LanguageManager.Translate("atcf.detail.meaning", "    說明：{0}").Replace("{0}", AtcfFieldMeaning(index)))
             Next
             If Not String.IsNullOrEmpty(record.UserDefined) Then
                 lines.Add(LanguageManager.Translate("atcf.detail.userdefined", "36+ USERDEFINED"))
-                lines.Add(LanguageManager.Translate("atcf.detail.value", "    ??{0}").Replace("{0}", record.UserDefined))
-                lines.Add(LanguageManager.Translate("atcf.detail.event", "    ?????????? ID ??"))
+                lines.Add(LanguageManager.Translate("atcf.detail.value", "    值：{0}").Replace("{0}", record.UserDefined))
+                lines.Add(LanguageManager.Translate("atcf.detail.event", "    說明：事件描述／系統 ID 轉換"))
             Else
                 lines.Add(LanguageManager.Translate("atcf.detail.userdefined", "36+ USERDEFINED"))
-                lines.Add(LanguageManager.Translate("atcf.detail.value", "    ??{0}").Replace("{0}", LanguageManager.Translate("atcf.blank", "??")))
-                lines.Add(LanguageManager.Translate("atcf.detail.no.event", "    ???????????"))
+                lines.Add(LanguageManager.Translate("atcf.detail.value", "    值：{0}").Replace("{0}", LanguageManager.Translate("atcf.blank", "空白")))
+                lines.Add(LanguageManager.Translate("atcf.detail.no.event", "    說明：沒有額外事件描述"))
             End If
             If Not String.IsNullOrEmpty(record.UserData) Then
                 lines.Add(LanguageManager.Translate("atcf.detail.userdata", "userdata"))
-                lines.Add(LanguageManager.Translate("atcf.detail.value", "    ??{0}").Replace("{0}", record.UserData))
-                lines.Add(LanguageManager.Translate("atcf.detail.userdata.meaning", "    ???USERDEFINED ?????"))
+                lines.Add(LanguageManager.Translate("atcf.detail.value", "    值：{0}").Replace("{0}", record.UserData))
+                lines.Add(LanguageManager.Translate("atcf.detail.userdata.meaning", "    說明：USERDEFINED 的補充資料"))
             Else
                 lines.Add(LanguageManager.Translate("atcf.detail.userdata", "userdata"))
-                lines.Add(LanguageManager.Translate("atcf.detail.value", "    ??{0}").Replace("{0}", LanguageManager.Translate("atcf.blank", "??")))
+                lines.Add(LanguageManager.Translate("atcf.detail.value", "    值：{0}").Replace("{0}", LanguageManager.Translate("atcf.blank", "空白")))
             End If
             Return String.Join(Environment.NewLine, lines.ToArray())
         End Function
 
         Private Shared Function AtcfRawValue(record As AtcfRecord, index As Integer) As String
-            If index < 0 OrElse index >= record.RawFields.Count OrElse String.IsNullOrEmpty(record.RawFields(index)) Then Return LanguageManager.Translate("atcf.blank", "??")
+            If index < 0 OrElse index >= record.RawFields.Count OrElse String.IsNullOrEmpty(record.RawFields(index)) Then Return LanguageManager.Translate("atcf.blank", "空白")
             Return record.RawFields(index)
         End Function
 
         Private Shared Function IsAtcfBlank(value As String) As Boolean
-            Return String.Equals(value, "??", StringComparison.Ordinal) OrElse
-                   String.Equals(value, LanguageManager.Translate("atcf.blank", "??"), StringComparison.Ordinal)
+            Return String.Equals(value, "空白", StringComparison.Ordinal) OrElse
+                   String.Equals(value, LanguageManager.Translate("atcf.blank", "空白"), StringComparison.Ordinal)
         End Function
 
         Private Shared Function AtcfDisplayField(record As AtcfRecord, index As Integer, rawValue As String) As String
@@ -1144,73 +1144,73 @@ Public Class MainForm
                 Case 0
                     Return record.Basin
                 Case 1
-                    Return If(record.HasCycloneNumber, record.CycloneNumber.ToString("00", CultureInfo.InvariantCulture), LanguageManager.Translate("atcf.blank", "??"))
+                    Return If(record.HasCycloneNumber, record.CycloneNumber.ToString("00", CultureInfo.InvariantCulture), LanguageManager.Translate("atcf.blank", "空白"))
                 Case 2
                     Return AtcfTimeText(record) & " UTC"
                 Case 3
                     Return rawValue
                 Case 4
-                    Return If(String.IsNullOrEmpty(record.Tech), LanguageManager.Translate("atcf.blank", "??"), record.Tech)
+                    Return If(String.IsNullOrEmpty(record.Tech), LanguageManager.Translate("atcf.blank", "空白"), record.Tech)
                 Case 5
-                    Return If(record.HasTau, record.TauHours.ToString(CultureInfo.InvariantCulture) & " h", LanguageManager.Translate("atcf.blank", "??"))
+                    Return If(record.HasTau, record.TauHours.ToString(CultureInfo.InvariantCulture) & " h", LanguageManager.Translate("atcf.blank", "空白"))
                 Case 6
-                    Return If(record.HasLatitude, FormatCoordinate(record.Latitude, True) & "?" & record.LatitudeText & "?", rawValue)
+                    Return If(record.HasLatitude, FormatCoordinate(record.Latitude, True) & "（" & record.LatitudeText & "）", rawValue)
                 Case 7
-                    Return If(record.HasLongitude, FormatCoordinate(record.Longitude, False) & "?" & record.LongitudeText & "?", rawValue)
+                    Return If(record.HasLongitude, FormatCoordinate(record.Longitude, False) & "（" & record.LongitudeText & "）", rawValue)
                 Case 8
                     Return If(record.HasMaxWind, record.MaxWindKnots.ToString(CultureInfo.InvariantCulture) & " kt", rawValue)
                 Case 9
                     Return If(record.HasMslp, record.MslpHpa.ToString(CultureInfo.InvariantCulture) & " hPa", rawValue)
                 Case 10
-                    Return If(String.IsNullOrEmpty(record.SystemType), LanguageManager.Translate("atcf.blank", "??"), record.SystemType & "?" & record.TypeText & "?")
+                    Return If(String.IsNullOrEmpty(record.SystemType), LanguageManager.Translate("atcf.blank", "空白"), record.SystemType & "（" & record.TypeText & "）")
                 Case 11
-                    If rawValue = "0" Then Return LanguageManager.Translate("atcf.display.wind.threshold.none", "0????????????")
+                    If rawValue = "0" Then Return LanguageManager.Translate("atcf.display.wind.threshold.none", "0（沒有指定風速半徑門檻）")
                     Return If(record.HasRadiusIntensity, record.RadiusIntensityKnots.ToString(CultureInfo.InvariantCulture) & " kt", rawValue)
                 Case 12
-                    If IsAtcfBlank(rawValue) Then Return LanguageManager.Translate("atcf.display.wind.quadrant.blank", "???????????")
+                    If IsAtcfBlank(rawValue) Then Return LanguageManager.Translate("atcf.display.wind.quadrant.blank", "空白（無風圈象限編碼）")
                     Return record.WindCode
                 Case 13 To 16
-                    If rawValue = "0" Then Return LanguageManager.Translate("atcf.display.radius.none", "0?????????")
-                    Return If(IsAtcfBlank(rawValue), LanguageManager.Translate("atcf.blank", "??"), rawValue & " nm")
+                    If rawValue = "0" Then Return LanguageManager.Translate("atcf.display.radius.none", "0（無對應風圈半徑）")
+                    Return If(IsAtcfBlank(rawValue), LanguageManager.Translate("atcf.blank", "空白"), rawValue & " nm")
                 Case 17
                     Return If(record.HasPressureLastClosedIsobar, record.PressureLastClosedIsobarHpa.ToString(CultureInfo.InvariantCulture) & " hPa", rawValue)
                 Case 18 To 19
                     Return If(IsAtcfBlank(rawValue), rawValue, rawValue & " nm")
                 Case 20
-                    If rawValue = "0" Then Return LanguageManager.Translate("atcf.display.gust.none", "0?????????")
-                    Return If(IsAtcfBlank(rawValue), LanguageManager.Translate("atcf.blank", "??"), rawValue & " kt")
+                    If rawValue = "0" Then Return LanguageManager.Translate("atcf.display.gust.none", "0（陣風資料未提供）")
+                    Return If(IsAtcfBlank(rawValue), LanguageManager.Translate("atcf.blank", "空白"), rawValue & " kt")
                 Case 21
-                    If rawValue = "0" Then Return LanguageManager.Translate("atcf.display.eye.none", "0????????????")
-                    Return If(IsAtcfBlank(rawValue), LanguageManager.Translate("atcf.blank", "??"), rawValue & " nm")
+                    If rawValue = "0" Then Return LanguageManager.Translate("atcf.display.eye.none", "0（無眼徑／無眼風眼資料）")
+                    Return If(IsAtcfBlank(rawValue), LanguageManager.Translate("atcf.blank", "空白"), rawValue & " nm")
                 Case 22
                     Return SubregionText(record.Subregion, rawValue)
                 Case 23
-                    If rawValue = "0" Then Return LanguageManager.Translate("atcf.display.seas.none", "0???????????")
-                    Return If(IsAtcfBlank(rawValue), LanguageManager.Translate("atcf.blank", "??"), rawValue & " ft")
+                    If rawValue = "0" Then Return LanguageManager.Translate("atcf.display.seas.none", "0（最大有效波高未提供）")
+                    Return If(IsAtcfBlank(rawValue), LanguageManager.Translate("atcf.blank", "空白"), rawValue & " ft")
                 Case 24
                     Return rawValue
                 Case 25
-                    If rawValue = "0" Then Return "0?????????"
-                    Return If(record.HasDirection, record.DirectionDegrees.ToString(CultureInfo.InvariantCulture) & "?", rawValue)
+                    If rawValue = "0" Then Return "0（移動方向未提供）"
+                    Return If(record.HasDirection, record.DirectionDegrees.ToString(CultureInfo.InvariantCulture) & "°", rawValue)
                 Case 26
-                    If rawValue = "0" Then Return "0?????????"
+                    If rawValue = "0" Then Return "0（移動速度未提供）"
                     Return If(record.HasSpeed, record.SpeedKnots.ToString(CultureInfo.InvariantCulture) & " kt", rawValue)
                 Case 27
-                    Return If(String.IsNullOrEmpty(record.StormName), LanguageManager.Translate("atcf.blank", "??"), record.StormName)
+                    Return If(String.IsNullOrEmpty(record.StormName), LanguageManager.Translate("atcf.blank", "空白"), record.StormName)
                 Case 28
-                    If record.Depth = "S" Then Return LanguageManager.Translate("atcf.depth.shallow", "S?Shallow??????")
-                    If record.Depth = "D" Then Return LanguageManager.Translate("atcf.depth.deep", "D?Deep??????")
-                    If record.Depth = "M" Then Return LanguageManager.Translate("atcf.depth.medium", "M?Medium??????")
+                    If record.Depth = "S" Then Return LanguageManager.Translate("atcf.depth.shallow", "S（Shallow，淺層系統）")
+                    If record.Depth = "D" Then Return LanguageManager.Translate("atcf.depth.deep", "D（Deep，深層系統）")
+                    If record.Depth = "M" Then Return LanguageManager.Translate("atcf.depth.medium", "M（Medium，中層系統）")
                     Return rawValue
                 Case 29
-                    If rawValue = "0" Then Return LanguageManager.Translate("atcf.display.seas.threshold.none", "0?????????")
-                    Return If(IsAtcfBlank(rawValue), LanguageManager.Translate("atcf.blank", "??"), rawValue & " ft")
+                    If rawValue = "0" Then Return LanguageManager.Translate("atcf.display.seas.threshold.none", "0（波高閾值未提供）")
+                    Return If(IsAtcfBlank(rawValue), LanguageManager.Translate("atcf.blank", "空白"), rawValue & " ft")
                 Case 30
-                    If IsAtcfBlank(rawValue) Then Return LanguageManager.Translate("atcf.display.seas.quadrant.blank", "???????????")
+                    If IsAtcfBlank(rawValue) Then Return LanguageManager.Translate("atcf.display.seas.quadrant.blank", "空白（無波浪象限編碼）")
                     Return rawValue
                 Case 31 To 34
-                    If rawValue = "0" Then Return LanguageManager.Translate("atcf.display.wave.radius.none", "0?????????")
-                    Return If(IsAtcfBlank(rawValue), LanguageManager.Translate("atcf.blank", "??"), rawValue & " nm")
+                    If rawValue = "0" Then Return LanguageManager.Translate("atcf.display.wave.radius.none", "0（無波浪半徑資料）")
+                    Return If(IsAtcfBlank(rawValue), LanguageManager.Translate("atcf.blank", "空白"), rawValue & " nm")
                 Case Else
                     Return rawValue
             End Select
@@ -1219,17 +1219,17 @@ Public Class MainForm
         Private Shared Function SubregionText(code As String, rawValue As String) As String
             Select Case code
                 Case "W"
-                    Return LanguageManager.Translate("atcf.subregion.W", "W???????")
+                    Return LanguageManager.Translate("atcf.subregion.W", "W（西北太平洋）")
                 Case "A"
-                    Return LanguageManager.Translate("atcf.subregion.A", "A??????")
+                    Return LanguageManager.Translate("atcf.subregion.A", "A（阿拉伯海）")
                 Case "B"
-                    Return LanguageManager.Translate("atcf.subregion.B", "B??????")
+                    Return LanguageManager.Translate("atcf.subregion.B", "B（孟加拉灣）")
                 Case "C"
-                    Return LanguageManager.Translate("atcf.subregion.C", "C??????")
+                    Return LanguageManager.Translate("atcf.subregion.C", "C（中太平洋）")
                 Case "E"
-                    Return LanguageManager.Translate("atcf.subregion.E", "E??????")
+                    Return LanguageManager.Translate("atcf.subregion.E", "E（東太平洋）")
                 Case "L"
-                    Return LanguageManager.Translate("atcf.subregion.L", "L?????")
+                    Return LanguageManager.Translate("atcf.subregion.L", "L（大西洋）")
                 Case Else
                     Return rawValue
             End Select
@@ -1278,36 +1278,36 @@ Public Class MainForm
 
         Private Shared Function AtcfFieldMeaning(index As Integer) As String
             Select Case index
-                Case 0 : Return AtcfMeaning(index, "????")
-                Case 1 : Return AtcfMeaning(index, "??????")
-                Case 2 : Return AtcfMeaning(index, "??????????UTC?")
-                Case 3 : Return AtcfMeaning(index, "Best Track ????? objective technique ???")
-                Case 4 : Return AtcfMeaning(index, "?????BEST ????????")
-                Case 5 : Return AtcfMeaning(index, "???? TAU?Best Track ? 0 ??")
-                Case 6 : Return AtcfMeaning(index, "????????? N/S")
-                Case 7 : Return AtcfMeaning(index, "????????? E/W")
-                Case 8 : Return AtcfMeaning(index, "???????kt?")
-                Case 9 : Return AtcfMeaning(index, "????????hPa?")
-                Case 10 : Return AtcfMeaning(index, "??????? DB?TD?TS?STS?TY?ST?WV?MD")
-                Case 11 : Return AtcfMeaning(index, "???????0 ????????")
-                Case 12 : Return AtcfMeaning(index, "??????????????????")
-                Case 13 To 16 : Return AtcfMeaning(index, "RAD1?RAD4 ???????0 ????????nm?")
-                Case 17 : Return AtcfMeaning(index, "???????????hPa?")
-                Case 18 : Return AtcfMeaning(index, "???????????nm?")
-                Case 19 : Return AtcfMeaning(index, "???????nm?")
-                Case 20 : Return AtcfMeaning(index, "?????0 ?????")
-                Case 21 : Return AtcfMeaning(index, "???0 ????????????")
-                Case 22 : Return AtcfMeaning(index, "????????????W ???????")
-                Case 23 : Return AtcfMeaning(index, "???????0 ??????ft?")
-                Case 24 : Return AtcfMeaning(index, "????????????")
-                Case 25 : Return AtcfMeaning(index, "?????0 ????????")
-                Case 26 : Return AtcfMeaning(index, "?????0 ??????kt?")
-                Case 27 : Return AtcfMeaning(index, "??????? KUJIRA")
-                Case 28 : Return AtcfMeaning(index, "?????S=Shallow ???D=Deep ???M=Medium ??")
-                Case 29 : Return AtcfMeaning(index, "?????0 ?????")
-                Case 30 : Return AtcfMeaning(index, "?????????????????")
-                Case 31 To 34 : Return AtcfMeaning(index, "???????0 ?????")
-                Case Else : Return AtcfMeaning(index, "ATCF ??")
+                Case 0 : Return AtcfMeaning(index, "海域代碼")
+                Case 1 : Return AtcfMeaning(index, "年度系統編號")
+                Case 2 : Return AtcfMeaning(index, "分析／警報日期時間（UTC）")
+                Case 3 : Return AtcfMeaning(index, "Best Track 分鐘欄位或 objective technique 排序號")
+                Case 4 : Return AtcfMeaning(index, "分析技術；BEST 代表最佳路徑分析")
+                Case 5 : Return AtcfMeaning(index, "預報時效 TAU；Best Track 為 0 小時")
+                Case 6 : Return AtcfMeaning(index, "緯度，十分之一度加 N/S")
+                Case 7 : Return AtcfMeaning(index, "經度，十分之一度加 E/W")
+                Case 8 : Return AtcfMeaning(index, "最大持續風速（kt）")
+                Case 9 : Return AtcfMeaning(index, "最低海平面氣壓（hPa）")
+                Case 10 : Return AtcfMeaning(index, "系統分級；例如 DB、TD、TS、STS、TY、ST、WV、MD")
+                Case 11 : Return AtcfMeaning(index, "風速半徑門檻；0 代表沒有指定門檻")
+                Case 12 : Return AtcfMeaning(index, "風圈象限編碼；空白代表無風圈象限編碼")
+                Case 13 To 16 : Return AtcfMeaning(index, "RAD1～RAD4 對應風圈半徑；0 代表無對應資料（nm）")
+                Case 17 : Return AtcfMeaning(index, "最外圍閉合等壓線氣壓（hPa）")
+                Case 18 : Return AtcfMeaning(index, "最外圍閉合等壓線半徑（nm）")
+                Case 19 : Return AtcfMeaning(index, "最大風速半徑（nm）")
+                Case 20 : Return AtcfMeaning(index, "陣風資料；0 代表未提供")
+                Case 21 : Return AtcfMeaning(index, "眼徑；0 代表無眼徑／無眼風眼資料")
+                Case 22 : Return AtcfMeaning(index, "西北太平洋等次區域代碼；W 代表西北太平洋")
+                Case 23 : Return AtcfMeaning(index, "最大有效波高；0 代表未提供（ft）")
+                Case 24 : Return AtcfMeaning(index, "分析員縮寫；空白代表未填")
+                Case 25 : Return AtcfMeaning(index, "移動方向；0 代表未提供（度）")
+                Case 26 : Return AtcfMeaning(index, "移動速度；0 代表未提供（kt）")
+                Case 27 : Return AtcfMeaning(index, "系統名稱；例如 KUJIRA")
+                Case 28 : Return AtcfMeaning(index, "系統深度；S=Shallow 淺層、D=Deep 深層、M=Medium 中層")
+                Case 29 : Return AtcfMeaning(index, "波高閾值；0 代表未提供")
+                Case 30 : Return AtcfMeaning(index, "波浪半徑／象限編碼；空白代表未提供")
+                Case 31 To 34 : Return AtcfMeaning(index, "波浪半徑資料；0 代表未提供")
+                Case Else : Return AtcfMeaning(index, "ATCF 欄位")
             End Select
         End Function
 
@@ -1320,7 +1320,7 @@ Public Class MainForm
             panel.Dock = DockStyle.Fill
 
             Dim title As New Label()
-            title.Text = T("app.title", "????? 2026 V6")
+            title.Text = T("app.title", "氣象小工具 2026 V6")
             title.Font = New Font(Font.FontFamily, 24.0F, FontStyle.Bold)
             title.ForeColor = Color.FromArgb(28, 53, 78)
             title.AutoSize = True
@@ -1328,7 +1328,7 @@ Public Class MainForm
             panel.Controls.Add(title)
 
             Dim subtitle As New Label()
-            subtitle.Text = T("app.subtitle", "?????????????????????????? API Key")
+            subtitle.Text = T("app.subtitle", "給氣象初學者的離線換算工具｜不需安裝、不需網路、不需 API Key")
             subtitle.ForeColor = Color.FromArgb(82, 104, 123)
             subtitle.AutoSize = True
             subtitle.Location = New Point(8, 48)
@@ -1348,7 +1348,7 @@ Public Class MainForm
             languagePanel.Controls.Add(languageSelector)
             panel.Controls.Add(languagePanel)
 
-            lblStatus.Text = T("status.ready", "????")
+            lblStatus.Text = T("status.ready", "準備就緒")
             lblStatus.AutoSize = True
             lblStatus.ForeColor = Color.FromArgb(44, 112, 83)
             lblStatus.Anchor = AnchorStyles.Top Or AnchorStyles.Right
@@ -1393,16 +1393,16 @@ Public Class MainForm
             Dim package As LanguagePackageInfo = TryCast(languageSelector.SelectedItem, LanguagePackageInfo)
             If package Is Nothing OrElse String.Equals(package.FileName, LanguageManager.CurrentFileName, StringComparison.OrdinalIgnoreCase) Then Return
             If Not LanguageManager.LoadPackage(package.FileName) Then
-                ShowError(T("language.load.failed", "????????"))
+                ShowError(T("language.load.failed", "語言包載入失敗。"))
                 Return
             End If
             Application.Restart()
         End Sub
 
         Private Sub ApplyUiLanguage()
-            Text = T("app.title", "????? 2026 V6")
+            Text = T("app.title", "氣象小工具 2026 V6")
             TranslateControlTexts(Me)
-            lblStatus.Text = T("status.ready", "????")
+            lblStatus.Text = T("status.ready", "準備就緒")
         End Sub
 
         Private Shared Sub TranslateControlTexts(parent As Control)
@@ -1430,7 +1430,7 @@ Public Class MainForm
         End Sub
 
         Private Function BuildWindGroup() As GroupBox
-            Dim group As GroupBox = CreateGroup("1. ?????????")
+            Dim group As GroupBox = CreateGroup("1. 風速換算與颱風分級")
             Dim layout As TableLayoutPanel = CreateLayout(4, 9)
             layout.ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 27.0F))
             layout.ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 27.0F))
@@ -1438,38 +1438,38 @@ Public Class MainForm
             layout.ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 21.0F))
             group.Controls.Add(layout)
 
-            AddTextKey(layout, "quick.input.wind", "?????1??", 0, 0)
+            AddTextKey(layout, "quick.input.wind", "輸入風速（1分）", 0, 0)
             txtKnots.Width = 120
             txtKnots.Text = "20"
             layout.Controls.Add(txtKnots, 1, 0)
-            AddText(layout, "??kt?", 2, 0)
-            Dim button As Button = CreateButton("????")
+            AddText(layout, "節（kt）", 2, 0)
+            Dim button As Button = CreateButton("開始換算")
             AddHandler button.Click, AddressOf WindButtonClick
             layout.Controls.Add(button, 3, 0)
 
-            AddText(layout, "?????", 0, 1)
+            AddText(layout, "公里／小時", 0, 1)
             layout.Controls.Add(PrepareValueLabel(lblKmh), 1, 1)
-            AddText(layout, "????", 2, 1)
+            AddText(layout, "公尺／秒", 2, 1)
             layout.Controls.Add(PrepareValueLabel(lblMs), 3, 1)
-            AddText(layout, "?????", 0, 2)
+            AddText(layout, "英里／小時", 0, 2)
             layout.Controls.Add(PrepareValueLabel(lblMph), 1, 2)
 
-            AddTextKey(layout, "quick.jtwc", "JTWC?1? kt?", 0, 3)
+            AddTextKey(layout, "quick.jtwc", "JTWC（1分 kt）", 0, 3)
             layout.Controls.Add(PrepareValueLabel(lblJtwc), 1, 3)
-            AddTextKey(layout, "quick.cwa", "CWA?10? m/s?", 2, 3)
+            AddTextKey(layout, "quick.cwa", "CWA（10分 m/s）", 2, 3)
             layout.Controls.Add(PrepareValueLabel(lblCwa), 3, 3)
-            AddTextKey(layout, "quick.jma", "JMA?10? m/s?", 0, 4)
+            AddTextKey(layout, "quick.jma", "JMA（10分 m/s）", 0, 4)
             layout.Controls.Add(PrepareValueLabel(lblJma), 1, 4)
-            AddTextKey(layout, "quick.hko", "HKO?10? km/h?", 2, 4)
+            AddTextKey(layout, "quick.hko", "HKO（10分 km/h）", 2, 4)
             layout.Controls.Add(PrepareValueLabel(lblHko), 3, 4)
 
-            AddText(layout, "Dvorak T?CI", 0, 5)
+            AddText(layout, "Dvorak T／CI", 0, 5)
             layout.Controls.Add(PrepareValueLabel(lblWindDvorak), 1, 5)
-            AddText(layout, "????", 2, 5)
+            AddText(layout, "換算基準", 2, 5)
             layout.Controls.Add(PrepareValueLabel(lblWindBasis), 3, 5)
 
             layout.RowStyles(6) = New RowStyle(SizeType.Absolute, 52.0F)
-            Dim note As Label = CreateNote(T("quick.wind.note", "??? NHC?JTWC 1 ?????????CWA?JMA ?? 10 ?????HKO ?? Dvorak 1 ???? ? 0.93?" & Environment.NewLine & "??????????????????????"))
+            Dim note As Label = CreateNote(T("quick.wind.note", "輸入以 NHC／JTWC 1 分鐘平均風為基準；CWA、JMA 使用 10 分鐘參考，HKO 使用 Dvorak 1 分鐘風速 × 0.93。" & Environment.NewLine & "結果是官方對照表的教學參考，不代表即時警報。"))
             note.AutoSize = False
             note.Dock = DockStyle.Fill
             note.MaximumSize = New Size(0, 0)
@@ -1480,33 +1480,33 @@ Public Class MainForm
         End Function
 
         Private Function BuildBeaufortGroup() As GroupBox
-            Dim group As GroupBox = CreateGroup("2. ??????")
+            Dim group As GroupBox = CreateGroup("2. 蒲福風級換算")
             Dim layout As TableLayoutPanel = CreateLayout(2, 6)
             layout.RowStyles(5) = New RowStyle(SizeType.Absolute, 48.0F)
             layout.ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 42.0F))
             layout.ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 58.0F))
             group.Controls.Add(layout)
 
-            AddText(layout, "?????0?12?", 0, 0)
+            AddText(layout, "輸入風級（0～12）", 0, 0)
             txtBeaufort.Width = 120
             txtBeaufort.Text = "5"
             layout.Controls.Add(txtBeaufort, 1, 0)
-            Dim button As Button = CreateButton("????")
+            Dim button As Button = CreateButton("換算風速")
             AddHandler button.Click, AddressOf BeaufortButtonClick
             layout.Controls.Add(button, 1, 1)
 
-            AddText(layout, "????", 0, 2)
+            AddText(layout, "約當風速", 0, 2)
             layout.Controls.Add(PrepareValueLabel(lblBeaufortMs), 1, 2)
-            AddText(layout, "????", 0, 3)
+            AddText(layout, "風況名稱", 0, 3)
             layout.Controls.Add(PrepareValueLabel(lblBeaufortName), 1, 3)
-            Dim note As Label = CreateNote("??????????????????????????????????")
+            Dim note As Label = CreateNote("蒲福風級是觀察風力的入門尺度；風速越高，風對海面與物體的影響越明顯。")
             layout.Controls.Add(note, 0, 5)
             layout.SetColumnSpan(note, 2)
             Return group
         End Function
 
         Private Function BuildTemperatureGroup() As GroupBox
-            Dim group As GroupBox = CreateGroup("3. ????")
+            Dim group As GroupBox = CreateGroup("3. 溫度換算")
             Dim layout As TableLayoutPanel = CreateLayout(3, 5)
             For index As Integer = 0 To 3
                 layout.RowStyles(index) = New RowStyle(SizeType.Absolute, 30.0F)
@@ -1517,29 +1517,29 @@ Public Class MainForm
             layout.ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 30.0F))
             group.Controls.Add(layout)
 
-            AddText(layout, "????C?", 0, 0)
+            AddText(layout, "攝氏（°C）", 0, 0)
             txtCelsius.Width = 120
             txtCelsius.Text = "25"
             layout.Controls.Add(txtCelsius, 1, 0)
-            Dim cButton As Button = CreateButton("????")
+            Dim cButton As Button = CreateButton("轉成華氏")
             AddHandler cButton.Click, AddressOf CelsiusButtonClick
             layout.Controls.Add(cButton, 2, 0)
 
-            AddText(layout, "????F?", 0, 1)
+            AddText(layout, "華氏（°F）", 0, 1)
             txtFahrenheit.Width = 120
             layout.Controls.Add(txtFahrenheit, 1, 1)
-            Dim fButton As Button = CreateButton("????")
+            Dim fButton As Button = CreateButton("轉成攝氏")
             AddHandler fButton.Click, AddressOf FahrenheitButtonClick
             layout.Controls.Add(fButton, 2, 1)
 
-            Dim note As Label = CreateNote("?C ???????F ???????????????????????")
+            Dim note As Label = CreateNote("°C 常用於台灣；°F 常見於美國。體感溫度會受濕度、風速與日照影響。")
             layout.Controls.Add(note, 0, 4)
             layout.SetColumnSpan(note, 3)
             Return group
         End Function
 
         Private Function BuildPressureGroup() As GroupBox
-            Dim group As GroupBox = CreateGroup("4. ???????")
+            Dim group As GroupBox = CreateGroup("4. 氣壓與理想浪高")
             Dim layout As TableLayoutPanel = CreateLayout(2, 5)
             For index As Integer = 0 To 3
                 layout.RowStyles(index) = New RowStyle(SizeType.Absolute, 30.0F)
@@ -1549,17 +1549,17 @@ Public Class MainForm
             layout.ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 56.0F))
             group.Controls.Add(layout)
 
-            AddText(layout, "???hPa?", 0, 0)
+            AddText(layout, "氣壓（hPa）", 0, 0)
             txtPressure.Width = 120
             txtPressure.Text = "1013"
             layout.Controls.Add(txtPressure, 1, 0)
-            Dim button As Button = CreateButton("????")
+            Dim button As Button = CreateButton("估算浪高")
             AddHandler button.Click, AddressOf PressureButtonClick
             layout.Controls.Add(button, 1, 1)
 
-            AddText(layout, "????", 0, 2)
+            AddText(layout, "估算結果", 0, 2)
             layout.Controls.Add(PrepareValueLabel(lblWaveHeight), 1, 2)
-            Dim note As Label = CreateNote("????????????????????????????????????????")
+            Dim note As Label = CreateNote("使用舊版工具的簡化公式，不能取代海象預報或現場觀測。氣壓越低，估算浪高通常越高。")
             layout.Controls.Add(note, 0, 4)
             layout.SetColumnSpan(note, 2)
             Return group
@@ -1613,7 +1613,7 @@ Public Class MainForm
         End Sub
 
         Private Shared Function PrepareValueLabel(label As Label) As Label
-            label.Text = "?"
+            label.Text = "—"
             label.AutoSize = False
             label.Dock = DockStyle.Fill
             label.TextAlign = ContentAlignment.MiddleLeft
@@ -1651,7 +1651,7 @@ Public Class MainForm
             Dim knots As Double
             If Not ReadNumber(txtKnots, knots) Then Return
             If knots < 0 Then
-                ShowError("?????? 0?")
+                ShowError("風速不能小於 0。")
                 Return
             End If
 
@@ -1665,12 +1665,12 @@ Public Class MainForm
 
             Dim reference As DvorakReference = TropicalCycloneIntensityCalculator.GetReferenceFromNHCWind(knots)
             If reference Is Nothing Then
-                lblCwa.Text = "?"
-                lblJma.Text = "?"
-                lblHko.Text = "?"
-                lblWindDvorak.Text = "?? CI 1.0"
-                lblWindBasis.Text = "??????"
-                SetStatus("????????? Dvorak ????")
+                lblCwa.Text = "—"
+                lblJma.Text = "—"
+                lblHko.Text = "—"
+                lblWindDvorak.Text = "未達 CI 1.0"
+                lblWindBasis.Text = "低於表格範圍"
+                SetStatus("風速換算完成；低於 Dvorak 表最低值")
                 Return
             End If
 
@@ -1680,15 +1680,15 @@ Public Class MainForm
             lblJma.Text = cwaMs.ToString("0.0")
             lblHko.Text = hkoKmh.ToString("0.0")
             lblWindDvorak.Text = "CI " & reference.CI.ToString("0.0")
-            lblWindBasis.Text = "NHC 1??CI"
-            SetStatus("???????????")
+            lblWindBasis.Text = "NHC 1分→CI"
+            SetStatus("風速換算與機構對照完成")
         End Sub
 
         Private Sub BeaufortButtonClick(sender As Object, e As EventArgs)
             Dim force As Double
             If Not ReadNumber(txtBeaufort, force) Then Return
             If force < 0 OrElse force > 12 OrElse force <> Math.Truncate(force) Then
-                ShowError("??????? 0?12 ????")
+                ShowError("蒲福風級請輸入 0～12 的整數。")
                 Return
             End If
 
@@ -1696,41 +1696,41 @@ Public Class MainForm
             Dim ms As Double = 0.836 * Math.Pow(force, 1.5)
             lblBeaufortMs.Text = ms.ToString("0.00") & " m/s"
             lblBeaufortName.Text = LanguageManager.Translate("beaufort." & index.ToString(CultureInfo.InvariantCulture), BeaufortNames(index))
-            SetStatus("????????")
+            SetStatus("蒲福風級換算完成")
         End Sub
 
         Private Sub CelsiusButtonClick(sender As Object, e As EventArgs)
             Dim celsius As Double
             If Not ReadNumber(txtCelsius, celsius) Then Return
             txtFahrenheit.Text = ((celsius * 9.0 / 5.0) + 32.0).ToString("0.00")
-            SetStatus("??????")
+            SetStatus("溫度換算完成")
         End Sub
 
         Private Sub FahrenheitButtonClick(sender As Object, e As EventArgs)
             Dim fahrenheit As Double
             If Not ReadNumber(txtFahrenheit, fahrenheit) Then Return
             txtCelsius.Text = ((fahrenheit - 32.0) * 5.0 / 9.0).ToString("0.00")
-            SetStatus("??????")
+            SetStatus("溫度換算完成")
         End Sub
 
         Private Sub PressureButtonClick(sender As Object, e As EventArgs)
             Dim pressure As Double
             If Not ReadNumber(txtPressure, pressure) Then Return
             If pressure < 850 OrElse pressure > 1100 Then
-                ShowError("?????????????850?1100 hPa??")
+                ShowError("請輸入合理的海平面氣壓值（850～1100 hPa）。")
                 Return
             End If
 
             Dim waveHeight As Double = Math.Max(0.0, 0.154 * (1019.0 - pressure))
             lblWaveHeight.Text = waveHeight.ToString("0.00") & " m"
-            SetStatus("????????")
+            SetStatus("理想浪高估算完成")
         End Sub
 
         Private Sub AgencyButtonClick(sender As Object, e As EventArgs)
             Dim finalT As Double
             If Not ReadNumber(txtIntensityT, finalT) Then Return
             If finalT < 1.0 OrElse finalT > 8.0 OrElse Math.Abs((finalT * 2.0) - Math.Round(finalT * 2.0)) > 0.0001 Then
-                ShowError("Final-T?T ???? 1.0?8.0 ???? 0.5 ???????")
+                ShowError("Final-T／T 值請輸入 1.0～8.0 之間、以 0.5 為間隔的數字。")
                 Return
             End If
 
@@ -1746,9 +1746,9 @@ Public Class MainForm
 
             Dim ci As Double = TropicalCycloneIntensityCalculator.EstimateCI(finalT, trend)
             Dim rows As List(Of IntensityAgencyRow) = TropicalCycloneIntensityCalculator.GetRows(finalT, trend)
-            Dim summary As String = String.Format(T("agency.summary", "Final-T {0:0.0}?{1}?? ?? CI {2:0.0}?{3}"), finalT, TropicalCycloneIntensityCalculator.TDescription(finalT), ci, TrendExplanation(trend))
+            Dim summary As String = String.Format(T("agency.summary", "Final-T {0:0.0}（{1}）→ 估算 CI {2:0.0}；{3}"), finalT, TropicalCycloneIntensityCalculator.TDescription(finalT), ci, TrendExplanation(trend))
             PopulateAgencyGrid(rows, ci, summary)
-            SetStatus("??????????")
+            SetStatus("熱帶氣旋強度對照完成")
         End Sub
 
         Private Sub PopulateAgencyGrid(rows As List(Of IntensityAgencyRow), ci As Double, summary As String)
@@ -1779,21 +1779,21 @@ Public Class MainForm
             ApplyDvtsCenterFilter()
 
             If records.Count = 0 Then
-                lblDvtsInfo.Text = T("dvts.error.no.records", "??????? DVTS????????? DVTS ???")
+                lblDvtsInfo.Text = T("dvts.error.no.records", "沒有解析到有效 DVTS。請確認每行都符合 DVTS 格式。")
                 If warnings.Count > 0 Then ShowError(warnings(0))
                 Return
             End If
 
-            Dim warningText As String = If(warnings.Count = 0, "", String.Format(T("dvts.warning.other", "??? {0} ????"), warnings.Count))
-            Dim sourceText As String = If(String.IsNullOrEmpty(dvtsSourceFileName), T("dvts.source.pasted", "????"), Path.GetFileName(dvtsSourceFileName))
-            lblDvtsInfo.Text = String.Format(T("dvts.info.parsed", "{0}???? {1} ? DVTS{2}????????????????"), sourceText, records.Count, warningText)
+            Dim warningText As String = If(warnings.Count = 0, "", String.Format(T("dvts.warning.other", "；另有 {0} 行未解析"), warnings.Count))
+            Dim sourceText As String = If(String.IsNullOrEmpty(dvtsSourceFileName), T("dvts.source.pasted", "貼上內容"), Path.GetFileName(dvtsSourceFileName))
+            lblDvtsInfo.Text = String.Format(T("dvts.info.parsed", "{0}：已解析 {1} 筆 DVTS{2}；選取資料後按「帶入選取資料」。"), sourceText, records.Count, warningText)
             dvtsGrid.Rows(0).Selected = True
-            SetStatus("DVTS ????")
+            SetStatus("DVTS 解析完成")
         End Sub
 
         Private Sub ImportDvtsButtonClick(sender As Object, e As EventArgs)
             If parsedDvtsRecords.Count = 0 Then
-                ShowError(T("dvts.error.parse.first", "?????? DVTS??"))
+                ShowError(T("dvts.error.parse.first", "請先按「解析 DVTS」。"))
                 Return
             End If
 
@@ -1802,11 +1802,11 @@ Public Class MainForm
                 record = TryCast(dvtsGrid.SelectedRows(0).Tag, DvtsRecord)
             End If
             If record Is Nothing Then
-                ShowError(T("dvts.error.selection.missing", "?????? DVTS ???"))
+                ShowError(T("dvts.error.selection.missing", "找不到選取的 DVTS 資料。"))
                 Return
             End If
             If Not record.HasTNumber Then
-                ShowError(T("dvts.error.no.tci", "?? DVTS ???? T?CI????? Dvorak ????"))
+                ShowError(T("dvts.error.no.tci", "這筆 DVTS 沒有提供 T／CI，無法帶入 Dvorak 對照表。"))
                 Return
             End If
 
@@ -1822,11 +1822,11 @@ Public Class MainForm
             End If
 
             Dim tText As String = record.TNumber.ToString("0.0")
-            Dim ciText As String = If(record.HasCINumber, record.CINumber.ToString("0.0"), T("dvts.import.estimated", "?? ") & ci.ToString("0.0"))
-            Dim summary As String = String.Format(T("dvts.import.summary", "DVTS {0} {1:00}?{2}Z??? {3:0.0} kt?T{4}?CI{5}???????????"), record.Center, record.StormNumber, record.AnalysisTimeUtc.ToString("yyyy-MM-dd HH:mm"), record.WindKnots, tText, ciText)
+            Dim ciText As String = If(record.HasCINumber, record.CINumber.ToString("0.0"), T("dvts.import.estimated", "估算 ") & ci.ToString("0.0"))
+            Dim summary As String = String.Format(T("dvts.import.summary", "DVTS {0} {1:00}／{2}Z：風速 {3:0.0} kt，T{4}／CI{5}；已帶入下方官方對照。"), record.Center, record.StormNumber, record.AnalysisTimeUtc.ToString("yyyy-MM-dd HH:mm"), record.WindKnots, tText, ciText)
             PopulateAgencyGrid(rows, ci, summary)
             mainTabs.SelectedIndex = 1
-            SetStatus("DVTS ????????")
+            SetStatus("DVTS 強度已帶入對照表")
         End Sub
 
         Private Shared Function DvtsTrendToIntensityTrend(record As DvtsRecord) As IntensityTrend
@@ -1841,11 +1841,11 @@ Public Class MainForm
         End Function
 
         Private Shared Function DvtsTrendText(record As DvtsRecord) As String
-            If String.IsNullOrEmpty(record.TrendCode) Then Return "?"
-            Dim direction As String = LanguageManager.Translate("trend.developing", "??")
-            If record.TrendCode = "S" Then direction = LanguageManager.Translate("trend.steady", "??")
-            If record.TrendCode = "W" Then direction = LanguageManager.Translate("trend.weakening", "??")
-            Return String.Format(LanguageManager.Translate("trend.code", "{0} {1:0.0}?{2}h"), direction, record.TrendChange, record.TrendHours)
+            If String.IsNullOrEmpty(record.TrendCode) Then Return "—"
+            Dim direction As String = LanguageManager.Translate("trend.developing", "發展")
+            If record.TrendCode = "S" Then direction = LanguageManager.Translate("trend.steady", "維持")
+            If record.TrendCode = "W" Then direction = LanguageManager.Translate("trend.weakening", "減弱")
+            Return String.Format(LanguageManager.Translate("trend.code", "{0} {1:0.0}／{2}h"), direction, record.TrendChange, record.TrendHours)
         End Function
 
         Private Shared Function FormatCoordinate(value As Double, isLatitude As Boolean) As String
@@ -1857,13 +1857,13 @@ Public Class MainForm
         Private Shared Function TrendExplanation(trend As IntensityTrend) As String
             Select Case trend
                 Case IntensityTrend.Weakening
-                    Return LanguageManager.Translate("trend.explanation.weakening", "???????? T?1.0")
+                    Return LanguageManager.Translate("trend.explanation.weakening", "傳統減弱處理約為 T＋1.0")
                 Case IntensityTrend.LandfallWeakening
-                    Return LanguageManager.Translate("trend.explanation.landfall", "? HKO ??????????? T?0.5")
+                    Return LanguageManager.Translate("trend.explanation.landfall", "採 HKO 登陸後減弱試行處理約為 T＋0.5")
                 Case IntensityTrend.Steady
-                    Return LanguageManager.Translate("trend.explanation.steady", "????? CI?T")
+                    Return LanguageManager.Translate("trend.explanation.steady", "維持階段採 CI＝T")
                 Case Else
-                    Return LanguageManager.Translate("trend.explanation.developing", "????? CI?T")
+                    Return LanguageManager.Translate("trend.explanation.developing", "發展階段採 CI＝T")
             End Select
         End Function
 
@@ -1880,7 +1880,7 @@ Public Class MainForm
             If Double.TryParse(input.Text.Trim(), NumberStyles.Float, CultureInfo.CurrentCulture, value) Then
                 Return True
             End If
-            ShowError("???????? 20 ? 1013?")
+            ShowError("請輸入數字，例如 20 或 1013。")
             input.Focus()
             input.SelectAll()
             Return False
@@ -1895,7 +1895,7 @@ Public Class MainForm
             ShowError(message)
             MessageBox.Show(Me,
                             LanguageManager.TranslateText(message),
-                            T("atcf.trend.title", "ATCF ????"),
+                            T("atcf.trend.title", "ATCF 強度變化"),
                             MessageBoxButtons.OK,
                             MessageBoxIcon.Warning)
         End Sub
@@ -1906,38 +1906,38 @@ Public Class MainForm
         End Sub
 
         Private Shared Function JtwcCategory(knots As Double) As String
-            If knots < 22 Then Return "?"
-            If knots <= 33 Then Return LanguageManager.Translate("category.tropical.depression", "?????")
-            If knots < 64 Then Return LanguageManager.Translate("category.tropical.storm", "????")
-            If knots < 130 Then Return LanguageManager.Translate("category.typhoon", "??")
-            Return LanguageManager.Translate("category.super.typhoon", "????")
+            If knots < 22 Then Return "—"
+            If knots <= 33 Then Return LanguageManager.Translate("category.tropical.depression", "熱帶低氣壓")
+            If knots < 64 Then Return LanguageManager.Translate("category.tropical.storm", "熱帶風暴")
+            If knots < 130 Then Return LanguageManager.Translate("category.typhoon", "颱風")
+            Return LanguageManager.Translate("category.super.typhoon", "超級颱風")
         End Function
 
         Private Shared Function CwaCategory(ms As Double) As String
-            If ms < 10.8 Then Return "?"
-            If ms <= 17.1 Then Return LanguageManager.Translate("category.tropical.depression", "?????")
-            If ms < 32.6 Then Return LanguageManager.Translate("category.cwa.light", "????")
-            If ms < 50.9 Then Return LanguageManager.Translate("category.cwa.moderate", "????")
-            Return LanguageManager.Translate("category.cwa.strong", "????")
+            If ms < 10.8 Then Return "—"
+            If ms <= 17.1 Then Return LanguageManager.Translate("category.tropical.depression", "熱帶低氣壓")
+            If ms < 32.6 Then Return LanguageManager.Translate("category.cwa.light", "輕度颱風")
+            If ms < 50.9 Then Return LanguageManager.Translate("category.cwa.moderate", "中度颱風")
+            Return LanguageManager.Translate("category.cwa.strong", "強烈颱風")
         End Function
 
         Private Shared Function JmaCategory(ms As Double) As String
-            If ms < 10.8 Then Return "?"
-            If ms <= 17 Then Return LanguageManager.Translate("category.tropical.depression", "?????")
-            If ms < 24.4 Then Return LanguageManager.Translate("category.tropical.storm", "????")
-            If ms < 32.6 Then Return LanguageManager.Translate("category.severe.tropical.storm", "??????")
-            If ms < 44 Then Return LanguageManager.Translate("category.typhoon", "??")
-            If ms < 54 Then Return LanguageManager.Translate("category.very.strong.typhoon", "??????")
-            Return LanguageManager.Translate("category.monstrous.typhoon", "?????")
+            If ms < 10.8 Then Return "—"
+            If ms <= 17 Then Return LanguageManager.Translate("category.tropical.depression", "熱帶低氣壓")
+            If ms < 24.4 Then Return LanguageManager.Translate("category.tropical.storm", "熱帶風暴")
+            If ms < 32.6 Then Return LanguageManager.Translate("category.severe.tropical.storm", "強烈熱帶風暴")
+            If ms < 44 Then Return LanguageManager.Translate("category.typhoon", "颱風")
+            If ms < 54 Then Return LanguageManager.Translate("category.very.strong.typhoon", "非常強的颱風")
+            Return LanguageManager.Translate("category.monstrous.typhoon", "猛烈的颱風")
         End Function
 
         Private Shared Function HkoCategory(kmh As Double) As String
-            If kmh < 41 Then Return "?"
-            If kmh <= 62 Then Return LanguageManager.Translate("category.tropical.depression", "?????")
-            If kmh < 87 Then Return LanguageManager.Translate("category.tropical.storm", "????")
-            If kmh < 117 Then Return LanguageManager.Translate("category.severe.tropical.storm", "??????")
-            If kmh < 149 Then Return LanguageManager.Translate("category.typhoon", "??")
-            If kmh < 184 Then Return LanguageManager.Translate("category.strong.typhoon", "???")
-            Return LanguageManager.Translate("category.super.typhoon", "????")
+            If kmh < 41 Then Return "—"
+            If kmh <= 62 Then Return LanguageManager.Translate("category.tropical.depression", "熱帶低氣壓")
+            If kmh < 87 Then Return LanguageManager.Translate("category.tropical.storm", "熱帶風暴")
+            If kmh < 117 Then Return LanguageManager.Translate("category.severe.tropical.storm", "強烈熱帶風暴")
+            If kmh < 149 Then Return LanguageManager.Translate("category.typhoon", "颱風")
+            If kmh < 184 Then Return LanguageManager.Translate("category.strong.typhoon", "強颱風")
+            Return LanguageManager.Translate("category.super.typhoon", "超強颱風")
         End Function
 End Class

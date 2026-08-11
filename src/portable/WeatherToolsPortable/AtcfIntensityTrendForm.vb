@@ -38,7 +38,7 @@ Public Class AtcfIntensityPoint
             .VmaxKnots = record.MaxWindKnots,
             .HasMslp = record.HasMslp,
             .MslpHpa = record.MslpHpa,
-            .PositionText = If(record.HasLatitude AndAlso record.HasLongitude, record.LatitudeText & " " & record.LongitudeText, "?")
+            .PositionText = If(record.HasLatitude AndAlso record.HasLongitude, record.LatitudeText & " " & record.LongitudeText, "—")
         }
     End Function
 
@@ -86,7 +86,7 @@ Public Class AtcfIntensityTrendForm
         Me.sourceName = If(String.IsNullOrEmpty(sourceName), "ATCF", sourceName)
 
         LanguageManager.EnsureInitialized()
-        Text = LanguageManager.Translate("atcf.trend.title", "ATCF ????")
+        Text = LanguageManager.Translate("atcf.trend.title", "ATCF 強度變化")
         StartPosition = FormStartPosition.CenterParent
         MinimumSize = New Size(900, 580)
         Size = New Size(1180, 740)
@@ -121,7 +121,7 @@ Public Class AtcfIntensityTrendForm
         filterPanel.WrapContents = False
         filterPanel.Padding = New Padding(2, 8, 2, 2)
         filterPanel.Controls.Add(New Label With {
-            .Text = LanguageManager.Translate("atcf.trend.filter", "??"),
+            .Text = LanguageManager.Translate("atcf.trend.filter", "顯示"),
             .AutoSize = True,
             .Margin = New Padding(3, 7, 6, 0)})
 
@@ -133,7 +133,7 @@ Public Class AtcfIntensityTrendForm
         valueSelector.Items.Add(New ValueOption("MSLP", LanguageManager.Translate("atcf.trend.mode.mslp", "MSLP")))
         filterPanel.Controls.Add(valueSelector)
 
-        Dim resetButton As Button = CreateButton("????")
+        Dim resetButton As Button = CreateButton("重設縮放")
         AddHandler resetButton.Click, AddressOf ResetZoomButtonClick
         filterPanel.Controls.Add(resetButton)
 
@@ -148,7 +148,7 @@ Public Class AtcfIntensityTrendForm
         root.Controls.Add(trendChart, 0, 1)
 
         Dim note As New Label()
-        note.Text = LanguageManager.Translate("atcf.trend.note", "VMAX?Y ? 0?200 kts?MSLP?Y ? 800?1050 hPa?????? UTC?????? 0?")
+        note.Text = LanguageManager.Translate("atcf.trend.note", "VMAX：Y 軸 0～200 kts；MSLP：Y 軸 800～1050 hPa。時間採報文 UTC，空白值不補 0。")
         note.Dock = DockStyle.Fill
         note.ForeColor = Color.FromArgb(102, 114, 124)
         note.Font = New Font("Microsoft JhengHei", 9.0F, FontStyle.Regular)
@@ -167,7 +167,7 @@ Public Class AtcfIntensityTrendForm
 
         Dim area As New ChartArea("ATCF")
         area.BackColor = Color.White
-        area.AxisX.Title = LanguageManager.Translate("atcf.trend.axis.x", "??????UTC?")
+        area.AxisX.Title = LanguageManager.Translate("atcf.trend.axis.x", "日期與時間（UTC）")
         area.AxisX.TitleFont = New Font("Microsoft JhengHei", 10.0F, FontStyle.Bold)
         area.AxisX.LabelStyle.Format = "MM-dd HH:mm"
         area.AxisX.LabelStyle.Font = New Font("Microsoft JhengHei", 9.0F, FontStyle.Regular)
@@ -190,7 +190,7 @@ Public Class AtcfIntensityTrendForm
         Dim cycloneTitle As New Title()
         cycloneTitle.Name = "CycloneIdentifier"
         cycloneTitle.Text = String.Format(
-            LanguageManager.Translate("atcf.trend.cyclone.title", "?????{0}"), GetCycloneIdentifier())
+            LanguageManager.Translate("atcf.trend.cyclone.title", "氣旋編號：{0}"), GetCycloneIdentifier())
         cycloneTitle.Docking = Docking.Top
         cycloneTitle.Alignment = ContentAlignment.TopRight
         cycloneTitle.Font = New Font("Microsoft JhengHei", 10.0F, FontStyle.Bold)
@@ -217,7 +217,7 @@ Public Class AtcfIntensityTrendForm
         Dim mode As String = GetSelectedMode()
         Dim isVmax As Boolean = String.Equals(mode, "VMAX", StringComparison.OrdinalIgnoreCase)
         trendChart.Titles("CycloneIdentifier").Text = String.Format(
-            LanguageManager.Translate("atcf.trend.cyclone.title", "?????{0}"), GetCycloneIdentifier())
+            LanguageManager.Translate("atcf.trend.cyclone.title", "氣旋編號：{0}"), GetCycloneIdentifier())
         If isVmax Then
             area.AxisY.Title = LanguageManager.Translate("atcf.trend.axis.vmax", "VMAX (kts)")
             area.AxisY.Minimum = 0.0
@@ -287,7 +287,7 @@ Public Class AtcfIntensityTrendForm
                                     LanguageManager.Translate("atcf.trend.mode.vmax", "VMAX"),
                                     LanguageManager.Translate("atcf.trend.mode.mslp", "MSLP"))
         summaryLabel.Text = String.Format(CultureInfo.InvariantCulture,
-            LanguageManager.Translate("atcf.trend.summary", "{0}?{1}?{2} ???"), sourceName, modeText, validCount)
+            LanguageManager.Translate("atcf.trend.summary", "{0}｜{1}｜{2} 筆資料"), sourceName, modeText, validCount)
         area.RecalculateAxesScale()
         If isVmax Then
             area.AxisY.Minimum = 0.0
@@ -311,19 +311,19 @@ Public Class AtcfIntensityTrendForm
         For Each point As AtcfIntensityPoint In sourcePoints
             If Not String.IsNullOrEmpty(point.SystemKey) Then Return point.SystemKey
         Next
-        Return "?"
+        Return "—"
     End Function
 
     Private Shared Function BuildTooltip(point As AtcfIntensityPoint, mode As String) As String
-        Dim vmaxText As String = If(point.HasVmax, point.VmaxKnots.ToString("0.#", CultureInfo.InvariantCulture) & " kts", "?")
-        Dim mslpText As String = If(point.HasMslp, point.MslpHpa.ToString(CultureInfo.InvariantCulture) & " hPa", "?")
+        Dim vmaxText As String = If(point.HasVmax, point.VmaxKnots.ToString("0.#", CultureInfo.InvariantCulture) & " kts", "—")
+        Dim mslpText As String = If(point.HasMslp, point.MslpHpa.ToString(CultureInfo.InvariantCulture) & " hPa", "—")
         Return String.Join(Environment.NewLine, New String() {
             point.AnalysisTimeUtc.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture) & " UTC",
             point.SystemKey,
-            String.Format(LanguageManager.Translate("atcf.trend.tooltip.value", "{0}?{1}"), mode, If(String.Equals(mode, "VMAX", StringComparison.OrdinalIgnoreCase), vmaxText, mslpText)),
-            String.Format(LanguageManager.Translate("atcf.trend.tooltip.vmax", "VMAX?{0}"), vmaxText),
-            String.Format(LanguageManager.Translate("atcf.trend.tooltip.mslp", "MSLP?{0}"), mslpText),
-            String.Format(LanguageManager.Translate("atcf.trend.tooltip.position", "???{0}"), point.PositionText)})
+            String.Format(LanguageManager.Translate("atcf.trend.tooltip.value", "{0}：{1}"), mode, If(String.Equals(mode, "VMAX", StringComparison.OrdinalIgnoreCase), vmaxText, mslpText)),
+            String.Format(LanguageManager.Translate("atcf.trend.tooltip.vmax", "VMAX：{0}"), vmaxText),
+            String.Format(LanguageManager.Translate("atcf.trend.tooltip.mslp", "MSLP：{0}"), mslpText),
+            String.Format(LanguageManager.Translate("atcf.trend.tooltip.position", "位置：{0}"), point.PositionText)})
     End Function
 
     Private Sub ResetZoomButtonClick(sender As Object, e As EventArgs)
