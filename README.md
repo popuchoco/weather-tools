@@ -95,8 +95,10 @@ Portable 版的介面與解讀內容由 `src/portable/WeatherToolsPortable/langu
 - v2.5～v4：以 GitHub Releases 提供的歷史執行檔與安裝封裝。
 - [2016 legacy v5.0](https://github.com/popuchoco/weather-tools/releases/tag/legacy-v5.0-2016)：由使用者提供的舊版壓縮檔與原始改版紀錄。
 - [2016 legacy v5.5](https://github.com/popuchoco/weather-tools/releases/tag/legacy-v5.5-2016)：由使用者提供的舊版壓縮檔與原始改版紀錄。
-- [2026 V5（重置改造）](https://github.com/popuchoco/weather-tools/releases/tag/2026.2)：重置 VB.NET source code 與專案結構，建立可延續改造的離線氣象工具基礎。
-- [2026 V6](https://github.com/popuchoco/weather-tools/releases/tag/v6.0)：延續 V5 基礎，加入完整語言包、DVTS／ATCF 報文解析、趨勢圖、PNG 輸出與介面版面修正。
+- [2026 V5（重置版）](https://github.com/popuchoco/weather-tools/releases/tag/2026.0)：以「氣象小工具 2026 Ver.」重新整理 VB.NET source code 與專案結構，建立目前離線 Portable 架構，並納入風速／Dvorak、DVTS 與 ATCF 基礎功能。
+  - [2026 V5（Ver. 1）](https://github.com/popuchoco/weather-tools/releases/tag/2026.1)：在 V5 重置架構上加入 DVTS 中心篩選、T／CI／ALL 趨勢顯示、同機構圖例、氣旋編號與 PNG 檔名辨識。
+  - [2026 V5（Ver. 2）](https://github.com/popuchoco/weather-tools/releases/tag/2026.2)：補上 DVTS／ATCF 清除資料流程，清除輸入、解析結果、篩選與檔案狀態，並修正清空後趨勢圖沿用舊資料。
+- [2026 V6](https://github.com/popuchoco/weather-tools/releases/tag/v6.0)：在 V5 重置架構上進行大幅改版，加入三語 343-key XML 語言包、語言設定記憶、介面版面整理與乾淨的 Portable 交付包，並延續 DVTS／ATCF、趨勢圖與 PNG 功能。
 
 ## 建置
 
