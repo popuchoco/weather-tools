@@ -46,14 +46,14 @@ Public NotInheritable Class DvtsParser
 
             Dim match As Match = LinePattern.Match(line)
             If Not match.Success Then
-                warnings.Add("無法解析 DVTS 行：" & line)
+                warnings.Add(LanguageManager.Translate("dvts.warning.unparsed", "無法解析 DVTS 行：") & line)
                 Continue For
             End If
 
             Try
                 records.Add(ParseMatch(match, line))
             Catch ex As Exception
-                warnings.Add("DVTS 欄位格式錯誤：" & line)
+                warnings.Add(LanguageManager.Translate("dvts.warning.invalid", "DVTS 欄位格式錯誤：") & line)
             End Try
         Next
         Return records

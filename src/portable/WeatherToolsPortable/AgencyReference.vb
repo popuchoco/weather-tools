@@ -129,71 +129,71 @@ Public NotInheritable Class TropicalCycloneIntensityCalculator
         Dim nhcPressure As String = FormatPressure(reference.AtlanticPressure, reference.NorthwestPacificPressure)
         rows.Add(New IntensityAgencyRow(
             "NHC",
-            "1 分鐘平均風",
+            LanguageManager.Translate("agency.wind.1min", "1 分鐘平均風"),
             String.Format("{0} kt / {1} mph / {2} km/h / {3} m/s", reference.NhcKnots, reference.NhcMph, reference.NhcKmh, reference.NhcMs),
             NhcCategory(reference.NhcKnots),
             nhcPressure,
-            "Dvorak CI 對照；ATL/EPAC 與 NW Pacific 氣壓欄不同"))
+            LanguageManager.Translate("agency.source.nhc", "Dvorak CI 對照；ATL/EPAC 與 NW Pacific 氣壓欄不同")))
 
         Dim hkoKmh As Double = reference.HkoTenMinuteKnots * 1.852
         rows.Add(New IntensityAgencyRow(
             "HKO",
-            "10 分鐘平均風",
+            LanguageManager.Translate("agency.wind.10min", "10 分鐘平均風"),
             String.Format("{0} kt / {1:0} km/h / {2:0.0} m/s", reference.HkoTenMinuteKnots, hkoKmh, hkoKmh / 3.6),
             HkoCategory(hkoKmh),
-            "—（此表未提供氣壓）",
-            "傳統 1 分鐘風速 × 0.93"))
+            LanguageManager.Translate("agency.no.pressure", "—（此表未提供氣壓）"),
+            LanguageManager.Translate("agency.source.hko", "傳統 1 分鐘風速 × 0.93")))
 
         rows.Add(New IntensityAgencyRow(
             "CWA",
-            "10 分鐘平均風",
+            LanguageManager.Translate("agency.wind.10min", "10 分鐘平均風"),
             String.Format("{0} km/h / {1:0.0} m/s / {2:0} kt", reference.CwaKmh, reference.CwaKmh / 3.6, reference.CwaKmh / 1.852),
             CwaCategory(reference.CwaKmh),
             reference.CwaPressure.ToString() & " hPa",
-            "CWA CI 對照表；衛星估計約有 10～15% 誤差"))
+            LanguageManager.Translate("agency.source.cwa", "CWA CI 對照表；衛星估計約有 10～15% 誤差")))
 
         Return rows
     End Function
 
     Public Shared Function TDescription(finalT As Double) As String
         Dim t As Double = NormalizeCI(finalT)
-        If t < 2.0 Then Return "熱帶低壓階段"
-        If t < 2.5 Then Return "熱帶系統發展中"
-        If t <= 3.5 Then Return "輕度颱風（CWA 參考）"
-        If t <= 5.5 Then Return "中度颱風（CWA 參考）"
-        Return "強烈颱風（CWA 參考）"
+        If t < 2.0 Then Return LanguageManager.Translate("intensity.tropical.depression", "熱帶低壓階段")
+        If t < 2.5 Then Return LanguageManager.Translate("intensity.developing", "熱帶系統發展中")
+        If t <= 3.5 Then Return LanguageManager.Translate("intensity.cwa.light", "輕度颱風（CWA 參考）")
+        If t <= 5.5 Then Return LanguageManager.Translate("intensity.cwa.moderate", "中度颱風（CWA 參考）")
+        Return LanguageManager.Translate("intensity.cwa.strong", "強烈颱風（CWA 參考）")
     End Function
 
     Private Shared Function FormatPressure(atlantic As Nullable(Of Integer), northwestPacific As Nullable(Of Integer)) As String
-        If Not atlantic.HasValue OrElse Not northwestPacific.HasValue Then Return "—（CI 1.0～1.5 未列）"
-        Return String.Format("ATL/EPAC {0} hPa；NW Pacific {1} hPa", atlantic.Value, northwestPacific.Value)
+        If Not atlantic.HasValue OrElse Not northwestPacific.HasValue Then Return LanguageManager.Translate("agency.no.pressure.ci", "—（CI 1.0～1.5 未列）")
+        Return String.Format(LanguageManager.Translate("agency.pressure.format", "ATL/EPAC {0} hPa；NW Pacific {1} hPa"), atlantic.Value, northwestPacific.Value)
     End Function
 
     Private Shared Function NhcCategory(knots As Integer) As String
-        If knots < 34 Then Return "熱帶低氣壓"
-        If knots < 64 Then Return "熱帶風暴"
-        If knots < 83 Then Return "一級颶風"
-        If knots < 96 Then Return "二級颶風"
-        If knots < 113 Then Return "三級颶風"
-        If knots < 137 Then Return "四級颶風"
-        Return "五級颶風"
+        If knots < 34 Then Return LanguageManager.Translate("category.tropical.depression", "熱帶低氣壓")
+        If knots < 64 Then Return LanguageManager.Translate("category.tropical.storm", "熱帶風暴")
+        If knots < 83 Then Return LanguageManager.Translate("category.hurricane.1", "一級颶風")
+        If knots < 96 Then Return LanguageManager.Translate("category.hurricane.2", "二級颶風")
+        If knots < 113 Then Return LanguageManager.Translate("category.hurricane.3", "三級颶風")
+        If knots < 137 Then Return LanguageManager.Translate("category.hurricane.4", "四級颶風")
+        Return LanguageManager.Translate("category.hurricane.5", "五級颶風")
     End Function
 
     Private Shared Function HkoCategory(kmh As Double) As String
-        If kmh < 41 Then Return "熱帶低氣壓"
-        If kmh < 63 Then Return "熱帶低氣壓"
-        If kmh < 88 Then Return "熱帶風暴"
-        If kmh < 118 Then Return "強烈熱帶風暴"
-        If kmh < 150 Then Return "颱風"
-        If kmh < 185 Then Return "強颱風"
-        Return "超強颱風"
+        If kmh < 41 Then Return LanguageManager.Translate("category.tropical.depression", "熱帶低氣壓")
+        If kmh < 63 Then Return LanguageManager.Translate("category.tropical.depression", "熱帶低氣壓")
+        If kmh < 88 Then Return LanguageManager.Translate("category.tropical.storm", "熱帶風暴")
+        If kmh < 118 Then Return LanguageManager.Translate("category.severe.tropical.storm", "強烈熱帶風暴")
+        If kmh < 150 Then Return LanguageManager.Translate("category.typhoon", "颱風")
+        If kmh < 185 Then Return LanguageManager.Translate("category.strong.typhoon", "強颱風")
+        Return LanguageManager.Translate("category.super.typhoon", "超強颱風")
     End Function
 
     Private Shared Function CwaCategory(kmh As Integer) As String
-        If kmh < 39 Then Return "一般低壓／熱帶低氣壓"
-        If kmh < 62 Then Return "熱帶低氣壓"
-        If kmh < 118 Then Return "輕度颱風"
-        If kmh < 184 Then Return "中度颱風"
-        Return "強烈颱風"
+        If kmh < 39 Then Return LanguageManager.Translate("category.cwa.low", "一般低壓／熱帶低氣壓")
+        If kmh < 62 Then Return LanguageManager.Translate("category.tropical.depression", "熱帶低氣壓")
+        If kmh < 118 Then Return LanguageManager.Translate("category.cwa.light", "輕度颱風")
+        If kmh < 184 Then Return LanguageManager.Translate("category.cwa.moderate", "中度颱風")
+        Return LanguageManager.Translate("category.cwa.strong", "強烈颱風")
     End Function
 End Class

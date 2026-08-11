@@ -49,7 +49,8 @@ Public Class DvtsTrendForm
     Public Sub New(records As IEnumerable(Of DvtsRecord))
         If records IsNot Nothing Then sourceRecords.AddRange(records)
 
-        Text = "DVTS 趨勢圖分析"
+        LanguageManager.EnsureInitialized()
+        Text = LanguageManager.Translate("trend.title", "DVTS 趨勢圖分析")
         StartPosition = FormStartPosition.CenterParent
         MinimumSize = New Size(980, 620)
         Size = New Size(1240, 780)
@@ -85,7 +86,7 @@ Public Class DvtsTrendForm
         filterPanel.FlowDirection = FlowDirection.LeftToRight
         filterPanel.WrapContents = False
         filterPanel.Padding = New Padding(2, 8, 2, 2)
-        filterPanel.Controls.Add(New Label With {.Text = "分析機構", .AutoSize = True, .Margin = New Padding(3, 7, 6, 0)})
+        filterPanel.Controls.Add(New Label With {.Text = LanguageManager.Translate("trend.filter.agency", "分析機構"), .AutoSize = True, .Margin = New Padding(3, 7, 6, 0)})
 
         agencySelector.DropDownStyle = ComboBoxStyle.DropDownList
         agencySelector.Width = 300
@@ -93,14 +94,14 @@ Public Class DvtsTrendForm
         AddHandler agencySelector.SelectedIndexChanged, AddressOf AgencySelectorChanged
         filterPanel.Controls.Add(agencySelector)
 
-        filterPanel.Controls.Add(New Label With {.Text = "顯示", .AutoSize = True, .Margin = New Padding(0, 7, 6, 0)})
+        filterPanel.Controls.Add(New Label With {.Text = LanguageManager.Translate("trend.filter.value", "顯示"), .AutoSize = True, .Margin = New Padding(0, 7, 6, 0)})
         valueSelector.DropDownStyle = ComboBoxStyle.DropDownList
         valueSelector.Width = 100
         valueSelector.Margin = New Padding(2, 3, 12, 0)
         AddHandler valueSelector.SelectedIndexChanged, AddressOf ValueSelectorChanged
-        valueSelector.Items.Add(New ValueOption("ALL", "T／CI"))
-        valueSelector.Items.Add(New ValueOption("T", "只看 T"))
-        valueSelector.Items.Add(New ValueOption("CI", "只看 CI"))
+        valueSelector.Items.Add(New ValueOption("ALL", LanguageManager.Translate("trend.value.all", "T／CI")))
+        valueSelector.Items.Add(New ValueOption("T", LanguageManager.Translate("trend.value.t", "只看 T")))
+        valueSelector.Items.Add(New ValueOption("CI", LanguageManager.Translate("trend.value.ci", "只看 CI")))
         filterPanel.Controls.Add(valueSelector)
 
         Dim resetButton As Button = CreateButton("重設縮放")
@@ -122,7 +123,7 @@ Public Class DvtsTrendForm
         root.Controls.Add(trendChart, 0, 1)
 
         Dim note As New Label()
-        note.Text = "T／CI 為 Dvorak 數值，Y 軸固定 0～8；缺值不補 0，會在折線上留下空白。時間採報文 UTC。"
+        note.Text = LanguageManager.Translate("trend.note", "T／CI 為 Dvorak 數值，Y 軸固定 0～8；缺值不補 0，會在折線上留下空白。時間採報文 UTC。")
         note.Dock = DockStyle.Fill
         note.ForeColor = Color.FromArgb(102, 114, 124)
         note.Font = New Font("Microsoft JhengHei", 9.0F, FontStyle.Regular)
@@ -140,7 +141,7 @@ Public Class DvtsTrendForm
 
         Dim area As New ChartArea("DVTS")
         area.BackColor = Color.White
-        area.AxisX.Title = "日期與時間（UTC）"
+        area.AxisX.Title = LanguageManager.Translate("trend.axis.x", "日期與時間（UTC）")
         area.AxisX.TitleFont = New Font("Microsoft JhengHei", 10.0F, FontStyle.Bold)
         area.AxisX.LabelStyle.Format = "MM-dd HH:mm"
         area.AxisX.LabelStyle.Font = New Font("Microsoft JhengHei", 9.0F, FontStyle.Regular)
@@ -155,7 +156,7 @@ Public Class DvtsTrendForm
         area.CursorX.IsUserSelectionEnabled = True
         area.CursorX.Interval = 0
 
-        area.AxisY.Title = "Dvorak T／CI"
+        area.AxisY.Title = LanguageManager.Translate("trend.axis.y", "Dvorak T／CI")
         area.AxisY.TitleFont = New Font("Microsoft JhengHei", 10.0F, FontStyle.Bold)
         area.AxisY.LabelStyle.Font = New Font("Microsoft JhengHei", 9.0F, FontStyle.Regular)
         area.AxisY.Minimum = 0.0
@@ -174,7 +175,7 @@ Public Class DvtsTrendForm
 
         Dim cycloneTitle As New Title()
         cycloneTitle.Name = "CycloneIdentifier"
-        cycloneTitle.Text = "氣旋編號：—"
+        cycloneTitle.Text = LanguageManager.Translate("trend.cyclone.empty", "氣旋編號：—")
         cycloneTitle.Docking = Docking.Top
         cycloneTitle.Alignment = ContentAlignment.TopRight
         cycloneTitle.Font = New Font("Microsoft JhengHei", 10.0F, FontStyle.Bold)
@@ -184,7 +185,7 @@ Public Class DvtsTrendForm
 
     Private Sub PopulateAgencySelector()
         agencySelector.Items.Clear()
-        agencySelector.Items.Add(New AgencyOption("", "全部機構"))
+        agencySelector.Items.Add(New AgencyOption("", LanguageManager.Translate("trend.agency.all", "全部機構")))
 
         Dim agencies As New SortedDictionary(Of String, String)(StringComparer.OrdinalIgnoreCase)
         For Each record As DvtsRecord In sourceRecords
@@ -192,7 +193,7 @@ Public Class DvtsTrendForm
         Next
 
         For Each item As KeyValuePair(Of String, String) In agencies
-            agencySelector.Items.Add(New AgencyOption(item.Key, item.Key & " — " & item.Value))
+            agencySelector.Items.Add(New AgencyOption(item.Key, String.Format(LanguageManager.Translate("trend.agency.format", "{0} — {1}"), item.Key, item.Value)))
         Next
 
         If agencySelector.Items.Count > 0 Then agencySelector.SelectedIndex = 0
@@ -215,7 +216,7 @@ Public Class DvtsTrendForm
     Private Sub RefreshChart()
         trendChart.Series.Clear()
         trendChart.Legends("DVTS Legend").CustomItems.Clear()
-        trendChart.Titles("CycloneIdentifier").Text = "氣旋編號：" & GetCycloneIdentifier()
+        trendChart.Titles("CycloneIdentifier").Text = String.Format(LanguageManager.Translate("trend.cyclone.title", "氣旋編號：{0}"), GetCycloneIdentifier())
         Dim selectedOption As AgencyOption = TryCast(agencySelector.SelectedItem, AgencyOption)
         Dim selectedCode As String = If(selectedOption Is Nothing, "", selectedOption.Code)
         Dim valueMode As String = GetSelectedValueMode()
@@ -280,9 +281,9 @@ Public Class DvtsTrendForm
             If groupHasT OrElse groupHasCI Then AddGroupedLegendItem(trendChart.Legends("DVTS Legend"), group.Key, agencyName, If(groupHasT, tSeries, Nothing), If(groupHasCI, ciSeries, Nothing))
         Next
 
-        Dim selectedText As String = If(String.IsNullOrEmpty(selectedCode), "全部機構", selectedCode)
-        Dim valueText As String = If(valueMode = "T", "只看 T", If(valueMode = "CI", "只看 CI", "T／CI"))
-        summaryLabel.Text = String.Format(CultureInfo.InvariantCulture, "{0}｜{1}｜{2} 筆資料，T {3} 點，CI {4} 點", selectedText, valueText, filteredCount, tCount, ciCount)
+        Dim selectedText As String = If(String.IsNullOrEmpty(selectedCode), LanguageManager.Translate("trend.agency.all", "全部機構"), selectedCode)
+        Dim valueText As String = If(valueMode = "T", LanguageManager.Translate("trend.value.t", "只看 T"), If(valueMode = "CI", LanguageManager.Translate("trend.value.ci", "只看 CI"), LanguageManager.Translate("trend.value.all", "T／CI")))
+        summaryLabel.Text = String.Format(CultureInfo.InvariantCulture, LanguageManager.Translate("trend.summary", "{0}｜{1}｜{2} 筆資料，T {3} 點，CI {4} 點"), selectedText, valueText, filteredCount, tCount, ciCount)
         trendChart.ChartAreas("DVTS").RecalculateAxesScale()
         trendChart.ChartAreas("DVTS").AxisY.Minimum = 0.0
         trendChart.ChartAreas("DVTS").AxisY.Maximum = 8.0
@@ -331,7 +332,7 @@ Public Class DvtsTrendForm
             ciCell.ForeColor = ciSeries.Color
             item.Cells.Add(ciCell)
         End If
-        Dim nameCell As New LegendCell(LegendCellType.Text, centerCode & " — " & agencyName, ContentAlignment.MiddleLeft)
+        Dim nameCell As New LegendCell(LegendCellType.Text, String.Format(LanguageManager.Translate("trend.agency.format", "{0} — {1}"), centerCode, agencyName), ContentAlignment.MiddleLeft)
         nameCell.ForeColor = If(tSeries IsNot Nothing, tSeries.Color, ciSeries.Color)
         item.Cells.Add(nameCell)
         legend.CustomItems.Add(item)
@@ -356,12 +357,12 @@ Public Class DvtsTrendForm
         Dim trendText As String = If(String.IsNullOrEmpty(record.TrendCode), "—", String.Format(CultureInfo.InvariantCulture, "{0}{1:0.0}/{2}h", record.TrendCode, record.TrendChange, record.TrendHours))
         Return String.Join(Environment.NewLine, New String() {
             record.AnalysisTimeUtc.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture) & " UTC",
-            record.Center & " — " & record.AgencyName,
-            valueType & "：" & If(valueType = "T", tText, ciText),
-            "T：" & tText & "／CI：" & ciText,
-            "風速：" & record.WindKnots.ToString("0.0", CultureInfo.InvariantCulture) & " kt",
-            "位置：" & CoordinateText(record.Latitude, True) & " " & CoordinateText(record.Longitude, False),
-            "趨勢：" & trendText})
+            String.Format(LanguageManager.Translate("trend.tooltip.agency", "{0} — {1}"), record.Center, record.AgencyName),
+            String.Format(LanguageManager.Translate("trend.tooltip.value", "{0}：{1}"), valueType, If(valueType = "T", tText, ciText)),
+            String.Format(LanguageManager.Translate("trend.tooltip.tci", "T：{0}／CI：{1}"), tText, ciText),
+            String.Format(LanguageManager.Translate("trend.tooltip.wind", "風速：{0} kt"), record.WindKnots.ToString("0.0", CultureInfo.InvariantCulture)),
+            String.Format(LanguageManager.Translate("trend.tooltip.position", "位置：{0} {1}"), CoordinateText(record.Latitude, True), CoordinateText(record.Longitude, False)),
+            String.Format(LanguageManager.Translate("trend.tooltip.trend", "趨勢：{0}"), trendText)})
     End Function
 
     Private Shared Function CoordinateText(value As Double, isLatitude As Boolean) As String
@@ -377,8 +378,8 @@ Public Class DvtsTrendForm
 
     Private Sub ExportPngButtonClick(sender As Object, e As EventArgs)
         Using dialog As New SaveFileDialog()
-            dialog.Filter = "PNG 圖檔 (*.png)|*.png"
-            dialog.Title = "輸出 DVTS 趨勢圖 PNG"
+            dialog.Filter = LanguageManager.Translate("trend.png.filter", "PNG 圖檔 (*.png)|*.png")
+            dialog.Title = LanguageManager.Translate("trend.png.title", "輸出 DVTS 趨勢圖 PNG")
             dialog.DefaultExt = "png"
             dialog.AddExtension = True
             dialog.FileName = BuildDefaultFileName()
@@ -386,9 +387,9 @@ Public Class DvtsTrendForm
 
             Try
                 trendChart.SaveImage(dialog.FileName, ChartImageFormat.Png)
-                MessageBox.Show(Me, "PNG 圖檔已輸出：" & Environment.NewLine & dialog.FileName, "輸出完成", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                MessageBox.Show(Me, String.Format(LanguageManager.Translate("trend.png.success", "PNG 圖檔已輸出：{0}"), Environment.NewLine & dialog.FileName), LanguageManager.Translate("text.輸出完成", "輸出完成"), MessageBoxButtons.OK, MessageBoxIcon.Information)
             Catch ex As Exception
-                MessageBox.Show(Me, "PNG 輸出失敗：" & ex.Message, "輸出失敗", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                MessageBox.Show(Me, String.Format(LanguageManager.Translate("trend.png.failure", "PNG 輸出失敗：{0}"), ex.Message), LanguageManager.Translate("text.輸出失敗", "輸出失敗"), MessageBoxButtons.OK, MessageBoxIcon.Error)
             End Try
         End Using
     End Sub
@@ -403,7 +404,7 @@ Public Class DvtsTrendForm
 
     Private Shared Function CreateButton(caption As String) As Button
         Dim button As New Button()
-        button.Text = caption
+        button.Text = LanguageManager.TranslateText(caption)
         button.AutoSize = True
         button.Height = 28
         button.FlatStyle = FlatStyle.Flat

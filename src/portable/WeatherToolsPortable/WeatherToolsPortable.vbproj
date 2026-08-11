@@ -7,7 +7,7 @@
     <OutputType>WinExe</OutputType>
     <StartupObject>WeatherToolsPortable.Program</StartupObject>
     <RootNamespace>WeatherToolsPortable</RootNamespace>
-    <AssemblyName>WeatherToolsV5</AssemblyName>
+    <AssemblyName>WeatherToolsV6</AssemblyName>
     <ApplicationIcon>icon.ico</ApplicationIcon>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -21,7 +21,7 @@
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
     <OutputPath>bin\Debug\</OutputPath>
-    <DocumentationFile>WeatherToolsV5.xml</DocumentationFile>
+    <DocumentationFile>WeatherToolsV6.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -31,7 +31,7 @@
     <DefineTrace>true</DefineTrace>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DocumentationFile>WeatherToolsV5.xml</DocumentationFile>
+    <DocumentationFile>WeatherToolsV6.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
   </PropertyGroup>
   <PropertyGroup>
@@ -43,6 +43,7 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Xml" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Windows.Forms.DataVisualization" />
   </ItemGroup>
@@ -56,8 +57,18 @@
     <Content Include="icon.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="languages\zh-TW.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="languages\zh-CN.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="languages\en-US.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Compile Include="Program.vb" />
     <Compile Include="MainForm.vb" />
+    <Compile Include="LanguageManager.vb" />
     <Compile Include="AgencyReference.vb" />
     <Compile Include="DvtsParser.vb" />
     <Compile Include="DvtsTrendForm.vb" />

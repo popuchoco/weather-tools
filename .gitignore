@@ -7,6 +7,13 @@ obj/
 *.pdb
 *.xml
 
+# Runtime-editable language packages shipped with the Portable source
+!src/portable/WeatherToolsPortable/languages/
+!src/portable/WeatherToolsPortable/languages/*.xml
+
+# Local V6 release staging and portable archive
+dist/
+
 # ClickOnce and local signing material
 Application Files/
 *.application

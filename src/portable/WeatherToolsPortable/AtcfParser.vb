@@ -26,11 +26,11 @@ Public Class AtcfFileInfo
         Get
             Select Case FileKind.ToLowerInvariant()
                 Case "b"
-                    Return "Best Track（最佳路徑）"
+                    Return LanguageManager.Translate("atcf.filekind.best", "Best Track（最佳路徑）")
                 Case "a"
-                    Return "Objective Aid／分析輔助資料"
+                    Return LanguageManager.Translate("atcf.filekind.objective", "Objective Aid／分析輔助資料")
                 Case Else
-                    Return If(String.IsNullOrEmpty(FileKind), "未知檔案類型", FileKind.ToUpperInvariant() & " 類 ATCF 檔案")
+                    Return If(String.IsNullOrEmpty(FileKind), LanguageManager.Translate("atcf.filekind.unknown", "未知檔案類型"), FileKind.ToUpperInvariant() & " " & LanguageManager.Translate("atcf.filekind.atcf", "類 ATCF 檔案"))
             End Select
         End Get
     End Property
@@ -134,41 +134,41 @@ Public Class AtcfRecord
         Get
             Select Case SystemType.ToUpperInvariant()
                 Case "DB"
-                    Return "擾動"
+                    Return LanguageManager.Translate("atcf.type.db", "擾動")
                 Case "TD"
-                    Return "熱帶低壓"
+                    Return LanguageManager.Translate("atcf.type.td", "熱帶低壓")
                 Case "TS"
-                    Return "熱帶風暴"
+                    Return LanguageManager.Translate("atcf.type.ts", "熱帶風暴")
                 Case "STS"
-                    Return "強烈熱帶風暴"
+                    Return LanguageManager.Translate("atcf.type.sts", "強烈熱帶風暴")
                 Case "TY"
-                    Return "颱風"
+                    Return LanguageManager.Translate("atcf.type.ty", "颱風")
                 Case "ST"
-                    Return "超級颱風"
+                    Return LanguageManager.Translate("atcf.type.st", "超級颱風")
                 Case "TC"
-                    Return "熱帶氣旋"
+                    Return LanguageManager.Translate("atcf.type.tc", "熱帶氣旋")
                 Case "HU"
-                    Return "颶風"
+                    Return LanguageManager.Translate("atcf.type.hu", "颶風")
                 Case "SD"
-                    Return "副熱帶低壓"
+                    Return LanguageManager.Translate("atcf.type.sd", "副熱帶低壓")
                 Case "SS"
-                    Return "副熱帶風暴"
+                    Return LanguageManager.Translate("atcf.type.ss", "副熱帶風暴")
                 Case "MD"
-                    Return "季風低壓"
+                    Return LanguageManager.Translate("atcf.type.md", "季風低壓")
                 Case "EX"
-                    Return "溫帶氣旋"
+                    Return LanguageManager.Translate("atcf.type.ex", "溫帶氣旋")
                 Case "IN"
-                    Return "陸上系統"
+                    Return LanguageManager.Translate("atcf.type.in", "陸上系統")
                 Case "DS"
-                    Return "消散中"
+                    Return LanguageManager.Translate("atcf.type.ds", "消散中")
                 Case "LO"
-                    Return "低壓"
+                    Return LanguageManager.Translate("atcf.type.lo", "低壓")
                 Case "WV"
-                    Return "熱帶波／東風波"
+                    Return LanguageManager.Translate("atcf.type.wv", "熱帶波／東風波")
                 Case "ET"
-                    Return "外插資料"
+                    Return LanguageManager.Translate("atcf.type.et", "外插資料")
                 Case "XX"
-                    Return "未知"
+                    Return LanguageManager.Translate("atcf.type.xx", "未知")
                 Case Else
                     Return If(String.IsNullOrEmpty(SystemType), "—", SystemType)
             End Select
@@ -177,23 +177,22 @@ Public Class AtcfRecord
 
     Public ReadOnly Property WindRadiiText As String
         Get
-            If Not HasRadiusIntensity Then Return "—"
-            If RadiusIntensityKnots = 0 Then Return "沒有指定風速半徑門檻"
+            If Not HasRadiusIntensity Then Return LanguageManager.Translate("atcf.radii.none", "—")
+            If RadiusIntensityKnots = 0 Then Return LanguageManager.Translate("atcf.radii.threshold.none", "沒有指定風速半徑門檻")
             Dim code As String = If(String.IsNullOrEmpty(WindCode), "—", WindCode)
             If code = "AAA" AndAlso HasRadius1 Then
-                Return RadiusIntensityKnots.ToString(CultureInfo.InvariantCulture) & " kt，" & Radius1Nm.ToString(CultureInfo.InvariantCulture) & " nm 全圓"
+                Return String.Format(LanguageManager.Translate("atcf.radii.all", "{0} kt，{1} nm 全圓"), RadiusIntensityKnots, Radius1Nm)
             End If
             If code = "NEQ" Then
-                Return RadiusIntensityKnots.ToString(CultureInfo.InvariantCulture) & " kt，NE/SE/SW/NW " &
-                    RadiusValue(Radius1Nm, HasRadius1) & "/" & RadiusValue(Radius2Nm, HasRadius2) & "/" &
-                    RadiusValue(Radius3Nm, HasRadius3) & "/" & RadiusValue(Radius4Nm, HasRadius4) & " nm"
+                Return String.Format(LanguageManager.Translate("atcf.radii.quadrants", "{0} kt，NE/SE/SW/NW {1}/{2}/{3}/{4} nm"), RadiusIntensityKnots,
+                    RadiusValue(Radius1Nm, HasRadius1), RadiusValue(Radius2Nm, HasRadius2), RadiusValue(Radius3Nm, HasRadius3), RadiusValue(Radius4Nm, HasRadius4))
             End If
-            Return RadiusIntensityKnots.ToString(CultureInfo.InvariantCulture) & " kt，" & code
+            Return String.Format(LanguageManager.Translate("atcf.radii.code", "{0} kt，{1}"), RadiusIntensityKnots, code)
         End Get
     End Property
 
     Private Shared Function RadiusValue(value As Integer, hasValue As Boolean) As String
-        Return If(hasValue, value.ToString(CultureInfo.InvariantCulture), "—")
+        Return If(hasValue, value.ToString(CultureInfo.InvariantCulture), LanguageManager.Translate("atcf.radii.value.none", "—"))
     End Function
 End Class
 
@@ -212,7 +211,7 @@ Public NotInheritable Class AtcfParser
 
             Dim fields() As String = line.Split(","c)
             If fields.Length < 8 Then
-                warnings.Add(String.Format(CultureInfo.InvariantCulture, "第 {0} 行：少於 ATCF 前 8 個必要欄位。", i + 1))
+                warnings.Add(String.Format(CultureInfo.InvariantCulture, LanguageManager.Translate("atcf.warning.required", "第 {0} 行：少於 ATCF 前 8 個必要欄位。"), i + 1))
                 Continue For
             End If
 
@@ -226,7 +225,7 @@ Public NotInheritable Class AtcfParser
             record.Basin = Field(fields, 0).ToUpperInvariant()
             record.HasCycloneNumber = TryReadInteger(Field(fields, 1), record.CycloneNumber)
             record.HasAnalysisTime = TryReadDate(Field(fields, 2), record.AnalysisTimeUtc)
-            If Not record.HasAnalysisTime Then warnings.Add(String.Format(CultureInfo.InvariantCulture, "第 {0} 行：無法解析 YYYYMMDDHH。", i + 1))
+            If Not record.HasAnalysisTime Then warnings.Add(String.Format(CultureInfo.InvariantCulture, LanguageManager.Translate("atcf.warning.time", "第 {0} 行：無法解析 YYYYMMDDHH。"), i + 1))
             record.TechNumMin = Field(fields, 3)
             record.Tech = Field(fields, 4).ToUpperInvariant()
             record.HasTau = TryReadInteger(Field(fields, 5), record.TauHours)
@@ -234,7 +233,7 @@ Public NotInheritable Class AtcfParser
             record.LatitudeText = Field(fields, 6).ToUpperInvariant()
             record.HasLongitude = TryReadCoordinate(Field(fields, 7), False, record.Longitude)
             record.LongitudeText = Field(fields, 7).ToUpperInvariant()
-            If Not record.HasLatitude OrElse Not record.HasLongitude Then warnings.Add(String.Format(CultureInfo.InvariantCulture, "第 {0} 行：無法解析緯度或經度。", i + 1))
+            If Not record.HasLatitude OrElse Not record.HasLongitude Then warnings.Add(String.Format(CultureInfo.InvariantCulture, LanguageManager.Translate("atcf.warning.position", "第 {0} 行：無法解析緯度或經度。"), i + 1))
 
             record.HasMaxWind = TryReadInteger(Field(fields, 8), record.MaxWindKnots)
             record.HasMslp = TryReadInteger(Field(fields, 9), record.MslpHpa)
