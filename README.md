@@ -93,7 +93,8 @@ Portable 版的介面與解讀內容由 `src/portable/WeatherToolsPortable/langu
 - v2.5～v4：以 GitHub Releases 提供的歷史執行檔與安裝封裝。
 - [2016 legacy v5.0](https://github.com/popuchoco/weather-tools/releases/tag/legacy-v5.0-2016)：由使用者提供的舊版壓縮檔與原始改版紀錄。
 - [2016 legacy v5.5](https://github.com/popuchoco/weather-tools/releases/tag/legacy-v5.5-2016)：由使用者提供的舊版壓縮檔與原始改版紀錄。
-- [2026 V6](https://github.com/popuchoco/weather-tools/releases/tag/v6.0)：大幅整理的 VB.NET source code，保留離線工具定位並加入氣象資料解析、DVTS 趨勢圖、PNG 輸出與 XML 語言包功能。
+- [2026 V5（重置改造）](https://github.com/popuchoco/weather-tools/releases/tag/2026.2)：重置 VB.NET source code 與專案結構，建立可延續改造的離線氣象工具基礎。
+- [2026 V6](https://github.com/popuchoco/weather-tools/releases/tag/v6.0)：延續 V5 基礎，加入完整語言包、DVTS／ATCF 報文解析、趨勢圖、PNG 輸出與介面版面修正。
 
 ## 建置
 
