@@ -30,6 +30,8 @@ Public NotInheritable Class TropicalCycloneCenters
                 Return LanguageManager.Translate("agency.KNES", "NOAA 衛星服務部（NESDIS）")
             Case "KNHC"
                 Return LanguageManager.Translate("agency.KNHC", "美國國家颶風中心（NHC）")
+            Case "TAFB"
+                Return LanguageManager.Translate("agency.TAFB", "熱帶分析與預報分支（TAFB；NHC 旗下部門）")
             Case "VTBB"
                 Return LanguageManager.Translate("agency.VTBB", "泰國氣象局")
             Case "DEMS"

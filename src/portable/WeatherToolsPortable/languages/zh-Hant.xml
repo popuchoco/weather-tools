@@ -63,6 +63,7 @@ CWA 的入門分段：T 小於 2 約為熱帶低壓階段，T 約 2.5～3.5 為�
   <string key="agency.RJTD">日本氣象廳（JMA）</string>
   <string key="agency.KNES">NOAA 衛星服務部（NESDIS）</string>
   <string key="agency.KNHC">美國國家颶風中心（NHC）</string>
+  <string key="agency.TAFB">熱帶分析與預報分支（TAFB；NHC 旗下部門）</string>
   <string key="agency.VTBB">泰國氣象局</string>
   <string key="agency.DEMS">印度氣象局（IMD）</string>
   <string key="agency.VVNB">越南國家水文氣象預報中心</string>

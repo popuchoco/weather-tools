@@ -63,6 +63,7 @@ Limitations: Dvorak is a statistical and subjective satellite estimate, not a di
   <string key="agency.RJTD">Japan Meteorological Agency (JMA)</string>
   <string key="agency.KNES">NOAA Satellite Services (NESDIS)</string>
   <string key="agency.KNHC">National Hurricane Center (NHC)</string>
+  <string key="agency.TAFB">Tropical Analysis and Forecast Branch (TAFB; NHC branch under NOAA/NWS)</string>
   <string key="agency.VTBB">Thai Meteorological Department</string>
   <string key="agency.DEMS">India Meteorological Department (IMD)</string>
   <string key="agency.VVNB">Viet Nam National Hydro-Meteorological Forecasting Centre</string>

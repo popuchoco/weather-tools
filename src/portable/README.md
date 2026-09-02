@@ -17,7 +17,7 @@
 - 以顏色帶協助初學者理解熱帶氣旋強度變化
 - Dvorak 的 CSC、DT、MET、PT、FT、CI 入門流程
 - DVTS `.txt`／`.dat` 檔案開啟或多行報文貼上、T／CI／趨勢解析
-- 發報中心代碼與機構名稱對照（例如 RCTP、KNES、PGTW、RJTD）
+- 發報中心代碼與機構名稱對照（例如 RCTP、KNES、PGTW、RJTD、TAFB）；TAFB 代表 Tropical Analysis and Forecast Branch（熱帶分析與預報分支，NHC 旗下部門）
 - 將選取 DVTS 的實際 CI 帶入 NHC、HKO、CWA 對照表
 - DVTS 趨勢圖與 ATCF 強度分析圖：依 UTC 時間繪製資料折線圖，並可將目前顯示的圖表輸出為 PNG 圖檔
 - ATCF 路徑資料（例如 `bwp132026.dat`）檔案開啟、貼上、清除與完整欄位解讀

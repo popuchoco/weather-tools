@@ -17,7 +17,7 @@ VB.NET Windows Forms 气象工具，延续早期“气象小工具”的换算�
 - 风速、蒲福风级、温度、气压与简化浪高换算。
 - NHC、HKO、CWA 的 Dvorak Final-T／T、CI、风速与中心气压对照。
 - AMSU research 卫星自动分析报文的 DVTS 解析，可打开 `.txt`／`.dat` 文件或粘贴内容，读取 T、CI、趋势与分析机构。
-- DVTS 趋势图与 ATCF 强度分析图：依 UTC 时间绘制资料折线图，并可将当前显示的图表输出为 PNG 图像文件。
+- DVTS 趋势图与 ATCF 强度分析图：依 UTC 时间绘制资料折线图，并可将当前显示的图表输出为 PNG 图像文件；DVTS 机构代码支持 TAFB（Tropical Analysis and Forecast Branch）。
 - ATCF 路径解析：读取或粘贴 ATCF Best Track `b*.dat`，分析时间、位置、VMAX、MSLP、等级、风圈与完整字段。
 - ATCF 实时定位分析：读取或粘贴 `NRL Sector File`，解析 Storm ID、Storm Name、YYMMDD、HHMM、LAT、LON、BASIN、VMAX 与 MSLP。
 - ATCF 两个页面都可打开强度变化图：X 轴为 UTC 时间，并可在 `VMAX`（0～200 kts）与 `MSLP`（800～1050 hPa）之间切换 Y 轴。
