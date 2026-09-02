@@ -259,13 +259,14 @@ Limitations: Dvorak is a statistical and subjective satellite estimate, not a di
   <string key="atcf.meaning.21">Eye diameter; 0 means no eye data</string>
   <string key="atcf.meaning.22">Subregion code; W means western North Pacific</string>
   <string key="atcf.meaning.23">Maximum significant wave height; 0 means not provided (ft)</string>
-  <string key="atcf.meaning.24">Analyst initials; blank means not filled</string>
+  <string key="atcf.meaning.24">Analyst or branch initials; TAFB means Tropical Analysis and Forecast Branch, an NHC branch under NOAA/NWS; blank means not filled</string>
   <string key="atcf.meaning.25">Motion direction; 0 means not provided (degrees)</string>
   <string key="atcf.meaning.26">Motion speed; 0 means not provided (kt)</string>
   <string key="atcf.meaning.27">Storm name; for example KUJIRA</string>
   <string key="atcf.meaning.28">System depth; S=Shallow, D=Deep, M=Medium</string>
   <string key="atcf.meaning.29">Wave-height threshold; 0 means not provided</string>
   <string key="atcf.meaning.30">Wave-radius / quadrant code; blank means not provided</string>
+  <string key="atcf.initials.tafb">TAFB (Tropical Analysis and Forecast Branch, an NHC branch under NOAA/NWS)</string>
   <string key="atcf.meaning.31">Wave-radius data; 0 means not provided</string>
   <string key="atcf.meaning.32">Wave-radius data; 0 means not provided</string>
   <string key="atcf.meaning.33">Wave-radius data; 0 means not provided</string>

@@ -93,7 +93,7 @@ NHC 的表格使用 1 分鐘平均風；HKO 說明以 0.93 將 Dvorak 的 1 分�
 
 - 第 1～11 欄：海域、系統編號、UTC 時間、TECHNUM/MIN、TECH、TAU、位置、VMAX、MSLP、TY。
 - 第 12～17 欄：RAD、WINDCODE、RAD1～RAD4 風圈門檻與象限半徑。
-- 第 18～27 欄：RADP、RRP、MRD、GUSTS、EYE、SUBREGION、MAXSEAS、INITIALS、DIR、SPEED。
+- 第 18～27 欄：RADP、RRP、MRD、GUSTS、EYE、SUBREGION、MAXSEAS、INITIALS、DIR、SPEED；`INITIALS` 若為 `TAFB`，會顯示為 Tropical Analysis and Forecast Branch（熱帶分析與預報分支，NHC 旗下部門）。
 - 第 28～35 欄：STORMNAME、DEPTH、SEAS、SEASCODE、SEAS1～SEAS4。
 - 第 36 欄起：USERDEFINED 描述與 userdata 補充資料。
 

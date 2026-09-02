@@ -43,7 +43,7 @@ ATCF 分頁的「清除資料」會同時清除輸入框、已解析路徑表格
 - `13`：年度系統編號。
 - `2026`：年份。
 
-欄位分析依照 [ATCF Best Track／Objective Aid／Wind Radii Format](https://science.nrlmry.navy.mil/atcf/docs/database/new/abrdeck.html)，包含 common fields 1–35，以及第 36 欄起的 `USERDEFINED`／`userdata`。
+欄位分析依照 [ATCF Best Track／Objective Aid／Wind Radii Format](https://science.nrlmry.navy.mil/atcf/docs/database/new/abrdeck.html)，包含 common fields 1–35，以及第 36 欄起的 `USERDEFINED`／`userdata`。`INITIALS` 欄若為 `TAFB`，會解讀為 Tropical Analysis and Forecast Branch（熱帶分析與預報分支，NHC 旗下部門）。
 
 ## ATCF實時定位分析
 

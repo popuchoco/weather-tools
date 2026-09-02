@@ -1188,7 +1188,7 @@ Public Class MainForm
                     If rawValue = "0" Then Return LanguageManager.Translate("atcf.display.seas.none", "0（最大有效波高未提供）")
                     Return If(IsAtcfBlank(rawValue), LanguageManager.Translate("atcf.blank", "空白"), rawValue & " ft")
                 Case 24
-                    Return rawValue
+                    Return AtcfInitialsText(rawValue)
                 Case 25
                     If rawValue = "0" Then Return "0（移動方向未提供）"
                     Return If(record.HasDirection, record.DirectionDegrees.ToString(CultureInfo.InvariantCulture) & "°", rawValue)
@@ -1233,6 +1233,14 @@ Public Class MainForm
                 Case Else
                     Return rawValue
             End Select
+        End Function
+
+        Private Shared Function AtcfInitialsText(rawValue As String) As String
+            If IsAtcfBlank(rawValue) Then Return LanguageManager.Translate("atcf.blank", "空白")
+            If String.Equals(rawValue.Trim(), "TAFB", StringComparison.OrdinalIgnoreCase) Then
+                Return LanguageManager.Translate("atcf.initials.tafb", "TAFB（Tropical Analysis and Forecast Branch；熱帶分析與預報分支，NHC 旗下部門）")
+            End If
+            Return rawValue
         End Function
 
         Private Shared Function AtcfFieldName(index As Integer) As String
@@ -1299,7 +1307,7 @@ Public Class MainForm
                 Case 21 : Return AtcfMeaning(index, "眼徑；0 代表無眼徑／無眼風眼資料")
                 Case 22 : Return AtcfMeaning(index, "西北太平洋等次區域代碼；W 代表西北太平洋")
                 Case 23 : Return AtcfMeaning(index, "最大有效波高；0 代表未提供（ft）")
-                Case 24 : Return AtcfMeaning(index, "分析員縮寫；空白代表未填")
+                Case 24 : Return AtcfMeaning(index, "分析員／機構縮寫；TAFB 代表 Tropical Analysis and Forecast Branch（熱帶分析與預報分支，NHC 旗下部門）；空白代表未填")
                 Case 25 : Return AtcfMeaning(index, "移動方向；0 代表未提供（度）")
                 Case 26 : Return AtcfMeaning(index, "移動速度；0 代表未提供（kt）")
                 Case 27 : Return AtcfMeaning(index, "系統名稱；例如 KUJIRA")

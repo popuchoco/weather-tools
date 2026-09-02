@@ -259,13 +259,14 @@ CWA 的入門分段：T 小於 2 約為熱帶低壓階段，T 約 2.5～3.5 為�
   <string key="atcf.meaning.21">眼徑；0 代表無眼徑／無眼風眼資料</string>
   <string key="atcf.meaning.22">西北太平洋等次區域代碼；W 代表西北太平洋</string>
   <string key="atcf.meaning.23">最大有效波高；0 代表未提供（ft）</string>
-  <string key="atcf.meaning.24">分析員縮寫；空白代表未填</string>
+  <string key="atcf.meaning.24">分析員／機構縮寫；TAFB 代表 Tropical Analysis and Forecast Branch（熱帶分析與預報分支，NHC 旗下部門）；空白代表未填</string>
   <string key="atcf.meaning.25">移動方向；0 代表未提供（度）</string>
   <string key="atcf.meaning.26">移動速度；0 代表未提供（kt）</string>
   <string key="atcf.meaning.27">系統名稱；例如 KUJIRA</string>
   <string key="atcf.meaning.28">系統深度；S=Shallow 淺層、D=Deep 深層、M=Medium 中層</string>
   <string key="atcf.meaning.29">波高閾值；0 代表未提供</string>
   <string key="atcf.meaning.30">波浪半徑／象限編碼；空白代表未提供</string>
+  <string key="atcf.initials.tafb">TAFB（Tropical Analysis and Forecast Branch；熱帶分析與預報分支，NHC 旗下部門）</string>
   <string key="atcf.meaning.31">波浪半徑資料；0 代表未提供</string>
   <string key="atcf.meaning.32">波浪半徑資料；0 代表未提供</string>
   <string key="atcf.meaning.33">波浪半徑資料；0 代表未提供</string>
