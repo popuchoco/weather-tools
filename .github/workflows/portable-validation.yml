@@ -1,0 +1,22 @@
+name: Portable validation
+
+on:
+  push:
+    paths:
+      - 'src/portable/WeatherToolsPortable/**'
+      - 'tests/**'
+      - '.github/workflows/portable-validation.yml'
+  pull_request:
+    paths:
+      - 'src/portable/WeatherToolsPortable/**'
+      - 'tests/**'
+      - '.github/workflows/portable-validation.yml'
+
+jobs:
+  build-and-smoke-test:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build and run portable smoke tests
+        shell: pwsh
+        run: ./tests/run-tests.ps1

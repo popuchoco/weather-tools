@@ -6,13 +6,19 @@
   <string key="language.label">Language</string>
   <string key="language.reload">Reload language package</string>
   <string key="language.load.failed">The language package could not be loaded.</string>
+  <string key="file.error.too.large">The file exceeds 25 MB. Paste only the required data lines instead.</string>
+  <string key="file.error.read">Could not read {0}: {1}</string>
+  <string key="file.error.title">File read failed</string>
+  <string key="language.restart.failed">The language package loaded, but the app could not restart automatically. Close and reopen it manually.</string>
   <string key="language.restart.title">Language package</string>
   <string key="language.restart.message">The language package has been selected. The application will restart to update the interface.</string>
   <string key="language.reload.message">The language package has been reloaded. The application will restart to apply the update.</string>
   <string key="status.ready">Ready</string>
   <string key="agency.note">NHC, HKO, and CWA use different definitions: the United States commonly uses 1-minute mean wind; HKO converts Dvorak 1-minute wind by multiplying by 0.93 for a 10-minute wind; the CWA table uses 10-minute wind. Results are for learning and do not replace official warnings.</string>
-  <string key="quick.wind.note">Input uses NHC/JTWC 1-minute mean wind; CWA and JMA references use 10-minute wind, while HKO uses Dvorak 1-minute wind × 0.93.
-Results are educational references to official tables and are not live warnings.</string>
+  <string key="quick.wind.note">NHC/JTWC categories use the entered 1-minute wind. JMA 10-minute wind is estimated with a 0.871 factor; CWA/HKO use the nearest Dvorak CI reference row.
+Estimates are not agency observations or warnings. HKO table values already include the averaging-period conversion; do not apply it again.</string>
+  <string key="quick.pressure.note">Legacy educational estimate: max(0, 0.154 × (1019 − pressure[hPa])) m. It omits wind field, duration, and fetch and is not a sea-state forecast.</string>
+  <string key="quick.beaufort.note">Wind speed uses the empirical midpoint approximation 0.836 × B^1.5 m/s, not the full wind-speed range for each Beaufort force.</string>
   <string key="dvts.note">DVTS format: basin number YYYYMMDDHHMM DVTS latitude longitude wind(kt) TCI trend issuing center; for example, 5050 means T5.0/CI5.0 and W1050 means weakening 1.0 over the past 50 hours.</string>
   <string key="atcf.note">The filename bwp132026.dat means b = Best Track, WP = western North Pacific, 13 = system number, and 2026 = year. The first 8 fields are core position data; later fields may be omitted by file version or purpose, and blanks are not errors.</string>
   <string key="learning.body"><![CDATA[Learning workflow:
@@ -215,10 +221,10 @@ Limitations: Dvorak is a statistical and subjective satellite estimate, not a di
   <string key="trend.steady">Steady</string>
   <string key="trend.weakening">Weakening</string>
   <string key="trend.code">{0} {1:0.0}/{2}h</string>
-  <string key="trend.explanation.weakening">Traditional weakening treatment: approximately T + 1.0</string>
-  <string key="trend.explanation.landfall">HKO post-landfall trial treatment: approximately T + 0.5</string>
-  <string key="trend.explanation.steady">Steady stage uses CI = T</string>
-  <string key="trend.explanation.developing">Developing stage uses CI = T</string>
+  <string key="trend.explanation.weakening">Teaching simplification: CI is about T + 1.0 while weakening; not formal Dvorak lag analysis.</string>
+  <string key="trend.explanation.landfall">Teaching simplification: about T + 0.5 after landfall; not formal Dvorak lag analysis.</string>
+  <string key="trend.explanation.steady">Teaching simplification: CI = T for steady systems; not formal Dvorak lag analysis.</string>
+  <string key="trend.explanation.developing">Teaching simplification: CI = T for developing systems; not formal Dvorak lag analysis.</string>
   <string key="atcf.warning">; {0} lines have field or format warnings</string>
   <string key="atcf.summary.count">{0} records</string>
   <string key="atcf.summary.time">{0:yyyy-MM-dd HH:mm} to {1:yyyy-MM-dd HH:mm} UTC</string>
@@ -273,10 +279,14 @@ Limitations: Dvorak is a statistical and subjective satellite estimate, not a di
   <string key="atcf.meaning.33">Wave-radius data; 0 means not provided</string>
   <string key="atcf.meaning.34">Wave-radius data; 0 means not provided</string>
   <string key="quick.input.wind">Input wind (1-min)</string>
-  <string key="quick.jtwc">JTWC 1 kt</string>
-  <string key="quick.cwa">CWA 10 m/s</string>
-  <string key="quick.jma">JMA 10 m/s</string>
-  <string key="quick.hko">HKO 10 km/h</string>
+  <string key="quick.jtwc">JTWC (1-min category)</string>
+  <string key="quick.ci.nearest">Nearest CI {0:0.0} (table estimate)</string>
+  <string key="quick.ci.unavailable">Below the CI table range</string>
+  <string key="quick.ci.reference">Nearest CI reference</string>
+  <string key="quick.nhc">NHC (1-min category)</string>
+  <string key="quick.cwa">CWA (10-min m/s / CI reference)</string>
+  <string key="quick.jma">JMA (estimated 10-min m/s)</string>
+  <string key="quick.hko">HKO (10-min km/h / CI reference)</string>
   <string key="agency.info">Analyze the satellite cloud pattern to obtain T, then estimate CI from the intensity trend; this tool does not automatically interpret satellite imagery.</string>
   <string key="learning.title">Dvorak estimates tropical-cyclone intensity from satellite cloud patterns</string>
   <string key="dvts.info.initial">Open a .txt/.dat file or paste multiple DVTS lines; parse them, select one record, and import it into the Dvorak reference.</string>
@@ -431,13 +441,14 @@ Limitations: Dvorak is a statistical and subjective satellite estimate, not a di
   <string key="atcf.trend.axis.x">Date and time (UTC)</string>
   <string key="atcf.trend.axis.vmax">VMAX (kts)</string>
   <string key="atcf.trend.axis.mslp">MSLP (hPa)</string>
-  <string key="atcf.trend.note">VMAX: Y axis 0–200 kts; MSLP: Y axis 800–1050 hPa. Times use message UTC, and missing values are not filled with zero.</string>
+  <string key="atcf.trend.note">Plots BEST records with TAU=0 only; wind-radii rows at the same cyclone/UTC analysis time are merged. VMAX: 0–200 kts; MSLP: 800–1050 hPa.</string>
   <string key="atcf.trend.summary">{0} | {1} | {2} records</string>
   <string key="atcf.trend.tooltip.value">{0}: {1}</string>
   <string key="atcf.trend.tooltip.vmax">VMAX: {0}</string>
   <string key="atcf.trend.tooltip.mslp">MSLP: {0}</string>
   <string key="atcf.trend.tooltip.position">Position: {0}</string>
   <string key="atcf.trend.error.first">Parse ATCF data before opening the intensity trend chart.</string>
+  <string key="atcf.trend.error.no.best">No plottable BEST, TAU=0 records were found; forecast aids are not mixed into the best-track intensity chart.</string>
   <string key="atcf.trend.error.time">The current ATCF data has no usable UTC time, so an intensity trend cannot be drawn.</string>
   <string key="atcf.trend.error.multiple.systems">Intensity analysis supports one cyclone ID at a time. The current data contains multiple cyclone IDs: {0}. Name changes such as INVEST, NINE, and the international name remain one cyclone and are not split by name. Keep one cyclone number before opening the chart.</string>
   <string key="atcf.trend.source.atcf">ATCF Tracking Data</string>
@@ -462,6 +473,7 @@ Limitations: Dvorak is a statistical and subjective satellite estimate, not a di
   <string key="thermal.heat.formula">NOAA screening equation + Rothfusz regression</string>
   <string key="thermal.heat.method.regression">Using the Rothfusz regression with applicable humidity adjustment.</string>
   <string key="thermal.heat.method.simple">Screening estimate is below about 80°F; using the NOAA simplified equation.</string>
+  <string key="thermal.heat.outside.range">Inputs are outside the common applicability range (about 80–110°F, RH 40–100%); treat the result as an estimate.</string>
   <string key="thermal.dewpoint.title">Relative Humidity from Dew Point</string>
   <string key="thermal.dewpoint.formula">Magnus-Tetens approximation｜a = 17.625, b = 243.04°C&#10;RH = 100 × es(dew point) / es(air temperature)</string>
   <string key="thermal.dewpoint.detail">Air/dew-point spread {0:0.0} {1}｜Magnus-Tetens approximation</string>

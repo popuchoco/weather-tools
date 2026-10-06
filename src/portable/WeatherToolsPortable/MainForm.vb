@@ -7,6 +7,8 @@ Imports System.Collections.Generic
 Imports System.Drawing
 Imports System.Globalization
 Imports System.IO
+Imports System.Security
+Imports System.Text
 Imports System.Windows.Forms
 
 Partial Public Class MainForm
@@ -445,8 +447,14 @@ Partial Public Class MainForm
                 dialog.Title = T("dvts.dialog.open", "開啟 DVTS 報文檔案")
                 If dialog.ShowDialog(Me) <> DialogResult.OK Then Return
 
+                Dim fileText As String = Nothing
+                Dim readError As String = Nothing
+                If Not TryReadWeatherFile(dialog.FileName, fileText, readError) Then
+                    ShowFileReadError(dialog.FileName, readError)
+                    Return
+                End If
                 dvtsSourceFileName = dialog.FileName
-                txtDvts.Text = File.ReadAllText(dialog.FileName, System.Text.Encoding.ASCII)
+                txtDvts.Text = fileText
                 lblDvtsInfo.Text = String.Format(T("dvts.file.loaded", "{0} 已載入；請按「解析 DVTS」。"), Path.GetFileName(dialog.FileName))
                 SetStatus("DVTS 檔案已載入")
             End Using
@@ -756,8 +764,14 @@ Partial Public Class MainForm
                 dialog.Title = T("atcf.sector.dialog.open", "開啟 ATCF 核心扇區定位檔")
                 If dialog.ShowDialog(Me) <> DialogResult.OK Then Return
 
+                Dim fileText As String = Nothing
+                Dim readError As String = Nothing
+                If Not TryReadWeatherFile(dialog.FileName, fileText, readError) Then
+                    ShowFileReadError(dialog.FileName, readError)
+                    Return
+                End If
                 atcfSectorSourceFileName = dialog.FileName
-                txtAtcfSector.Text = File.ReadAllText(dialog.FileName, System.Text.Encoding.ASCII)
+                txtAtcfSector.Text = fileText
                 lblAtcfSectorInfo.Text = String.Format(T("atcf.sector.file.loaded", "{0} 已載入；請按「解析核心扇區」。"), Path.GetFileName(dialog.FileName))
                 SetStatus(T("atcf.sector.status.loaded", "ATCF 核心扇區檔案已載入"))
             End Using
@@ -775,7 +789,7 @@ Partial Public Class MainForm
 
         Private Sub ParseAtcfSectorButtonClick(sender As Object, e As EventArgs)
             Dim warnings As New List(Of String)()
-            Dim records As List(Of AtcfSectorRecord) = AtcfSectorParser.Parse(txtAtcfSector.Text, atcfSectorSourceFileName, warnings)
+            Dim records As List(Of AtcfSectorRecord) = AtcfSectorParser.Parse(txtAtcfSector.Text, warnings)
             parsedAtcfSectorRecords.Clear()
             parsedAtcfSectorRecords.AddRange(records)
             UiRendering.BeginUpdate(atcfSectorGrid)
@@ -956,8 +970,14 @@ Partial Public Class MainForm
                 dialog.Title = T("atcf.dialog.open", "開啟 ATCF Tracking Data")
                 If dialog.ShowDialog(Me) <> DialogResult.OK Then Return
 
+                Dim fileText As String = Nothing
+                Dim readError As String = Nothing
+                If Not TryReadWeatherFile(dialog.FileName, fileText, readError) Then
+                    ShowFileReadError(dialog.FileName, readError)
+                    Return
+                End If
                 atcfSourceFileName = dialog.FileName
-                txtAtcf.Text = File.ReadAllText(dialog.FileName, System.Text.Encoding.ASCII)
+                txtAtcf.Text = fileText
                 lblAtcfInfo.Text = String.Format(T("atcf.file.loaded", "{0} 已載入；請按「解析 Tracking Data」。"), Path.GetFileName(dialog.FileName))
                 SetStatus("ATCF 檔案已載入")
             End Using
@@ -975,7 +995,7 @@ Partial Public Class MainForm
 
         Private Sub ParseAtcfButtonClick(sender As Object, e As EventArgs)
             Dim warnings As New List(Of String)()
-            Dim records As List(Of AtcfRecord) = AtcfParser.Parse(txtAtcf.Text, atcfSourceFileName, warnings)
+            Dim records As List(Of AtcfRecord) = AtcfParser.Parse(txtAtcf.Text, warnings)
             parsedAtcfRecords.Clear()
             parsedAtcfRecords.AddRange(records)
             UiRendering.BeginUpdate(atcfGrid)
@@ -1023,14 +1043,12 @@ Partial Public Class MainForm
                 Return
             End If
 
-            Dim allPoints As New List(Of AtcfIntensityPoint)()
-            Dim points As New List(Of AtcfIntensityPoint)()
-            For Each record As AtcfRecord In parsedAtcfRecords
-                Dim point As AtcfIntensityPoint = AtcfIntensityPoint.FromAtcfRecord(record)
-                allPoints.Add(point)
-                If record.HasAnalysisTime Then points.Add(point)
-            Next
-            Dim systemKeys As List(Of String) = GetAtcfSystemKeys(allPoints)
+            Dim points As List(Of AtcfIntensityPoint) = AtcfIntensityPoint.FromAtcfBestTrackRecords(parsedAtcfRecords)
+            If points.Count = 0 Then
+                ShowError(T("atcf.trend.error.no.best", "找不到可繪製的 BEST、TAU=0 資料；預報輔助資料不會混入最佳路徑強度圖。"))
+                Return
+            End If
+            Dim systemKeys As List(Of String) = GetAtcfSystemKeys(points)
             If systemKeys.Count > 1 Then
                 Dim message As String = String.Format(CultureInfo.InvariantCulture,
                     T("atcf.trend.error.multiple.systems", "強度分析目前只支援單一氣旋；目前資料包含多個氣旋編號：{0}。同一編號即使名稱由 INVEST、NINE 變更為正式名稱，也會視為同一氣旋，不會依名稱分開。請只保留一個氣旋編號後再開啟。"),
@@ -1038,11 +1056,6 @@ Partial Public Class MainForm
                 ShowErrorDialog(message)
                 Return
             End If
-            If points.Count = 0 Then
-                ShowError(T("atcf.trend.error.time", "目前 ATCF 資料沒有可用的 UTC 時間，無法繪製強度變化圖。"))
-                Return
-            End If
-
             Using trendForm As New AtcfIntensityTrendForm(points, T("atcf.trend.source.atcf", "ATCF Tracking Data"))
                 trendForm.ShowDialog(Me)
             End Using
@@ -1405,7 +1418,11 @@ Partial Public Class MainForm
                 ShowError(T("language.load.failed", "語言包載入失敗。"))
                 Return
             End If
-            Application.Restart()
+            Try
+                Application.Restart()
+            Catch ex As Exception
+                ShowError(T("language.restart.failed", "語言已載入，但無法自動重新啟動；請手動關閉並重新開啟程式。") & " " & ex.Message)
+            End Try
         End Sub
 
         Private Sub ApplyUiLanguage()
@@ -1463,22 +1480,22 @@ Partial Public Class MainForm
             AddText(layout, "英里／小時", 0, 2)
             layout.Controls.Add(PrepareValueLabel(lblMph), 1, 2)
 
-            AddTextKey(layout, "quick.jtwc", "JTWC（1分 kt）", 0, 3)
+            AddTextKey(layout, "quick.jtwc", "JTWC（1分分級）", 0, 3)
             layout.Controls.Add(PrepareValueLabel(lblJtwc), 1, 3)
-            AddTextKey(layout, "quick.cwa", "CWA（10分 m/s）", 2, 3)
+            AddTextKey(layout, "quick.cwa", "CWA（10分 m/s／CI對照）", 2, 3)
             layout.Controls.Add(PrepareValueLabel(lblCwa), 3, 3)
-            AddTextKey(layout, "quick.jma", "JMA（10分 m/s）", 0, 4)
+            AddTextKey(layout, "quick.jma", "JMA（估算10分 m/s）", 0, 4)
             layout.Controls.Add(PrepareValueLabel(lblJma), 1, 4)
-            AddTextKey(layout, "quick.hko", "HKO（10分 km/h）", 2, 4)
+            AddTextKey(layout, "quick.hko", "HKO（10分 km/h／CI對照）", 2, 4)
             layout.Controls.Add(PrepareValueLabel(lblHko), 3, 4)
 
-            AddText(layout, "Dvorak T／CI", 0, 5)
+            AddText(layout, T("quick.nhc", "NHC（1分分級）"), 0, 5)
             layout.Controls.Add(PrepareValueLabel(lblWindDvorak), 1, 5)
-            AddText(layout, "換算基準", 2, 5)
+            AddText(layout, T("quick.ci.reference", "最近 CI 對照"), 2, 5)
             layout.Controls.Add(PrepareValueLabel(lblWindBasis), 3, 5)
 
-            layout.RowStyles(6) = New RowStyle(SizeType.Absolute, 52.0F)
-            Dim note As Label = CreateNote(T("quick.wind.note", "輸入以 NHC／JTWC 1 分鐘平均風為基準；CWA、JMA 使用 10 分鐘參考，HKO 使用 Dvorak 1 分鐘風速 × 0.93。" & Environment.NewLine & "結果是官方對照表的教學參考，不代表即時警報。"))
+            layout.RowStyles(6) = New RowStyle(SizeType.Absolute, 66.0F)
+            Dim note As Label = CreateNote(T("quick.wind.note", "NHC／JTWC 分級使用輸入的 1 分鐘風。JMA 10 分鐘值以 0.871 比例估算；CWA／HKO 使用最近 Dvorak CI 對照列。" & Environment.NewLine & "估算與對照不代表機構實況或即時警報。HKO 表值已完成平均時間換算，不再重複乘係數。"))
             note.AutoSize = False
             note.Dock = DockStyle.Fill
             note.MaximumSize = New Size(0, 0)
@@ -1508,7 +1525,7 @@ Partial Public Class MainForm
             layout.Controls.Add(PrepareValueLabel(lblBeaufortMs), 1, 2)
             AddText(layout, "風況名稱", 0, 3)
             layout.Controls.Add(PrepareValueLabel(lblBeaufortName), 1, 3)
-            Dim note As Label = CreateNote("蒲福風級是觀察風力的入門尺度；風速越高，風對海面與物體的影響越明顯。")
+            Dim note As Label = CreateNote(T("quick.beaufort.note", "風速使用經驗中值近似 0.836 × B^1.5 m/s，不是蒲福各級的完整風速區間。"))
             layout.Controls.Add(note, 0, 5)
             layout.SetColumnSpan(note, 2)
             Return group
@@ -1568,7 +1585,7 @@ Partial Public Class MainForm
 
             AddText(layout, "估算結果", 0, 2)
             layout.Controls.Add(PrepareValueLabel(lblWaveHeight), 1, 2)
-            Dim note As Label = CreateNote("使用舊版工具的簡化公式，不能取代海象預報或現場觀測。氣壓越低，估算浪高通常越高。")
+            Dim note As Label = CreateNote(T("quick.pressure.note", "舊版教學經驗式：max(0, 0.154 × (1019 − 氣壓[hPa])) m；未納入風場、風時與風區，不能取代海象預報。"))
             layout.Controls.Add(note, 0, 4)
             layout.SetColumnSpan(note, 2)
             Return group
@@ -1670,26 +1687,29 @@ Partial Public Class MainForm
             lblKmh.Text = kmh.ToString("0.00")
             lblMs.Text = ms.ToString("0.00")
             lblMph.Text = mph.ToString("0.00")
-            lblJtwc.Text = TropicalCycloneIntensityCalculator.NHCClassification(knots)
+            lblJtwc.Text = JtwcCategory(knots)
+            lblWindDvorak.Text = TropicalCycloneIntensityCalculator.NHCClassification(knots)
+            ' WMO's approximate 1-minute to 10-minute averaging conversion.
+            Const oneMinuteToTenMinuteFactor As Double = 0.871
+            Dim jmaMs As Double = ms * oneMinuteToTenMinuteFactor
+            lblJma.Text = jmaMs.ToString("0.0") & " m/s｜" & JmaCategory(jmaMs)
 
             Dim reference As DvorakReference = TropicalCycloneIntensityCalculator.GetReferenceFromNHCWind(knots)
             If reference Is Nothing Then
                 lblCwa.Text = "—"
-                lblJma.Text = "—"
                 lblHko.Text = "—"
-                lblWindDvorak.Text = "未達 CI 1.0"
-                lblWindBasis.Text = "低於表格範圍"
+                lblWindBasis.Text = T("quick.ci.unavailable", "低於 CI 表範圍")
                 SetStatus("風速換算完成；低於 Dvorak 表最低值")
                 Return
             End If
 
             Dim cwaMs As Double = reference.CwaKmh / 3.6
             Dim hkoKmh As Double = reference.HkoTenMinuteKnots * 1.852
-            lblCwa.Text = cwaMs.ToString("0.0")
-            lblJma.Text = cwaMs.ToString("0.0")
-            lblHko.Text = hkoKmh.ToString("0.0")
-            lblWindDvorak.Text = "CI " & reference.CI.ToString("0.0")
-            lblWindBasis.Text = "NHC 1分→CI"
+            lblCwa.Text = cwaMs.ToString("0.0") & "｜" & CwaCategory(cwaMs)
+            lblHko.Text = hkoKmh.ToString("0.0") & "｜" & HkoCategory(hkoKmh)
+            lblWindDvorak.Text = TropicalCycloneIntensityCalculator.NHCClassification(knots)
+            lblWindBasis.Text = String.Format(CultureInfo.CurrentCulture,
+                T("quick.ci.nearest", "最近 CI {0:0.0}（查表估算）"), reference.CI)
             SetStatus("風速換算與機構對照完成")
         End Sub
 
@@ -1866,13 +1886,13 @@ Partial Public Class MainForm
         Private Shared Function TrendExplanation(trend As IntensityTrend) As String
             Select Case trend
                 Case IntensityTrend.Weakening
-                    Return LanguageManager.Translate("trend.explanation.weakening", "傳統減弱處理約為 T＋1.0")
+                    Return LanguageManager.Translate("trend.explanation.weakening", "教學簡化：減弱時 CI 約為 T＋1.0；不代替正式 Dvorak 滯後分析。")
                 Case IntensityTrend.LandfallWeakening
-                    Return LanguageManager.Translate("trend.explanation.landfall", "採 HKO 登陸後減弱試行處理約為 T＋0.5")
+                    Return LanguageManager.Translate("trend.explanation.landfall", "教學簡化：登陸後減弱約為 T＋0.5；不代替正式 Dvorak 滯後分析。")
                 Case IntensityTrend.Steady
-                    Return LanguageManager.Translate("trend.explanation.steady", "維持階段採 CI＝T")
+                    Return LanguageManager.Translate("trend.explanation.steady", "教學簡化：維持階段 CI＝T；不代替正式 Dvorak 滯後分析。")
                 Case Else
-                    Return LanguageManager.Translate("trend.explanation.developing", "發展階段採 CI＝T")
+                    Return LanguageManager.Translate("trend.explanation.developing", "教學簡化：發展階段 CI＝T；不代替正式 Dvorak 滯後分析。")
             End Select
         End Function
 
@@ -1886,7 +1906,8 @@ Partial Public Class MainForm
         End Function
 
         Private Function ReadNumber(input As TextBox, ByRef value As Double) As Boolean
-            If Double.TryParse(input.Text.Trim(), NumberStyles.Float, CultureInfo.CurrentCulture, value) Then
+            If Double.TryParse(input.Text.Trim(), NumberStyles.Float, CultureInfo.CurrentCulture, value) OrElse
+               Double.TryParse(input.Text.Trim(), NumberStyles.Float, CultureInfo.InvariantCulture, value) Then
                 Return True
             End If
             ShowError("請輸入數字，例如 20 或 1013。")
@@ -1894,6 +1915,40 @@ Partial Public Class MainForm
             input.SelectAll()
             Return False
         End Function
+
+        Private Shared Function TryReadWeatherFile(fileName As String, ByRef contents As String, ByRef errorMessage As String) As Boolean
+            Try
+                If New FileInfo(fileName).Length > 25L * 1024L * 1024L Then
+                    errorMessage = LanguageManager.Translate("file.error.too.large", "檔案超過 25 MB，請改用貼上必要資料列的方式載入。")
+                    Return False
+                End If
+                Try
+                    contents = File.ReadAllText(fileName, New UTF8Encoding(False, True))
+                Catch ex As DecoderFallbackException
+                    ' Legacy deck files may use the active Windows code page.
+                    contents = File.ReadAllText(fileName, Encoding.Default)
+                End Try
+                Return True
+            Catch ex As IOException
+                errorMessage = ex.Message
+            Catch ex As UnauthorizedAccessException
+                errorMessage = ex.Message
+            Catch ex As SecurityException
+                errorMessage = ex.Message
+            Catch ex As ArgumentException
+                errorMessage = ex.Message
+            Catch ex As NotSupportedException
+                errorMessage = ex.Message
+            End Try
+            Return False
+        End Function
+
+        Private Sub ShowFileReadError(fileName As String, errorMessage As String)
+            Dim message As String = String.Format(CultureInfo.CurrentCulture,
+                T("file.error.read", "無法讀取檔案 {0}：{1}"), Path.GetFileName(fileName), errorMessage)
+            MessageBox.Show(Me, message, T("file.error.title", "檔案讀取失敗"), MessageBoxButtons.OK, MessageBoxIcon.Error)
+            ShowError(message)
+        End Sub
 
         Private Sub ShowError(message As String)
             lblStatus.Text = LanguageManager.TranslateText(message)
@@ -1915,8 +1970,7 @@ Partial Public Class MainForm
         End Sub
 
         Private Shared Function JtwcCategory(knots As Double) As String
-            If knots < 22 Then Return "—"
-            If knots <= 33 Then Return LanguageManager.Translate("category.tropical.depression", "熱帶低氣壓")
+            If knots < 34 Then Return LanguageManager.Translate("category.tropical.depression", "熱帶低氣壓")
             If knots < 64 Then Return LanguageManager.Translate("category.tropical.storm", "熱帶風暴")
             If knots < 130 Then Return LanguageManager.Translate("category.typhoon", "颱風")
             Return LanguageManager.Translate("category.super.typhoon", "超級颱風")
@@ -1931,7 +1985,6 @@ Partial Public Class MainForm
         End Function
 
         Private Shared Function JmaCategory(ms As Double) As String
-            If ms < 10.8 Then Return "—"
             If ms <= 17 Then Return LanguageManager.Translate("category.tropical.depression", "熱帶低氣壓")
             If ms < 24.4 Then Return LanguageManager.Translate("category.tropical.storm", "熱帶風暴")
             If ms < 32.6 Then Return LanguageManager.Translate("category.severe.tropical.storm", "強烈熱帶風暴")
@@ -1941,7 +1994,7 @@ Partial Public Class MainForm
         End Function
 
         Private Shared Function HkoCategory(kmh As Double) As String
-            If kmh < 41 Then Return "—"
+            If kmh < 41 Then Return LanguageManager.Translate("category.tropical.depression", "熱帶低氣壓")
             If kmh <= 62 Then Return LanguageManager.Translate("category.tropical.depression", "熱帶低氣壓")
             If kmh < 87 Then Return LanguageManager.Translate("category.tropical.storm", "熱帶風暴")
             If kmh < 117 Then Return LanguageManager.Translate("category.severe.tropical.storm", "強烈熱帶風暴")

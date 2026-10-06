@@ -21,7 +21,7 @@ VB.NET Windows Forms 气象工具，延续早期“气象小工具”的换算�
 - DVTS 趋势图与 ATCF 强度分析图：依 UTC 时间绘制资料折线图，并可将当前显示的图表输出为 PNG 图像文件；DVTS 机构代码支持 TAFB（Tropical Analysis and Forecast Branch）。
 - ATCF 路径解析：读取或粘贴 ATCF Best Track `b*.dat`，分析时间、位置、VMAX、MSLP、等级、风圈与完整字段。
 - ATCF 实时定位分析：读取或粘贴 `NRL Sector File`，解析 Storm ID、Storm Name、YYMMDD、HHMM、LAT、LON、BASIN、VMAX 与 MSLP。
-- ATCF 两个页面都可打开强度变化图：X 轴为 UTC 时间，并可在 `VMAX`（0～200 kts）与 `MSLP`（800～1050 hPa）之间切换 Y 轴。
+- ATCF 两个页面都可打开强度变化图：ATCF 图只使用 `TECH=BEST`、`TAU=0`，相同气旋与 UTC 分析时刻的风圈重复行会合并；X 轴为 UTC 时间，Y 轴可切换 `VMAX`（0～200 kts）或 `MSLP`（800～1050 hPa）。
 - ATCF 强度分析一次只支持单一气旋编号；同编号的 `INVEST`、`NINE` 与正式国际名称视为同一气旋，不按名称分隔，也不显示气旋名称或图例。若资料包含多个编号，会在打开图表前拒绝分析。
 - 主窗口拖曳优化：大量页签控件在移动期间暂时与主窗口分离，释放鼠标后恢复，以减少 Windows Forms 重绘延迟。
 - 延续早期版本的 `icon.ico`，作为 2026 V6 执行文件与主窗口图标。
@@ -31,12 +31,14 @@ VB.NET Windows Forms 气象工具，延续早期“气象小工具”的换算�
 温度计算页可输入气温、相对湿度、风速与露点，并即时更新三项结果：
 
 - **Steadman／CWA 体感温度**：`AT = 1.04T + 0.2e − 0.65V − 2.7`；水汽压 `e = (RH/100) × 6.105 × exp(17.27T/(237.7+T))`。T 为 °C、e 为 hPa、V 为 m/s。适用于有遮蔽的户外场景，不含直接日照。
-- **NOAA Heat Index**：先计算 NOAA 筛选值；达到约 80°F 时使用 Rothfusz 多元回归，并按条件应用高／低湿度修正。其他情况按 NOAA 流程显示简化估值。超出原始适用条件时仅供参考。
+- **NOAA Heat Index**：先计算简化式并将其与气温平均作为 80°F 门槛；达到门槛时使用 Rothfusz 多元回归与适用的高／低湿度修正，未达到门槛时返回简化式本身（不是筛选平均值）。超出常见适用范围（约 80～110°F、RH 40～100%）时会标示仅供参考。
 - **露点换算相对湿度**：采用 Magnus-Tetens 近似法，`RH = 100 × exp(a·Td/(b+Td) − a·T/(b+T))`，其中 `a = 17.625`、`b = 243.04°C`。气温与露点限于 −40～60°C，露点不可高于气温。
 
-气温与露点可切换 °C／°F；风速输入单位为 m/s。体感温度是公式估算，不代表每个人的主观感受。
+气温与露点可切换 °C／°F；风速输入单位为 m/s。露点湿度只依气温与露点计算，不会因风速栏无效而清空。体感温度是公式估算，不代表每个人的主观感受。
 
 公式来源：[中央气象署《体感温度预报服务》](https://www.cwa.gov.tw/Data/knowledge/announce/service12.pdf)、[NOAA/WPC Heat Index Equation](https://www.wpc.ncep.noaa.gov/html/heatindex_equation.shtml)、[Magnus-Tetens 参考资料](https://blog.csdn.net/qq_37521537/article/details/105192708)。
+
+快速风速页分开显示 NHC 与 JTWC 1 分钟分级；JMA 10 分钟风速以 [WMO 约略 0.871 比例](https://cyclone.wmo.int/pdf/Glossary.pdf)估算，CWA 与 HKO 使用最近的 Dvorak CI 对照行。HKO 表格值已包含平均时间换算，不会重复乘系数。跨机构结果仅供教学参考，最近 CI 不是正式 Dvorak 分析。趋势中的 CI=T、减弱约 T+1、登陆后约 T+0.5 也是简化教学估算。
 
 ## ATCF 最佳路径资料
 
@@ -45,7 +47,7 @@ VB.NET Windows Forms 气象工具，延续早期“气象小工具”的换算�
 - [NOAA SSD／JTWC ATCF archive](https://www.ssd.noaa.gov/PS/TROP/DATA/ATCF/JTWC/)
 - [NOAA/NCEP EMC DECKS archive](https://www.emc.ncep.noaa.gov/gc_wmb/vxt/DECKS/)
 
-程序读取用户下载到本机的文件，不会自动下载资料。
+程序读取用户下载到本机的文件，不会自动下载资料。趋势图只绘 `TECH=BEST`、`TAU=0`，并合并同一分析时刻的风圈行；缺值及 MSLP 0 不会当成有效气压。
 
 ATCF 页面中的“清除资料”会同时清除输入框、已解析路径表格、字段详细资料与文件状态，方便继续粘贴另一份 Tracking Data。
 
@@ -71,7 +73,7 @@ ATCF 页面中的“清除资料”会同时清除输入框、已解析路径表
 [Storm ID] [Storm Name] [YYMMDD] [HHMM] [LAT] [LON] [BASIN] [VMAX] [MSLP]
 ```
 
-字段定义依据 2001 年 Hawkins 等人发表于 *Bulletin of the American Meteorological Society* 的 [Real-Time Internet Distribution of Satellite Products for Tropical Cyclone Reconnaissance](https://journals.ametsoc.org/view/journals/bams/82/4/1520-0477_2001_082_0567_ridosp_2_3_co_2.xml)。程序将两位数年份按 2000 年代解读，时间以 UTC 显示；此页面只解读文件内容，不会自动下载或替代官方定位分析。
+字段定义依据 2001 年 Hawkins 等人发表于 *Bulletin of the American Meteorological Society* 的 [Real-Time Internet Distribution of Satellite Products for Tropical Cyclone Reconnaissance](https://journals.ametsoc.org/view/journals/bams/82/4/1520-0477_2001_082_0567_ridosp_2_3_co_2.xml)。程序将 70～99 解读为 1970～1999、00～69 解读为 2000～2069，时间以 UTC 显示；此页面只解读文件内容，不会自动下载或替代官方定位分析。坐标与 MSLP 会检查合理范围。
 
 解析后点击“强度变化”即可打开新 Form。图内右上角会保留气旋编号，例如 `气旋编号：WP09`，但不显示气旋名称或图例；同一编号即使名称由 `INVEST`、`NINE` 变更为正式国际名称，也会视为同一气旋。若资料包含多个气旋编号，会在打开图表前拒绝分析。选择 `VMAX` 时 Y 轴固定为 0～200 kts，选择 `MSLP` 时固定为 800～1050 hPa。缺值会保留为空白，不会补成 0。
 
@@ -91,7 +93,7 @@ DVTS 页面中的“清除资料”会同时清除输入框、已解析记录、
 
 ## 语言包
 
-Portable 版的界面与解读内容由 `src/portable/WeatherToolsPortable/languages` 下的 XML 语言包提供，目前附带繁体中文 `zh-Hant.xml`、简体中文 `zh-Hans.xml` 与英文 `en-US.xml`。三份语言包使用相同的 454 个 key，并以每个 `<string>` 一行的格式维护，避免不同语言看起来像是缺少内容。程序右上方只提供 `EN`、`Zh-HanS`、`Zh-HanT` 三个选项；选择后会立即重新启动并套用语言，设置会记录在执行文件旁的 `language.settings.xml`，下次启动会沿用。
+Portable 版的界面与解读内容由 `src/portable/WeatherToolsPortable/languages` 下的 XML 语言包提供，目前附带繁体中文 `zh-Hant.xml`、简体中文 `zh-Hans.xml` 与英文 `en-US.xml`。三份语言包使用相同的 466 个 key，并以每个 `<string>` 一行的格式维护，避免不同语言看起来像是缺少内容。程序右上方只提供 `EN`、`Zh-HanS`、`Zh-HanT` 三个选项；选择后会立即重新启动并套用语言，设置会记录在执行文件旁的 `language.settings.xml`，下次启动会沿用。
 
 语言包是供使用者自行维护的 XML 资料，请使用 IDE 编辑各个 `<string>` 元素的文字，并保留 `key` 属性；程序不内置语言包编辑器。修改 XML 后重新打开程序即可套用。
 
@@ -135,10 +137,11 @@ Portable 版的界面与解读内容由 `src/portable/WeatherToolsPortable/langu
   - [2026 V5（Ver. 1）](https://github.com/popuchoco/weather-tools/releases/tag/2026.1)：在 V5 重置架构上加入 DVTS 中心筛选、T／CI／ALL 趋势显示、同机构图例、气旋编号与 PNG 文件名辨识。
   - [2026 V5（Ver. 2）](https://github.com/popuchoco/weather-tools/releases/tag/2026.2)：补上 DVTS／ATCF 清除资料流程，清除输入、解析结果、筛选与文件状态，并修正清空后趋势图沿用旧资料。
 - [2026 V6](https://github.com/popuchoco/weather-tools/releases/tag/v6.0)：在 V5 重置架构上进行大幅改版，加入三语 427-key XML 语言包、语言设置记忆、界面版面整理与干净的 Portable 交付包，并延续 DVTS／ATCF、趋势图与 PNG 功能。
+- [2026 V6.1.6](https://github.com/popuchoco/weather-tools/releases/tag/v6.1.6)：根据同侪审查修正 Heat Index 门槛回传、机构风速标签、ATCF BEST/TAU 筛选与去重、读档／解析器边界，并新增 smoke tests 与 GitHub Actions 验证。
 
 ## 建置
 
-使用 Visual Studio 2012/2015 打开 [`WeatherToolsPortable.sln`](src/portable/WeatherToolsPortable.sln)，建置 `Release` 后会产生 `WeatherToolsV6.exe`。2026 V6 目标为 .NET Framework 4.0。
+使用 Visual Studio 2012/2015 打开 [`WeatherToolsPortable.sln`](src/portable/WeatherToolsPortable.sln)，建置 `Release` 后会产生 `WeatherToolsV6.exe`。2026 V6 目标为 .NET Framework 4.0。在 Windows 执行 `tests/run-tests.ps1` 可建置并运行公式、DVTS／ATCF／Sector parser 与语言包 key parity smoke tests；GitHub Actions 会自动执行同一套检查。
 
 Dvorak、等级与浪高计算仅供学习与资料解读，不取代官方警报、海象预报或现场观测。
 

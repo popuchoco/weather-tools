@@ -70,7 +70,7 @@ Public NotInheritable Class AtcfSectorParser
     Private Sub New()
     End Sub
 
-    Public Shared Function Parse(text As String, sourceFileName As String, warnings As IList(Of String)) As List(Of AtcfSectorRecord)
+    Public Shared Function Parse(text As String, warnings As IList(Of String)) As List(Of AtcfSectorRecord)
         Dim records As New List(Of AtcfSectorRecord)()
         If text Is Nothing Then Return records
 
@@ -117,7 +117,8 @@ Public NotInheritable Class AtcfSectorParser
             End If
 
             record.HasMaxWind = Double.TryParse(match.Groups("wind").Value, NumberStyles.Float, CultureInfo.InvariantCulture, record.MaxWindKnots)
-            record.HasMslp = Integer.TryParse(match.Groups("pressure").Value, NumberStyles.Integer, CultureInfo.InvariantCulture, record.MslpHpa)
+            record.HasMslp = Integer.TryParse(match.Groups("pressure").Value, NumberStyles.Integer, CultureInfo.InvariantCulture, record.MslpHpa) AndAlso
+                record.MslpHpa >= 800 AndAlso record.MslpHpa <= 1100
             If Not record.HasMaxWind OrElse Not record.HasMslp Then
                 warnings.Add(String.Format(CultureInfo.InvariantCulture,
                     LanguageManager.Translate("atcf.sector.warning.intensity", "第 {0} 行：VMAX 或 MSLP 格式無效。"), i + 1))
@@ -143,7 +144,8 @@ Public NotInheritable Class AtcfSectorParser
            Not Integer.TryParse(timeText.Substring(2, 2), NumberStyles.Integer, CultureInfo.InvariantCulture, minute) Then Return False
 
         Try
-            result = New DateTime(2000 + year, month, day, hour, minute, 0, DateTimeKind.Utc)
+            Dim fullYear As Integer = If(year >= 70, 1900 + year, 2000 + year)
+            result = New DateTime(fullYear, month, day, hour, minute, 0, DateTimeKind.Utc)
             Return True
         Catch
             Return False

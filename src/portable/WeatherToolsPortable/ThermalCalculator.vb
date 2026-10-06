@@ -8,11 +8,13 @@ Public NotInheritable Class HeatIndexResult
     Public ReadOnly TemperatureFahrenheit As Double
     Public ReadOnly UsesRothfuszRegression As Boolean
     Public ReadOnly AdjustmentFahrenheit As Double
+    Public ReadOnly OutsideTypicalRange As Boolean
 
-    Public Sub New(temperatureFahrenheit As Double, usesRothfuszRegression As Boolean, adjustmentFahrenheit As Double)
+    Public Sub New(temperatureFahrenheit As Double, usesRothfuszRegression As Boolean, adjustmentFahrenheit As Double, outsideTypicalRange As Boolean)
         Me.TemperatureFahrenheit = temperatureFahrenheit
         Me.UsesRothfuszRegression = usesRothfuszRegression
         Me.AdjustmentFahrenheit = adjustmentFahrenheit
+        Me.OutsideTypicalRange = outsideTypicalRange
     End Sub
 End Class
 
@@ -43,9 +45,13 @@ Public NotInheritable Class ThermalCalculator
         Dim simpleFormula As Double = 0.5 * (temperatureFahrenheit + 61.0 +
             ((temperatureFahrenheit - 68.0) * 1.2) + (relativeHumidityPercent * 0.094))
         Dim simpleEstimate As Double = (simpleFormula + temperatureFahrenheit) / 2.0
+        Dim outsideTypicalRange As Boolean = temperatureFahrenheit < 80.0 OrElse temperatureFahrenheit > 110.0 OrElse
+            relativeHumidityPercent < 40.0 OrElse relativeHumidityPercent > 100.0
 
         If simpleEstimate < 80.0 Then
-            Return New HeatIndexResult(simpleEstimate, False, 0.0)
+            ' NOAA uses the averaged estimate only as the decision threshold. Below 80°F,
+            ' the reported value is the simple equation itself.
+            Return New HeatIndexResult(simpleFormula, False, 0.0, outsideTypicalRange)
         End If
 
         Dim t As Double = temperatureFahrenheit
@@ -63,7 +69,7 @@ Public NotInheritable Class ThermalCalculator
             adjustment = ((rh - 85.0) / 10.0) * ((87.0 - t) / 5.0)
         End If
 
-        Return New HeatIndexResult(heatIndex + adjustment, True, adjustment)
+        Return New HeatIndexResult(heatIndex + adjustment, True, adjustment, outsideTypicalRange)
     End Function
 
     ''' <summary>Converts air temperature and dew point to relative humidity using Magnus-Tetens (a=17.625, b=243.04 C).</summary>

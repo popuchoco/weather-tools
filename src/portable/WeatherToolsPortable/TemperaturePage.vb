@@ -321,15 +321,15 @@ Partial Public Class MainForm
         Dim humidity As Double
         Dim wind As Double
         Dim tempCelsius As Double
-        Dim environmentalInputsValid As Boolean = TryParseThermalNumber(txtThermalAirTemperature.Text, temperatureInput) AndAlso
-            TryParseThermalNumber(txtThermalHumidity.Text, humidity) AndAlso
-            TryParseThermalNumber(txtThermalWindSpeed.Text, wind)
-
-        If environmentalInputsValid Then
+        Dim airTemperatureValid As Boolean = TryParseThermalNumber(txtThermalAirTemperature.Text, temperatureInput)
+        If airTemperatureValid Then
             tempCelsius = If(isCelsius, temperatureInput, ThermalCalculator.FahrenheitToCelsius(temperatureInput))
-            environmentalInputsValid = tempCelsius >= -40.0 AndAlso tempCelsius <= 60.0 AndAlso
-                humidity >= 0.0 AndAlso humidity <= 100.0 AndAlso wind >= 0.0 AndAlso wind <= 100.0
+            airTemperatureValid = tempCelsius >= -40.0 AndAlso tempCelsius <= 60.0
         End If
+
+        Dim humidityValid As Boolean = TryParseThermalNumber(txtThermalHumidity.Text, humidity) AndAlso humidity >= 0.0 AndAlso humidity <= 100.0
+        Dim windValid As Boolean = TryParseThermalNumber(txtThermalWindSpeed.Text, wind) AndAlso wind >= 0.0 AndAlso wind <= 100.0
+        Dim environmentalInputsValid As Boolean = airTemperatureValid AndAlso humidityValid AndAlso windValid
 
         If environmentalInputsValid Then
             Dim apparentCelsius As Double = ThermalCalculator.CalculateSteadmanApparentTemperature(tempCelsius, humidity, wind)
@@ -347,6 +347,9 @@ Partial Public Class MainForm
             Else
                 lblHeatIndexDetail.Text = T("thermal.heat.method.simple", "篩選值低於約 80°F，依 NOAA 流程採用簡化式。")
             End If
+            If heatIndex.OutsideTypicalRange Then
+                lblHeatIndexDetail.Text &= " " & T("thermal.heat.outside.range", "目前輸入超出常見適用範圍（約 80～110°F、RH 40～100%），結果僅供參考。")
+            End If
         Else
             lblSteadmanValue.Text = "—"
             lblSteadmanDetail.Text = T("thermal.status.invalid.environment", "請輸入有效氣溫、相對濕度與風速。氣溫限 −40～60°C；濕度 0～100%；風速 0～100 m/s。")
@@ -355,7 +358,7 @@ Partial Public Class MainForm
         End If
 
         Dim dewPointInput As Double
-        Dim dewPointValid As Boolean = environmentalInputsValid AndAlso TryParseThermalNumber(txtThermalDewPoint.Text, dewPointInput)
+        Dim dewPointValid As Boolean = airTemperatureValid AndAlso TryParseThermalNumber(txtThermalDewPoint.Text, dewPointInput)
         If dewPointValid Then
             Dim dewPointCelsius As Double = If(isCelsius, dewPointInput, ThermalCalculator.FahrenheitToCelsius(dewPointInput))
             dewPointValid = dewPointCelsius >= -40.0 AndAlso dewPointCelsius <= 60.0 AndAlso dewPointCelsius <= tempCelsius

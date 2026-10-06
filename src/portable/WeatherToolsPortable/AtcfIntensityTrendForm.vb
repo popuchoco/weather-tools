@@ -42,6 +42,52 @@ Public Class AtcfIntensityPoint
         }
     End Function
 
+    ''' <summary>Returns a single observed BEST-track point per cyclone and analysis time.</summary>
+    Public Shared Function FromAtcfBestTrackRecords(records As IEnumerable(Of AtcfRecord)) As List(Of AtcfIntensityPoint)
+        Dim byTime As New Dictionary(Of String, AtcfIntensityPoint)(StringComparer.OrdinalIgnoreCase)
+        If records Is Nothing Then Return New List(Of AtcfIntensityPoint)()
+
+        For Each record As AtcfRecord In records
+            If record Is Nothing OrElse Not record.HasCycloneNumber OrElse Not record.IsBestTrack OrElse
+               Not record.HasTau OrElse record.TauHours <> 0 OrElse Not record.HasAnalysisTime Then Continue For
+            Dim candidate As AtcfIntensityPoint = FromAtcfRecord(record)
+            Dim key As String = candidate.SystemKey & "|" & candidate.AnalysisTimeUtc.Ticks.ToString(CultureInfo.InvariantCulture)
+            Dim existing As AtcfIntensityPoint = Nothing
+            If Not byTime.TryGetValue(key, existing) Then
+                byTime.Add(key, candidate)
+            ElseIf PointCompleteness(candidate) > PointCompleteness(existing) Then
+                MergeMissingValues(candidate, existing)
+                byTime(key) = candidate
+            Else
+                MergeMissingValues(existing, candidate)
+            End If
+        Next
+
+        Dim points As New List(Of AtcfIntensityPoint)(byTime.Values)
+        points.Sort(Function(left As AtcfIntensityPoint, right As AtcfIntensityPoint)
+                        Dim systemComparison As Integer = StringComparer.OrdinalIgnoreCase.Compare(left.SystemKey, right.SystemKey)
+                        If systemComparison <> 0 Then Return systemComparison
+                        Return DateTime.Compare(left.AnalysisTimeUtc, right.AnalysisTimeUtc)
+                    End Function)
+        Return points
+    End Function
+
+    Private Shared Function PointCompleteness(point As AtcfIntensityPoint) As Integer
+        Return If(point.HasVmax, 1, 0) + If(point.HasMslp, 1, 0) + If(point.PositionText <> "—", 1, 0)
+    End Function
+
+    Private Shared Sub MergeMissingValues(target As AtcfIntensityPoint, source As AtcfIntensityPoint)
+        If Not target.HasVmax AndAlso source.HasVmax Then
+            target.HasVmax = True
+            target.VmaxKnots = source.VmaxKnots
+        End If
+        If Not target.HasMslp AndAlso source.HasMslp Then
+            target.HasMslp = True
+            target.MslpHpa = source.MslpHpa
+        End If
+        If target.PositionText = "—" AndAlso source.PositionText <> "—" Then target.PositionText = source.PositionText
+    End Sub
+
     Public Shared Function FromAtcfSectorRecord(record As AtcfSectorRecord) As AtcfIntensityPoint
         Dim systemKey As String = NormalizeSystemKey(record.StormId)
         Return New AtcfIntensityPoint() With {
@@ -152,7 +198,7 @@ Public Class AtcfIntensityTrendForm
         root.Controls.Add(trendChart, 0, 1)
 
         Dim note As New Label()
-        note.Text = LanguageManager.Translate("atcf.trend.note", "VMAX：Y 軸 0～200 kts；MSLP：Y 軸 800～1050 hPa。時間採報文 UTC，空白值不補 0。")
+        note.Text = LanguageManager.Translate("atcf.trend.note", "只繪 BEST 且 TAU=0；同一氣旋／UTC 分析時刻風圈列會合併。VMAX：0～200 kts；MSLP：800～1050 hPa。")
         note.Dock = DockStyle.Fill
         note.ForeColor = Color.FromArgb(102, 114, 124)
         note.Font = New Font("Microsoft JhengHei", 9.0F, FontStyle.Regular)
@@ -263,6 +309,7 @@ Public Class AtcfIntensityTrendForm
             series.BorderWidth = 1
             series.Color = palette(seriesIndex Mod palette.Length)
             series.LegendText = group.Key
+            series.IsVisibleInLegend = False
             series.MarkerSize = 4
             series.MarkerStyle = MarkerStyle.Circle
             series.EmptyPointStyle.Color = Color.Transparent

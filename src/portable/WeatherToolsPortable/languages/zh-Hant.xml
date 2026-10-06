@@ -6,13 +6,19 @@
   <string key="language.label">語言包</string>
   <string key="language.reload">重新載入語言包</string>
   <string key="language.load.failed">語言包載入失敗。</string>
+  <string key="file.error.too.large">檔案超過 25 MB，請改用貼上必要資料列的方式載入。</string>
+  <string key="file.error.read">無法讀取檔案 {0}：{1}</string>
+  <string key="file.error.title">檔案讀取失敗</string>
+  <string key="language.restart.failed">語言已載入，但無法自動重新啟動；請手動關閉並重新開啟程式。</string>
   <string key="language.restart.title">語言包</string>
   <string key="language.restart.message">語言包已套用；程式將重新啟動以更新整個介面。</string>
   <string key="language.reload.message">語言包已重新載入；程式將重新啟動以套用更新。</string>
   <string key="status.ready">準備就緒</string>
   <string key="agency.note">NHC、HKO、CWA 的資料定義不同：美國常用 1 分鐘平均風，HKO 將 Dvorak 1 分鐘風速乘 0.93 轉成 10 分鐘風，CWA 表為 10 分鐘風。結果僅供學習，不可取代官方警報。</string>
-  <string key="quick.wind.note">輸入以 NHC／JTWC 1 分鐘平均風為基準；CWA、JMA 使用 10 分鐘參考，HKO 使用 Dvorak 1 分鐘風速 × 0.93。
-結果是官方對照表的教學參考，不代表即時警報。</string>
+  <string key="quick.wind.note">NHC／JTWC 分級使用輸入的 1 分鐘風。JMA 10 分鐘值以 0.871 比例估算；CWA／HKO 使用最近 Dvorak CI 對照列。
+估算與對照不代表機構實況或即時警報。HKO 表值已完成平均時間換算，不再重複乘係數。</string>
+  <string key="quick.pressure.note">舊版教學經驗式：max(0, 0.154 × (1019 − 氣壓[hPa])) m；未納入風場、風時與風區，不能取代海象預報。</string>
+  <string key="quick.beaufort.note">風速使用經驗中值近似 0.836 × B^1.5 m/s，不是蒲福各級的完整風速區間。</string>
   <string key="dvts.note">DVTS 格式：海域 編號 YYYYMMDDHHMM DVTS 緯度 經度 風速(kt) TCI 趨勢 發報中心；TCI 例如 5050 代表 T5.0／CI5.0，趨勢例如 W1050 代表過去 50 小時減弱 1.0。</string>
   <string key="atcf.note">檔名 bwp132026.dat 可解讀為：b＝Best Track、WP＝西北太平洋、13＝系統編號、2026＝年份。前 8 欄是基本定位資料；後續欄位可因檔案版本或資料用途省略，空白不視為錯誤。</string>
   <string key="learning.body"><![CDATA[學習流程：
@@ -215,10 +221,10 @@ CWA 的入門分段：T 小於 2 約為熱帶低壓階段，T 約 2.5～3.5 為�
   <string key="trend.steady">維持</string>
   <string key="trend.weakening">減弱</string>
   <string key="trend.code">{0} {1:0.0}／{2}h</string>
-  <string key="trend.explanation.weakening">傳統減弱處理約為 T＋1.0</string>
-  <string key="trend.explanation.landfall">採 HKO 登陸後減弱試行處理約為 T＋0.5</string>
-  <string key="trend.explanation.steady">維持階段採 CI＝T</string>
-  <string key="trend.explanation.developing">發展階段採 CI＝T</string>
+  <string key="trend.explanation.weakening">教學簡化：減弱時 CI 約為 T＋1.0；不代替正式 Dvorak 滯後分析。</string>
+  <string key="trend.explanation.landfall">教學簡化：登陸後減弱約為 T＋0.5；不代替正式 Dvorak 滯後分析。</string>
+  <string key="trend.explanation.steady">教學簡化：維持階段 CI＝T；不代替正式 Dvorak 滯後分析。</string>
+  <string key="trend.explanation.developing">教學簡化：發展階段 CI＝T；不代替正式 Dvorak 滯後分析。</string>
   <string key="atcf.warning">；{0} 行有欄位或格式提醒</string>
   <string key="atcf.summary.count">{0} 筆</string>
   <string key="atcf.summary.time">{0:yyyy-MM-dd HH:mm}～{1:yyyy-MM-dd HH:mm} UTC</string>
@@ -273,10 +279,14 @@ CWA 的入門分段：T 小於 2 約為熱帶低壓階段，T 約 2.5～3.5 為�
   <string key="atcf.meaning.33">波浪半徑資料；0 代表未提供</string>
   <string key="atcf.meaning.34">波浪半徑資料；0 代表未提供</string>
   <string key="quick.input.wind">輸入風速（1分）</string>
-  <string key="quick.jtwc">JTWC 1 kt</string>
-  <string key="quick.cwa">CWA 10 m/s</string>
-  <string key="quick.jma">JMA 10 m/s</string>
-  <string key="quick.hko">HKO 10 km/h</string>
+  <string key="quick.jtwc">JTWC（1分分級）</string>
+  <string key="quick.ci.nearest">最近 CI {0:0.0}（查表估算）</string>
+  <string key="quick.ci.unavailable">低於 CI 表範圍</string>
+  <string key="quick.ci.reference">最近 CI 對照</string>
+  <string key="quick.nhc">NHC（1分分級）</string>
+  <string key="quick.cwa">CWA（10分 m/s／CI對照）</string>
+  <string key="quick.jma">JMA（估算10分 m/s）</string>
+  <string key="quick.hko">HKO（10分 km/h／CI對照）</string>
   <string key="agency.info">先由衛星雲型分析得到 T 值，再依強度趨勢估算 CI；此工具不會自動判讀衛星影像。</string>
   <string key="learning.title">Dvorak 是從衛星雲型估計熱帶氣旋強度的方法</string>
   <string key="dvts.info.initial">可開啟 .txt／.dat 或貼上多行 DVTS；解析後選取一筆，再帶入 Dvorak 對照表。</string>
@@ -431,13 +441,14 @@ CWA 的入門分段：T 小於 2 約為熱帶低壓階段，T 約 2.5～3.5 為�
   <string key="atcf.trend.axis.x">日期與時間（UTC）</string>
   <string key="atcf.trend.axis.vmax">VMAX（kts）</string>
   <string key="atcf.trend.axis.mslp">MSLP（hPa）</string>
-  <string key="atcf.trend.note">VMAX：Y 軸 0～200 kts；MSLP：Y 軸 800～1050 hPa。時間採報文 UTC，空白值不補 0。</string>
+  <string key="atcf.trend.note">只繪 BEST 且 TAU=0；同一氣旋／UTC 分析時刻的風圈列會合併。VMAX：0～200 kts；MSLP：800～1050 hPa。</string>
   <string key="atcf.trend.summary">{0}｜{1}｜{2} 筆資料</string>
   <string key="atcf.trend.tooltip.value">{0}：{1}</string>
   <string key="atcf.trend.tooltip.vmax">VMAX：{0}</string>
   <string key="atcf.trend.tooltip.mslp">MSLP：{0}</string>
   <string key="atcf.trend.tooltip.position">位置：{0}</string>
   <string key="atcf.trend.error.first">請先解析 ATCF 資料，再開啟強度變化圖。</string>
+  <string key="atcf.trend.error.no.best">找不到可繪製的 BEST、TAU=0 資料；預報輔助資料不會混入最佳路徑強度圖。</string>
   <string key="atcf.trend.error.time">目前 ATCF 資料沒有可用的 UTC 時間，無法繪製強度變化圖。</string>
   <string key="atcf.trend.error.multiple.systems">強度分析目前只支援單一氣旋；目前資料包含多個氣旋編號：{0}。同一編號即使名稱由 INVEST、NINE 變更為正式名稱，也會視為同一氣旋，不會依名稱分開。請只保留一個氣旋編號後再開啟。</string>
   <string key="atcf.trend.source.atcf">ATCF Tracking Data</string>
@@ -462,6 +473,7 @@ CWA 的入門分段：T 小於 2 約為熱帶低壓階段，T 約 2.5～3.5 為�
   <string key="thermal.heat.formula">NOAA 篩選式 + Rothfusz 多元回歸</string>
   <string key="thermal.heat.method.regression">已採用 Rothfusz 多元回歸式及適用的濕度修正。</string>
   <string key="thermal.heat.method.simple">篩選值低於約 80°F，依 NOAA 流程採用簡化式。</string>
+  <string key="thermal.heat.outside.range">目前輸入超出常見適用範圍（約 80～110°F、RH 40～100%），結果僅供參考。</string>
   <string key="thermal.dewpoint.title">露點換算相對濕度</string>
   <string key="thermal.dewpoint.formula">Magnus-Tetens 近似法｜a = 17.625、b = 243.04°C&#10;相對濕度 = 100 × es(露點) / es(氣溫)</string>
   <string key="thermal.dewpoint.detail">氣溫與露點差 {0:0.0} {1}｜Magnus-Tetens 近似法</string>

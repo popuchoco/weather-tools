@@ -121,8 +121,7 @@ Public NotInheritable Class LanguageManager
         If Not File.Exists(filePath) Then Return False
 
         Try
-            Dim document As New XmlDocument()
-            document.Load(filePath)
+            Dim document As XmlDocument = LoadSecureXmlDocument(filePath)
             Dim root As XmlElement = document.DocumentElement
             If root Is Nothing OrElse Not String.Equals(root.Name, "language", StringComparison.OrdinalIgnoreCase) Then Return False
 
@@ -171,8 +170,7 @@ Public NotInheritable Class LanguageManager
 
     Private Shared Function ReadPackageInfo(filePath As String) As LanguagePackageInfo
         Try
-            Dim document As New XmlDocument()
-            document.Load(filePath)
+            Dim document As XmlDocument = LoadSecureXmlDocument(filePath)
             Dim root As XmlElement = document.DocumentElement
             If root Is Nothing OrElse Not String.Equals(root.Name, "language", StringComparison.OrdinalIgnoreCase) Then Return Nothing
             Dim fileName As String = System.IO.Path.GetFileName(filePath)
@@ -189,8 +187,7 @@ Public NotInheritable Class LanguageManager
         Try
             Dim settingsPath As String = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "language.settings.xml")
             If Not File.Exists(settingsPath) Then Return "zh-Hant.xml"
-            Dim document As New XmlDocument()
-            document.Load(settingsPath)
+            Dim document As XmlDocument = LoadSecureXmlDocument(settingsPath)
             Dim node As XmlElement = TryCast(document.SelectSingleNode("/settings/language"), XmlElement)
             If node Is Nothing Then Return "zh-Hant.xml"
             Dim fileName As String = node.GetAttribute("file")
@@ -215,4 +212,17 @@ Public NotInheritable Class LanguageManager
             ' A read-only portable directory should not prevent the application from running.
         End Try
     End Sub
+
+    Private Shared Function LoadSecureXmlDocument(filePath As String) As XmlDocument
+        Dim settings As New XmlReaderSettings()
+        settings.DtdProcessing = DtdProcessing.Prohibit
+        settings.XmlResolver = Nothing
+
+        Dim document As New XmlDocument()
+        document.XmlResolver = Nothing
+        Using reader As XmlReader = XmlReader.Create(filePath, settings)
+            document.Load(reader)
+        End Using
+        Return document
+    End Function
 End Class

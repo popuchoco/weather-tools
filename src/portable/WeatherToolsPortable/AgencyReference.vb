@@ -180,7 +180,6 @@ Public NotInheritable Class TropicalCycloneIntensityCalculator
     End Function
 
     Private Shared Function HkoCategory(kmh As Double) As String
-        If kmh < 41 Then Return LanguageManager.Translate("category.tropical.depression", "熱帶低氣壓")
         If kmh < 63 Then Return LanguageManager.Translate("category.tropical.depression", "熱帶低氣壓")
         If kmh < 88 Then Return LanguageManager.Translate("category.tropical.storm", "熱帶風暴")
         If kmh < 118 Then Return LanguageManager.Translate("category.severe.tropical.storm", "強烈熱帶風暴")

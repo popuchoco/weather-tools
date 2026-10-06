@@ -200,7 +200,7 @@ Public NotInheritable Class AtcfParser
     Private Sub New()
     End Sub
 
-    Public Shared Function Parse(text As String, sourceFileName As String, warnings As IList(Of String)) As List(Of AtcfRecord)
+    Public Shared Function Parse(text As String, warnings As IList(Of String)) As List(Of AtcfRecord)
         Dim records As New List(Of AtcfRecord)()
         If text Is Nothing Then Return records
 
@@ -236,7 +236,7 @@ Public NotInheritable Class AtcfParser
             If Not record.HasLatitude OrElse Not record.HasLongitude Then warnings.Add(String.Format(CultureInfo.InvariantCulture, LanguageManager.Translate("atcf.warning.position", "第 {0} 行：無法解析緯度或經度。"), i + 1))
 
             record.HasMaxWind = TryReadInteger(Field(fields, 8), record.MaxWindKnots)
-            record.HasMslp = TryReadInteger(Field(fields, 9), record.MslpHpa)
+            record.HasMslp = TryReadPressure(Field(fields, 9), record.MslpHpa)
             record.SystemType = Field(fields, 10).ToUpperInvariant()
             record.HasRadiusIntensity = TryReadInteger(Field(fields, 11), record.RadiusIntensityKnots)
             record.WindCode = Field(fields, 12).ToUpperInvariant()
@@ -291,6 +291,13 @@ Public NotInheritable Class AtcfParser
         Return Integer.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, result)
     End Function
 
+    Private Shared Function TryReadPressure(value As String, ByRef result As Integer) As Boolean
+        If Not TryReadInteger(value, result) Then Return False
+        ' Some ATCF feeds encode missing MSLP as 0. Values outside a plausible
+        ' tropical-cyclone central-pressure range should not become chart points.
+        Return result >= 800 AndAlso result <= 1100
+    End Function
+
     Private Shared Function TryReadDate(value As String, ByRef result As DateTime) As Boolean
         If String.IsNullOrEmpty(value) OrElse value.Length <> 10 Then Return False
         Return DateTime.TryParseExact(value, "yyyyMMddHH", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal Or DateTimeStyles.AdjustToUniversal, result)
@@ -305,6 +312,8 @@ Public NotInheritable Class AtcfParser
         Dim digits As String = value.Substring(0, value.Length - 1)
         Dim tenths As Integer
         If Not Integer.TryParse(digits, NumberStyles.Integer, CultureInfo.InvariantCulture, tenths) Then Return False
+        Dim maximumTenths As Integer = If(isLatitude, 900, 1800)
+        If tenths < 0 OrElse tenths > maximumTenths Then Return False
         result = tenths / 10.0
         If hemisphere = "S"c OrElse hemisphere = "W"c Then result = -result
         Return True
