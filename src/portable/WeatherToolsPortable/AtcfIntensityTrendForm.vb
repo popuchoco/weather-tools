@@ -43,7 +43,7 @@ Public Class AtcfIntensityPoint
     End Function
 
     ''' <summary>Returns a single observed BEST-track point per cyclone and analysis time.</summary>
-    Public Shared Function FromAtcfBestTrackRecords(records As IEnumerable(Of AtcfRecord)) As List(Of AtcfIntensityPoint)
+    Public Shared Function FromAtcfBestTrackRecords(records As IEnumerable(Of AtcfRecord), Optional conflictWarnings As IList(Of String) = Nothing) As List(Of AtcfIntensityPoint)
         Dim byTime As New Dictionary(Of String, AtcfIntensityPoint)(StringComparer.OrdinalIgnoreCase)
         If records Is Nothing Then Return New List(Of AtcfIntensityPoint)()
 
@@ -55,11 +55,21 @@ Public Class AtcfIntensityPoint
             Dim existing As AtcfIntensityPoint = Nothing
             If Not byTime.TryGetValue(key, existing) Then
                 byTime.Add(key, candidate)
-            ElseIf PointCompleteness(candidate) > PointCompleteness(existing) Then
-                MergeMissingValues(candidate, existing)
-                byTime(key) = candidate
             Else
-                MergeMissingValues(existing, candidate)
+                Dim candidateIsPreferred As Boolean = PointCompleteness(candidate) > PointCompleteness(existing)
+                If conflictWarnings IsNot Nothing AndAlso candidate.HasVmax AndAlso existing.HasVmax AndAlso candidate.VmaxKnots <> existing.VmaxKnots Then
+                    Dim selectedPoint As AtcfIntensityPoint = If(candidateIsPreferred, candidate, existing)
+                    conflictWarnings.Add(String.Format(CultureInfo.InvariantCulture,
+                        LanguageManager.Translate("atcf.trend.warning.vmax.conflict", "{0} {1:yyyy-MM-dd HH:mm}Z：重複 BEST 列的 VMAX 不一致（{2:0.#} 與 {3:0.#} kt）；保留 {4:0.#} kt。"),
+                        candidate.SystemKey, candidate.AnalysisTimeUtc, existing.VmaxKnots, candidate.VmaxKnots, selectedPoint.VmaxKnots))
+                End If
+
+                If candidateIsPreferred Then
+                    MergeMissingValues(candidate, existing)
+                    byTime(key) = candidate
+                Else
+                    MergeMissingValues(existing, candidate)
+                End If
             End If
         Next
 
@@ -109,6 +119,7 @@ Public Class AtcfIntensityTrendForm
 
     Private ReadOnly sourcePoints As New List(Of AtcfIntensityPoint)()
     Private ReadOnly sourceName As String
+    Private ReadOnly isSectorSource As Boolean
     Private ReadOnly valueSelector As New ComboBox()
     Private ReadOnly trendChart As New Chart()
     Private ReadOnly summaryLabel As New Label()
@@ -127,9 +138,10 @@ Public Class AtcfIntensityTrendForm
         End Function
     End Class
 
-    Public Sub New(points As IEnumerable(Of AtcfIntensityPoint), sourceName As String)
+    Public Sub New(points As IEnumerable(Of AtcfIntensityPoint), sourceName As String, Optional isSectorSource As Boolean = False)
         If points IsNot Nothing Then sourcePoints.AddRange(points)
         Me.sourceName = If(String.IsNullOrEmpty(sourceName), "ATCF", sourceName)
+        Me.isSectorSource = isSectorSource
 
         LanguageManager.EnsureInitialized()
         Text = LanguageManager.Translate("atcf.trend.title", "ATCF 強度變化")
@@ -198,7 +210,11 @@ Public Class AtcfIntensityTrendForm
         root.Controls.Add(trendChart, 0, 1)
 
         Dim note As New Label()
-        note.Text = LanguageManager.Translate("atcf.trend.note", "只繪 BEST 且 TAU=0；同一氣旋／UTC 分析時刻風圈列會合併。VMAX：0～200 kts；MSLP：800～1050 hPa。")
+        Dim noteKey As String = If(isSectorSource, "atcf.trend.note.sector", "atcf.trend.note")
+        Dim fallbackNote As String = If(isSectorSource,
+            "依 NRL Sector 輸入資料繪製各分析時間點；缺值或超出範圍的強度值不會繪入。VMAX：0～200 kts；MSLP：800～1050 hPa。",
+            "只繪 BEST 且 TAU=0；同一氣旋／UTC 分析時刻風圈列會合併。VMAX：0～200 kts；MSLP：800～1050 hPa。")
+        note.Text = LanguageManager.Translate(noteKey, fallbackNote)
         note.Dock = DockStyle.Fill
         note.ForeColor = Color.FromArgb(102, 114, 124)
         note.Font = New Font("Microsoft JhengHei", 9.0F, FontStyle.Regular)

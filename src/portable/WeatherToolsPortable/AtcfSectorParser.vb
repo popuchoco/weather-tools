@@ -117,11 +117,21 @@ Public NotInheritable Class AtcfSectorParser
             End If
 
             record.HasMaxWind = Double.TryParse(match.Groups("wind").Value, NumberStyles.Float, CultureInfo.InvariantCulture, record.MaxWindKnots)
-            record.HasMslp = Integer.TryParse(match.Groups("pressure").Value, NumberStyles.Integer, CultureInfo.InvariantCulture, record.MslpHpa) AndAlso
-                record.MslpHpa >= 800 AndAlso record.MslpHpa <= 1100
-            If Not record.HasMaxWind OrElse Not record.HasMslp Then
+            Dim pressureParsed As Boolean = Integer.TryParse(match.Groups("pressure").Value, NumberStyles.Integer, CultureInfo.InvariantCulture, record.MslpHpa)
+            record.HasMslp = pressureParsed AndAlso record.MslpHpa >= 800 AndAlso record.MslpHpa <= 1100
+            If Not record.HasMaxWind Then
                 warnings.Add(String.Format(CultureInfo.InvariantCulture,
-                    LanguageManager.Translate("atcf.sector.warning.intensity", "第 {0} 行：VMAX 或 MSLP 格式無效。"), i + 1))
+                    LanguageManager.Translate("atcf.sector.warning.vmax", "第 {0} 行：VMAX 格式無效。"), i + 1))
+            End If
+            If Not pressureParsed Then
+                warnings.Add(String.Format(CultureInfo.InvariantCulture,
+                    LanguageManager.Translate("atcf.sector.warning.mslp.format", "第 {0} 行：MSLP 格式無效。"), i + 1))
+            ElseIf record.MslpHpa = 0 Then
+                warnings.Add(String.Format(CultureInfo.InvariantCulture,
+                    LanguageManager.Translate("atcf.sector.warning.mslp.missing", "第 {0} 行：MSLP 為 0，視為缺值，未用於強度圖。"), i + 1))
+            ElseIf Not record.HasMslp Then
+                warnings.Add(String.Format(CultureInfo.InvariantCulture,
+                    LanguageManager.Translate("atcf.sector.warning.mslp.range", "第 {0} 行：MSLP 超出有效範圍（800–1100 hPa），未用於強度圖。"), i + 1))
             End If
 
             records.Add(record)

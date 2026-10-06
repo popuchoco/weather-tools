@@ -852,7 +852,7 @@ Partial Public Class MainForm
                 Return
             End If
 
-            Using trendForm As New AtcfIntensityTrendForm(points, T("atcf.trend.source.sector", "NRL Sector File"))
+            Using trendForm As New AtcfIntensityTrendForm(points, T("atcf.trend.source.sector", "NRL Sector File"), True)
                 trendForm.ShowDialog(Me)
             End Using
         End Sub
@@ -1043,7 +1043,8 @@ Partial Public Class MainForm
                 Return
             End If
 
-            Dim points As List(Of AtcfIntensityPoint) = AtcfIntensityPoint.FromAtcfBestTrackRecords(parsedAtcfRecords)
+            Dim mergeWarnings As New List(Of String)()
+            Dim points As List(Of AtcfIntensityPoint) = AtcfIntensityPoint.FromAtcfBestTrackRecords(parsedAtcfRecords, mergeWarnings)
             If points.Count = 0 Then
                 ShowError(T("atcf.trend.error.no.best", "找不到可繪製的 BEST、TAU=0 資料；預報輔助資料不會混入最佳路徑強度圖。"))
                 Return
@@ -1055,6 +1056,13 @@ Partial Public Class MainForm
                     String.Join(", ", systemKeys.ToArray()))
                 ShowErrorDialog(message)
                 Return
+            End If
+            If mergeWarnings.Count > 0 Then
+                MessageBox.Show(Me,
+                                String.Join(Environment.NewLine, mergeWarnings.ToArray()),
+                                T("atcf.trend.title", "ATCF 強度變化"),
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Warning)
             End If
             Using trendForm As New AtcfIntensityTrendForm(points, T("atcf.trend.source.atcf", "ATCF Tracking Data"))
                 trendForm.ShowDialog(Me)
@@ -1994,7 +2002,6 @@ Partial Public Class MainForm
         End Function
 
         Private Shared Function HkoCategory(kmh As Double) As String
-            If kmh < 41 Then Return LanguageManager.Translate("category.tropical.depression", "熱帶低氣壓")
             If kmh <= 62 Then Return LanguageManager.Translate("category.tropical.depression", "熱帶低氣壓")
             If kmh < 87 Then Return LanguageManager.Translate("category.tropical.storm", "熱帶風暴")
             If kmh < 117 Then Return LanguageManager.Translate("category.severe.tropical.storm", "強烈熱帶風暴")

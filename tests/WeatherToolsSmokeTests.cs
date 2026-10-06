@@ -83,6 +83,17 @@ internal static class WeatherToolsSmokeTests
         Near(points[0].VmaxKnots, 80.0, 1e-9, "ATCF VMAX.");
         Assert(points[0].MslpHpa == 950, "ATCF MSLP.");
 
+        var conflictWarnings = new List<string>();
+        List<AtcfRecord> conflicting = AtcfParser.Parse(String.Join(Environment.NewLine, new[] {
+            Atcf("BEST", 0, "80", "950", "135N"),
+            Atcf("BEST", 0, "81", "950", "135N")
+        }), warnings);
+        points = AtcfIntensityPoint.FromAtcfBestTrackRecords(conflicting, conflictWarnings);
+        Assert(points.Count == 1 && points[0].VmaxKnots == 80.0,
+            "Conflicting same-time BEST VMAX should keep the first equally complete row.");
+        Assert(conflictWarnings.Count == 1 && conflictWarnings[0].Contains("80") && conflictWarnings[0].Contains("81"),
+            "Conflicting same-time BEST VMAX should be surfaced as a warning.");
+
         List<AtcfRecord> invalid = AtcfParser.Parse(Atcf("BEST", 0, "45", "0", "999N"), warnings);
         Assert(invalid.Count == 1, "ATCF row remains inspectable even if individual fields are invalid.");
         Assert(!invalid[0].HasMslp, "ATCF MSLP 0 is a missing value.");
@@ -100,6 +111,7 @@ internal static class WeatherToolsSmokeTests
         records = AtcfSectorParser.Parse("WP012026 STORMNAME 000101 0000 13.5N 142.0E WP 80 0", warnings);
         Assert(records[0].AnalysisTimeUtc.Year == 2000, "Two-digit year 00 should map to 2000.");
         Assert(!records[0].HasMslp, "Out-of-range sector pressure should be missing, not plotted.");
+        Assert(warnings.Any(warning => warning.Contains("0")), "Sector MSLP zero should have a missing-value warning.");
     }
 
     private static void TestLanguageKeyParity(string repositoryRoot)

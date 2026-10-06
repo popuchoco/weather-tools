@@ -138,6 +138,7 @@ Portable 版的介面與解讀內容由 `src/portable/WeatherToolsPortable/langu
   - [2026 V5（Ver. 2）](https://github.com/popuchoco/weather-tools/releases/tag/2026.2)：補上 DVTS／ATCF 清除資料流程，清除輸入、解析結果、篩選與檔案狀態，並修正清空後趨勢圖沿用舊資料。
 - [2026 V6](https://github.com/popuchoco/weather-tools/releases/tag/v6.0)：在 V5 重置架構上進行大幅改版，加入三語 427-key XML 語言包、語言設定記憶、介面版面整理與乾淨的 Portable 交付包，並延續 DVTS／ATCF、趨勢圖與 PNG 功能。
 - [2026 V6.1.6](https://github.com/popuchoco/weather-tools/releases/tag/v6.1.6)：依同儕審查修正 Heat Index 門檻回傳、機構風速標籤、ATCF BEST/TAU 篩選與去重、讀檔／解析器邊界，並新增 smoke tests 與 GitHub Actions 驗證。
+- [2026 V6.1.7](https://github.com/popuchoco/weather-tools/releases/tag/v6.1.7)：依第二輪審查修正 Sector 強度圖說明、MSLP 缺值警告與冗餘 HKO 分級分支；偵測並提示同時刻 BEST 列的 VMAX 衝突，並補上測試。
 
 ## 建置
 

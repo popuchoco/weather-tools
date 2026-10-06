@@ -425,7 +425,6 @@ Limitations: Dvorak is a statistical and subjective satellite estimate, not a di
   <string key="atcf.sector.warning.time">Line {0}: could not parse YYMMDD HHMM (UTC).</string>
   <string key="atcf.sector.warning.latitude">Line {0}: invalid latitude format or range.</string>
   <string key="atcf.sector.warning.longitude">Line {0}: invalid longitude format or range.</string>
-  <string key="atcf.sector.warning.intensity">Line {0}: invalid VMAX or MSLP format.</string>
   <string key="atcf.sector.basin.WPAC">western North Pacific</string>
   <string key="atcf.sector.basin.CPAC">central Pacific</string>
   <string key="atcf.sector.basin.EPAC">eastern Pacific</string>
@@ -480,4 +479,10 @@ Limitations: Dvorak is a statistical and subjective satellite estimate, not a di
   <string key="thermal.note">Steadman is intended for shaded outdoor conditions. Dew-point conversion uses the Magnus-Tetens approximation (about ±0.4°C error from −40 to 60°C). Results are estimates, not individual sensations.</string>
   <string key="thermal.status.invalid.environment">Enter a valid air temperature, relative humidity, and wind speed. Temperature: −40 to 60°C; RH: 0–100%; wind: 0–100 m/s.</string>
   <string key="thermal.status.invalid.dewpoint">Enter a dew point no higher than the air temperature; both temperatures must be within −40 to 60°C.</string>
+  <string key="atcf.sector.warning.vmax">Line {0}: invalid VMAX format.</string>
+  <string key="atcf.sector.warning.mslp.format">Line {0}: invalid MSLP format.</string>
+  <string key="atcf.sector.warning.mslp.missing">Line {0}: MSLP is 0 and treated as missing; it will not be plotted.</string>
+  <string key="atcf.sector.warning.mslp.range">Line {0}: MSLP is outside the valid range (800–1100 hPa) and will not be plotted.</string>
+  <string key="atcf.trend.note.sector">Plots each analysis time from the NRL Sector input; missing or out-of-range intensity values are omitted. VMAX: 0–200 kts; MSLP: 800–1050 hPa.</string>
+  <string key="atcf.trend.warning.vmax.conflict">{0} {1:yyyy-MM-dd HH:mm}Z: duplicate BEST rows disagree on VMAX ({2:0.#} and {3:0.#} kt); kept {4:0.#} kt.</string>
 </language>

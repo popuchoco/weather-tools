@@ -425,7 +425,6 @@ CWA 入门分段：T 小于 2 约为热带低压阶段，T 约 2.5～3.5 为轻�
   <string key="atcf.sector.warning.time">第 {0} 行：无法解析 YYMMDD HHMM（UTC）。</string>
   <string key="atcf.sector.warning.latitude">第 {0} 行：纬度格式或范围无效。</string>
   <string key="atcf.sector.warning.longitude">第 {0} 行：经度格式或范围无效。</string>
-  <string key="atcf.sector.warning.intensity">第 {0} 行：VMAX 或 MSLP 格式无效。</string>
   <string key="atcf.sector.basin.WPAC">西北太平洋</string>
   <string key="atcf.sector.basin.CPAC">中太平洋</string>
   <string key="atcf.sector.basin.EPAC">东太平洋</string>
@@ -480,4 +479,10 @@ CWA 入门分段：T 小于 2 约为热带低压阶段，T 约 2.5～3.5 为轻�
   <string key="thermal.note">Steadman 适用于有遮蔽的户外环境；露点换算采用 Magnus-Tetens 近似法，在 −40～60°C 范围内误差约 ±0.4°C。结果为估算值，不代表个体感受。</string>
   <string key="thermal.status.invalid.environment">请输入有效气温、相对湿度与风速。气温限 −40～60°C；湿度 0～100%；风速 0～100 m/s。</string>
   <string key="thermal.status.invalid.dewpoint">请输入不高于气温的露点；气温与露点范围均为 −40～60°C。</string>
+  <string key="atcf.sector.warning.vmax">第 {0} 行：VMAX 格式无效。</string>
+  <string key="atcf.sector.warning.mslp.format">第 {0} 行：MSLP 格式无效。</string>
+  <string key="atcf.sector.warning.mslp.missing">第 {0} 行：MSLP 为 0，视为缺值，未用于强度图。</string>
+  <string key="atcf.sector.warning.mslp.range">第 {0} 行：MSLP 超出有效范围（800–1100 hPa），未用于强度图。</string>
+  <string key="atcf.trend.note.sector">根据 NRL Sector 输入数据绘制各分析时间点；缺值或超出范围的强度值不会绘入。VMAX：0～200 kts；MSLP：800～1050 hPa。</string>
+  <string key="atcf.trend.warning.vmax.conflict">{0} {1:yyyy-MM-dd HH:mm}Z：重复 BEST 行的 VMAX 不一致（{2:0.#} 与 {3:0.#} kt）；保留 {4:0.#} kt。</string>
 </language>
