@@ -445,4 +445,27 @@ CWA 的入門分段：T 小於 2 約為熱帶低壓階段，T 約 2.5～3.5 為�
   <string key="atcf.trend.cyclone.title">氣旋：{0}</string>
   <string key="atcf.trend.cyclone.empty">氣旋：—</string>
   <string key="atcf.trend.png.title">輸出 ATCF 強度分析圖 PNG</string>
+  <string key="thermal.tab">體感溫度／露點計算</string>
+  <string key="thermal.title">體感溫度計算機</string>
+  <string key="thermal.subtitle">整合 Steadman、NOAA Heat Index 與 Magnus-Tetens 露點換算。</string>
+  <string key="thermal.status.ready">輸入後即時更新</string>
+  <string key="thermal.status.check">請檢查輸入範圍</string>
+  <string key="thermal.input.title">氣象條件</string>
+  <string key="thermal.input.temperature">氣溫</string>
+  <string key="thermal.input.humidity">相對濕度 (%)</string>
+  <string key="thermal.input.wind">風速 (m/s)</string>
+  <string key="thermal.input.dewpoint">露點</string>
+  <string key="thermal.steadman.title">Steadman 體感溫度</string>
+  <string key="thermal.steadman.formula">1.04T + 0.2e − 0.65V − 2.7</string>
+  <string key="thermal.steadman.detail">氣溫 {0:0.0} {1}｜RH {2:0.#}%｜風速 {3:0.0} m/s</string>
+  <string key="thermal.heat.title">Rothfusz 酷熱指數</string>
+  <string key="thermal.heat.formula">NOAA 篩選式 + Rothfusz 多元回歸</string>
+  <string key="thermal.heat.method.regression">已採用 Rothfusz 多元回歸式及適用的濕度修正。</string>
+  <string key="thermal.heat.method.simple">篩選值低於約 80°F，依 NOAA 流程採用簡化式。</string>
+  <string key="thermal.dewpoint.title">露點換算相對濕度</string>
+  <string key="thermal.dewpoint.formula">Magnus-Tetens 近似法｜a = 17.625、b = 243.04°C&#10;相對濕度 = 100 × es(露點) / es(氣溫)</string>
+  <string key="thermal.dewpoint.detail">氣溫與露點差 {0:0.0} {1}｜Magnus-Tetens 近似法</string>
+  <string key="thermal.note">Steadman 適用有遮蔽的戶外環境；露點換算採 Magnus-Tetens 近似法，−40～60°C 範圍內誤差約 ±0.4°C。結果為估算值，不代表個別人體感受。</string>
+  <string key="thermal.status.invalid.environment">請輸入有效氣溫、相對濕度與風速。氣溫限 −40～60°C；濕度 0～100%；風速 0～100 m/s。</string>
+  <string key="thermal.status.invalid.dewpoint">請輸入不高於氣溫的露點；氣溫與露點範圍均為 −40～60°C。</string>
 </language>

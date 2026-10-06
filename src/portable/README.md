@@ -10,6 +10,7 @@
 - CWA（中央氣象署）、日本氣象廳、香港天文台的風速分級參考
 - 蒲福風級 0～12 與風速換算
 - 攝氏與華氏互換
+- Steadman 體感溫度、NOAA Rothfusz Heat Index 與 Magnus-Tetens 露點換算相對濕度（即時更新、支援 °C／°F）
 - 使用舊版工具公式估算理想浪高
 - 輸入檢查與初學者提示
 - 以 Final-T／T 值與強度趨勢估算 CI
@@ -26,6 +27,16 @@
 - ATCF 強度分析一次只支援單一氣旋編號；圖內右上角保留氣旋編號，例如 `氣旋編號：WP09`，但不顯示氣旋名稱或圖例。同編號的 `INVEST`、`NINE` 與正式國際名稱視為同一氣旋，不依名稱分隔。若資料含有多個編號，會在開圖前拒絕分析。X 軸為 UTC 時間，Y 軸可切換 `VMAX`（0～200 kts）或 `MSLP`（800～1050 hPa）
 - 主視窗拖曳最佳化：大量頁籤控制項在移動期間暫時與主視窗分離，放開後恢復，以減少 Windows Forms 重繪延遲
 
+### 體感溫度與露點
+
+「體感溫度／露點計算」頁使用氣溫、相對濕度、風速與露點作為輸入，結果會即時更新：
+
+- Steadman／CWA：`AT = 1.04T + 0.2e − 0.65V − 2.7`，其中 `e = (RH/100) × 6.105 × exp(17.27T/(237.7+T))`。T 為 °C、e 為 hPa、V 為 m/s，供有遮蔽的戶外環境估算。
+- Rothfusz／NOAA Heat Index：先用 NOAA 篩選式；估值達約 80°F 時套用 Rothfusz 多元回歸與適用的濕度修正，否則顯示 NOAA 簡化估值。
+- Magnus-Tetens：以 `RH = 100 × exp(a·Td/(b+Td) − a·T/(b+T))` 由露點換算相對濕度，採 `a = 17.625`、`b = 243.04°C`。氣溫與露點限制在 −40～60°C，露點不可高於氣溫。
+
+氣溫與露點可選擇 °C 或 °F；風速固定以 m/s 輸入。資料來源：[CWA 體感溫度服務](https://www.cwa.gov.tw/Data/knowledge/announce/service12.pdf)、[NOAA/WPC Heat Index Equation](https://www.wpc.ncep.noaa.gov/html/heatindex_equation.shtml)、[Magnus-Tetens 參考資料](https://blog.csdn.net/qq_37521537/article/details/105192708)。
+
 ## 使用方式
 
 用 Visual Studio 2012/2015 開啟 `WeatherToolsPortable.sln`，建置 `Release` 後，直接攜帶 `bin\Release\WeatherToolsV6.exe` 即可執行，不需要 ClickOnce 或 setup.exe。程式視窗名稱為「氣象小工具 2026 V6」。
@@ -34,7 +45,7 @@
 
 ### 語言包
 
-Portable 版附帶 `languages` 資料夾，內含 `zh-Hant.xml`（繁體中文）、`zh-Hans.xml`（簡體中文）與 `en-US.xml`（English）三份 XML 語言包；三份語言包使用相同的 427 個 key，且每個 `<string>` 會獨立一行。程式右上方只提供 `EN`、`Zh-HanS`、`Zh-HanT` 三個選項；選取後會立即重新啟動並套用語言，設定會記錄在執行檔旁的 `language.settings.xml`，下次啟動會沿用。
+Portable 版附帶 `languages` 資料夾，內含 `zh-Hant.xml`（繁體中文）、`zh-Hans.xml`（簡體中文）與 `en-US.xml`（English）三份 XML 語言包；三份語言包使用相同的 454 個 key，且每個 `<string>` 會獨立一行。程式右上方只提供 `EN`、`Zh-HanS`、`Zh-HanT` 三個選項；選取後會立即重新啟動並套用語言，設定會記錄在執行檔旁的 `language.settings.xml`，下次啟動會沿用。
 
 使用者可用 IDE 直接編輯 XML 的元素文字來維護翻譯；請保留 `key` 屬性，不需要也不應在程式內加入語言包編輯器。修改 XML 後重新開啟程式即可套用。
 

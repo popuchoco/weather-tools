@@ -9,7 +9,7 @@ Imports System.Globalization
 Imports System.IO
 Imports System.Windows.Forms
 
-Public Class MainForm
+Partial Public Class MainForm
         Inherits BufferedForm
 
         Protected Overrides ReadOnly Property MoveContentControl As Control
@@ -148,6 +148,7 @@ Public Class MainForm
              mainTabs.Margin = New Padding(0)
              UiRendering.EnableDoubleBuffer(mainTabs)
              mainTabs.TabPages.Add(BuildQuickTab())
+             mainTabs.TabPages.Add(BuildTemperatureTab())
              mainTabs.TabPages.Add(BuildAgencyTab())
              mainTabs.TabPages.Add(BuildDvtsTab())
              mainTabs.TabPages.Add(BuildAtcfTab())
@@ -1833,7 +1834,7 @@ Public Class MainForm
             Dim ciText As String = If(record.HasCINumber, record.CINumber.ToString("0.0"), T("dvts.import.estimated", "估算 ") & ci.ToString("0.0"))
             Dim summary As String = String.Format(T("dvts.import.summary", "DVTS {0} {1:00}／{2}Z：風速 {3:0.0} kt，T{4}／CI{5}；已帶入下方官方對照。"), record.Center, record.StormNumber, record.AnalysisTimeUtc.ToString("yyyy-MM-dd HH:mm"), record.WindKnots, tText, ciText)
             PopulateAgencyGrid(rows, ci, summary)
-            mainTabs.SelectedIndex = 1
+            mainTabs.SelectedIndex = 2
             SetStatus("DVTS 強度已帶入對照表")
         End Sub
 

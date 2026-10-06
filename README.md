@@ -15,6 +15,7 @@ VB.NET Windows Forms 氣象工具，延續早期「氣象小工具」的換算�
 ## 2026 V6 功能
 
 - 風速、蒲福風級、溫度、氣壓與簡化浪高換算。
+- 新增體感溫度與露點計算頁：Steadman、NOAA Rothfusz Heat Index、Magnus-Tetens 露點換算相對濕度，即時更新並支援 °C／°F。
 - NHC、HKO、CWA 的 Dvorak Final-T／T、CI、風速與中心氣壓對照。
 - AMSU research 衛星自動分析報文的 DVTS 解析，可開啟 `.txt`／`.dat` 檔案或貼上內容，讀取 T、CI、趨勢與分析中心。
 - DVTS 趨勢圖與 ATCF 強度分析圖：依 UTC 時間繪製資料折線圖，並可將目前顯示的圖表輸出為 PNG 圖檔；DVTS 機構代碼支援 TAFB（Tropical Analysis and Forecast Branch）。
@@ -24,6 +25,18 @@ VB.NET Windows Forms 氣象工具，延續早期「氣象小工具」的換算�
 - ATCF 強度分析一次只支援單一氣旋編號；同編號的 `INVEST`、`NINE` 與正式國際名稱視為同一氣旋，不依名稱分隔，也不顯示氣旋名稱或圖例。若資料含有多個編號，會在開圖前拒絕分析。
 - 主視窗拖曳最佳化：大量頁籤控制項在移動期間暫時與主視窗分離，放開後恢復，以減少 Windows Forms 重繪延遲。
 - 延續早期版本的 `icon.ico` 作為 2026 V6 執行檔與主視窗圖示。
+
+## 體感溫度與露點換算
+
+溫度計算頁可輸入氣溫、相對濕度、風速與露點，並即時更新三項結果：
+
+- **Steadman／CWA 體感溫度**：`AT = 1.04T + 0.2e − 0.65V − 2.7`；水氣壓 `e = (RH/100) × 6.105 × exp(17.27T/(237.7+T))`。T 為 °C、e 為 hPa、V 為 m/s。適用於有遮蔽的戶外情境，不含直接日照。
+- **NOAA Heat Index**：先計算 NOAA 篩選值；達約 80°F 時使用 Rothfusz 多元回歸，並依條件套用高／低濕度修正。其他情況依 NOAA 流程顯示簡化估值。超出原始適用條件時僅供參考。
+- **露點換算相對濕度**：採 Magnus-Tetens 近似法，`RH = 100 × exp(a·Td/(b+Td) − a·T/(b+T))`，其中 `a = 17.625`、`b = 243.04°C`。氣溫與露點限制於 −40～60°C，露點不可高於氣溫。
+
+溫度與露點可切換 °C／°F；風速輸入單位為 m/s。體感溫度是公式估算，不代表每個人的主觀感受。
+
+公式來源：[中央氣象署《體感溫度預報服務》](https://www.cwa.gov.tw/Data/knowledge/announce/service12.pdf)、[NOAA/WPC Heat Index Equation](https://www.wpc.ncep.noaa.gov/html/heatindex_equation.shtml)、[Magnus-Tetens 參考資料](https://blog.csdn.net/qq_37521537/article/details/105192708)。
 
 ## ATCF 最佳路徑資料
 
@@ -78,7 +91,7 @@ DVTS 分頁的「清除資料」會同時清除輸入框、已解析記錄、表
 
 ## 語言包
 
-Portable 版的介面與解讀內容由 `src/portable/WeatherToolsPortable/languages` 下的 XML 語言包提供，目前附帶繁體中文 `zh-Hant.xml`、簡體中文 `zh-Hans.xml` 與英文 `en-US.xml`。三份語言包使用相同的 427 個 key，並以每個 `<string>` 一行的格式維護，避免不同語言看起來像是缺少內容。程式右上方只提供 `EN`、`Zh-HanS`、`Zh-HanT` 三個選項；選取後會立即重新啟動並套用語言，設定會記錄在執行檔旁的 `language.settings.xml`，下次啟動會沿用。
+Portable 版的介面與解讀內容由 `src/portable/WeatherToolsPortable/languages` 下的 XML 語言包提供，目前附帶繁體中文 `zh-Hant.xml`、簡體中文 `zh-Hans.xml` 與英文 `en-US.xml`。三份語言包使用相同的 454 個 key，並以每個 `<string>` 一行的格式維護，避免不同語言看起來像是缺少內容。程式右上方只提供 `EN`、`Zh-HanS`、`Zh-HanT` 三個選項；選取後會立即重新啟動並套用語言，設定會記錄在執行檔旁的 `language.settings.xml`，下次啟動會沿用。
 
 語言包是給使用者自行維護的 XML 資料，請用 IDE 編輯各個 `<string>` 元素的文字，並保留 `key` 屬性；程式不內建語言包編輯器。修改 XML 後重新開啟程式即可套用。
 

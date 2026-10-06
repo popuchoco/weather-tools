@@ -445,4 +445,27 @@ Limitations: Dvorak is a statistical and subjective satellite estimate, not a di
   <string key="atcf.trend.cyclone.title">Cyclone: {0}</string>
   <string key="atcf.trend.cyclone.empty">Cyclone: —</string>
   <string key="atcf.trend.png.title">Export ATCF intensity chart PNG</string>
+  <string key="thermal.tab">Apparent Temperature / Dew Point</string>
+  <string key="thermal.title">Apparent Temperature Calculator</string>
+  <string key="thermal.subtitle">Steadman, NOAA Heat Index, and Magnus-Tetens dew-point conversion in one place.</string>
+  <string key="thermal.status.ready">Updates as you type</string>
+  <string key="thermal.status.check">Check the input ranges</string>
+  <string key="thermal.input.title">Weather conditions</string>
+  <string key="thermal.input.temperature">Air temperature</string>
+  <string key="thermal.input.humidity">Relative humidity (%)</string>
+  <string key="thermal.input.wind">Wind speed (m/s)</string>
+  <string key="thermal.input.dewpoint">Dew point</string>
+  <string key="thermal.steadman.title">Steadman Apparent Temperature</string>
+  <string key="thermal.steadman.formula">1.04T + 0.2e − 0.65V − 2.7</string>
+  <string key="thermal.steadman.detail">Air {0:0.0} {1}｜RH {2:0.#}%｜Wind {3:0.0} m/s</string>
+  <string key="thermal.heat.title">Rothfusz Heat Index</string>
+  <string key="thermal.heat.formula">NOAA screening equation + Rothfusz regression</string>
+  <string key="thermal.heat.method.regression">Using the Rothfusz regression with applicable humidity adjustment.</string>
+  <string key="thermal.heat.method.simple">Screening estimate is below about 80°F; using the NOAA simplified equation.</string>
+  <string key="thermal.dewpoint.title">Relative Humidity from Dew Point</string>
+  <string key="thermal.dewpoint.formula">Magnus-Tetens approximation｜a = 17.625, b = 243.04°C&#10;RH = 100 × es(dew point) / es(air temperature)</string>
+  <string key="thermal.dewpoint.detail">Air/dew-point spread {0:0.0} {1}｜Magnus-Tetens approximation</string>
+  <string key="thermal.note">Steadman is intended for shaded outdoor conditions. Dew-point conversion uses the Magnus-Tetens approximation (about ±0.4°C error from −40 to 60°C). Results are estimates, not individual sensations.</string>
+  <string key="thermal.status.invalid.environment">Enter a valid air temperature, relative humidity, and wind speed. Temperature: −40 to 60°C; RH: 0–100%; wind: 0–100 m/s.</string>
+  <string key="thermal.status.invalid.dewpoint">Enter a dew point no higher than the air temperature; both temperatures must be within −40 to 60°C.</string>
 </language>

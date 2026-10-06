@@ -77,6 +77,8 @@
     <Compile Include="AtcfParser.vb" />
     <Compile Include="AtcfSectorParser.vb" />
     <Compile Include="AtcfIntensityTrendForm.vb" />
+    <Compile Include="ThermalCalculator.vb" />
+    <Compile Include="TemperaturePage.vb" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
 </Project>
